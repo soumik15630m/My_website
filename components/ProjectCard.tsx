@@ -1,7 +1,8 @@
 import React from 'react';
 import { Project } from '../types';
 import { motion, MotionValue, useTransform, useMotionValue } from 'framer-motion';
-import { ArrowRight, Layers, Code2 } from 'lucide-react';
+import { ArrowRight, Layers, Code2, GitBranch } from 'lucide-react';
+import { MermaidDiagram } from './MermaidDiagram';
 
 interface ProjectCardProps {
   project: Project;
@@ -34,6 +35,9 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onOpen, activ
       "0 0 10px rgba(34,197,94,0.3)"
     ]
   );
+
+  // Calculate total slides (3 base + 1 if architecture exists)
+  const hasArchitecture = !!project.architecture;
 
   return (
     <motion.div
@@ -85,7 +89,6 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onOpen, activ
                 {project.status}
               </span>
             </div>
-            {/* Removed 'Swipe' text as arrow replaces it? Or keep it? keeping it clean */}
           </div>
 
           <div className="flex flex-col justify-center h-full space-y-6 pt-12">
@@ -154,7 +157,32 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onOpen, activ
           </div>
         </div>
 
-        {/* === SLIDE 3: ACTION === */}
+        {/* === SLIDE 3: ARCHITECTURE DIAGRAM (conditional) === */}
+        {hasArchitecture && (
+          <div className={`${slideClass} bg-black/20`}>
+            <div className="h-full flex flex-col">
+              <div className="flex items-center gap-3 text-secondaryText mb-4">
+                <GitBranch size={20} />
+                <h4 className="text-xs font-mono uppercase tracking-widest opacity-70">Architecture</h4>
+              </div>
+
+              <div className="flex-1 flex items-center justify-center overflow-hidden rounded-xl bg-black/30 border border-white/5 p-4">
+                <MermaidDiagram
+                  chart={project.architecture!}
+                  className="w-full h-full max-h-[320px]"
+                />
+              </div>
+            </div>
+
+            <div className="absolute bottom-8 left-8">
+              <p className="text-xs font-mono text-secondaryText/60 uppercase tracking-widest">
+                03 // Architecture
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* === SLIDE 4 (or 3): ACTION === */}
         <div className={`${slideClass} bg-accent/5 items-center justify-center text-center`}>
           <div className="space-y-6 max-w-xs">
             <h3 className="text-2xl font-bold text-primaryText">Dive Deeper</h3>
@@ -167,6 +195,12 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onOpen, activ
               Explore Project
               <ArrowRight size={16} />
             </button>
+          </div>
+
+          <div className="absolute bottom-8 left-8">
+            <p className="text-xs font-mono text-secondaryText/60 uppercase tracking-widest">
+              {hasArchitecture ? '04' : '03'} // Action
+            </p>
           </div>
         </div>
 

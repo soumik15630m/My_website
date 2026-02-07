@@ -18,11 +18,40 @@ Active contributor to major projects including LLVM and fmtlib/fmt. I focus on p
 Experienced in C++, Rust, Python, and modern web technologies. Currently exploring compiler internals and static analysis tools.`
 };
 
-// 25 Projects with images
+// 25 Projects with images and architecture diagrams
 const FAKE_PROJECTS = [
-    { id: 'p1', title: "Vortex Allocator", description: "High-performance slab allocator for real-time systems with minimal fragmentation.", problemStatement: "Standard allocators caused latency spikes in audio processing.", technicalDecisions: ["Thread-local caches", "Bit-mapped free lists", "Hugepage support"], techStack: ["C++20", "Assembly"], status: 'completed', year: "2024", githubUrl: "#", image: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&h=300&fit=crop" },
-    { id: 'p2', title: "Neural Code Search", description: "Semantic code search using transformer embeddings.", problemStatement: "Keyword search failed to find conceptually similar code.", technicalDecisions: ["CodeBERT embeddings", "FAISS indexing", "Hybrid ranking"], techStack: ["Python", "PyTorch", "FastAPI"], status: 'active', year: "2024", githubUrl: "#", image: "https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=400&h=300&fit=crop" },
-    { id: 'p3', title: "Distributed KV Store", description: "Eventually consistent key-value store with CRDT support.", problemStatement: "Need for partition-tolerant data sync across regions.", technicalDecisions: ["CRDT merge functions", "Gossip protocol", "Vector clocks"], techStack: ["Rust", "Tokio", "RocksDB"], status: 'completed', year: "2024", githubUrl: "#", image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=400&h=300&fit=crop" },
+    {
+        id: 'p1', title: "Vortex Allocator", description: "High-performance slab allocator for real-time systems with minimal fragmentation.", problemStatement: "Standard allocators caused latency spikes in audio processing.", technicalDecisions: ["Thread-local caches", "Bit-mapped free lists", "Hugepage support"], techStack: ["C++20", "Assembly"], status: 'completed', year: "2024", githubUrl: "#", image: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&h=300&fit=crop", architecture: `graph TD
+    A[Application] --> B[Allocator API]
+    B --> C{Size Class}
+    C -->|Small| D[Thread Cache]
+    C -->|Large| E[Central Heap]
+    D --> F[Slab Pool]
+    E --> G[Hugepage Allocator]
+    F --> H[OS Memory]
+    G --> H` },
+    {
+        id: 'p2', title: "Neural Code Search", description: "Semantic code search using transformer embeddings.", problemStatement: "Keyword search failed to find conceptually similar code.", technicalDecisions: ["CodeBERT embeddings", "FAISS indexing", "Hybrid ranking"], techStack: ["Python", "PyTorch", "FastAPI"], status: 'active', year: "2024", githubUrl: "#", image: "https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=400&h=300&fit=crop", architecture: `graph LR
+    A[Code Input] --> B[Tokenizer]
+    B --> C[CodeBERT]
+    C --> D[Embeddings]
+    D --> E[FAISS Index]
+    F[Query] --> B
+    E --> G[Top-K Results]
+    G --> H[Re-ranker]
+    H --> I[Final Results]` },
+    {
+        id: 'p3', title: "Distributed KV Store", description: "Eventually consistent key-value store with CRDT support.", problemStatement: "Need for partition-tolerant data sync across regions.", technicalDecisions: ["CRDT merge functions", "Gossip protocol", "Vector clocks"], techStack: ["Rust", "Tokio", "RocksDB"], status: 'completed', year: "2024", githubUrl: "#", image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=400&h=300&fit=crop", architecture: `graph TB
+    subgraph Region A
+        A1[Node 1] <--> A2[Node 2]
+    end
+    subgraph Region B
+        B1[Node 3] <--> B2[Node 4]
+    end
+    A1 <-.->|Gossip| B1
+    A2 <-.->|Gossip| B2
+    A1 --> R1[(RocksDB)]
+    B1 --> R2[(RocksDB)]` },
     { id: 'p4', title: "Real-time Metrics Engine", description: "Time-series database for application monitoring.", problemStatement: "Existing solutions too expensive for startups.", technicalDecisions: ["Gorilla compression", "Custom query language", "Streaming aggregation"], techStack: ["Go", "ClickHouse", "Grafana"], status: 'completed', year: "2023", githubUrl: "#", image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=300&fit=crop" },
     { id: 'p5', title: "WASM Runtime", description: "Lightweight WebAssembly runtime for edge computing.", problemStatement: "V8 too heavy for constrained environments.", technicalDecisions: ["Single-pass compilation", "Linear memory model", "WASI support"], techStack: ["Rust", "LLVM"], status: 'active', year: "2024", githubUrl: "#", image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=400&h=300&fit=crop" },
     { id: 'p6', title: "Git Internals Explorer", description: "Educational tool for visualizing git object model.", problemStatement: "Developers struggle to understand git's data structures.", technicalDecisions: ["D3.js visualization", "Interactive object graph", "Diff algorithms"], techStack: ["TypeScript", "React", "D3.js"], status: 'completed', year: "2023", githubUrl: "#", image: "https://images.unsplash.com/photo-1556075798-4825dfaaf498?w=400&h=300&fit=crop" },

@@ -101,8 +101,8 @@ export function Dashboard() {
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
                             className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${activeTab === tab.id
-                                    ? 'bg-accent/10 text-accent'
-                                    : 'text-secondaryText hover:bg-background hover:text-primaryText'
+                                ? 'bg-accent/10 text-accent'
+                                : 'text-secondaryText hover:bg-background hover:text-primaryText'
                                 }`}
                         >
                             <tab.icon size={20} />
@@ -137,8 +137,8 @@ export function Dashboard() {
                                 animate={{ opacity: 1, x: 0 }}
                                 exit={{ opacity: 0, x: 20 }}
                                 className={`px-4 py-2 rounded-lg text-sm ${message.type === 'success'
-                                        ? 'bg-green-500/10 text-green-400'
-                                        : 'bg-red-500/10 text-red-400'
+                                    ? 'bg-green-500/10 text-green-400'
+                                    : 'bg-red-500/10 text-red-400'
                                     }`}
                             >
                                 {message.text}
@@ -269,6 +269,7 @@ function ProjectsEditor({ projects, onChange, onSave, saving }: any) {
                 year: new Date().getFullYear().toString(),
                 githubUrl: '',
                 imageUrl: '',
+                architecture: '',
             },
         ]);
     };
@@ -317,6 +318,21 @@ function ProjectsEditor({ projects, onChange, onSave, saving }: any) {
                     <div className="grid grid-cols-2 gap-4">
                         <Input label="GitHub URL" value={project.githubUrl} onChange={(v: string) => updateProject(index, { githubUrl: v })} />
                         <Input label="Image URL (Google Drive)" value={project.imageUrl} onChange={(v: string) => updateProject(index, { imageUrl: v })} placeholder="https://drive.google.com/uc?export=view&id=..." />
+                    </div>
+                    <div className="space-y-1.5">
+                        <label className="text-sm text-secondaryText flex items-center gap-2">
+                            Architecture Diagram (Mermaid)
+                            <a href="https://mermaid.js.org/syntax/flowchart.html" target="_blank" rel="noopener noreferrer" className="text-xs text-accent hover:underline">
+                                Syntax Guide →
+                            </a>
+                        </label>
+                        <textarea
+                            value={project.architecture || ''}
+                            onChange={(e) => updateProject(index, { architecture: e.target.value })}
+                            placeholder={`graph TD\n    A[Client] --> B[API Gateway]\n    B --> C[Service]\n    C --> D[(Database)]`}
+                            className="w-full px-3 py-2 bg-background border border-border rounded-lg text-primaryText font-mono text-xs placeholder:text-secondaryText/30 focus:outline-none focus:border-accent transition-colors resize-none"
+                            rows={6}
+                        />
                     </div>
                     <div>
                         <label className="text-sm text-secondaryText">Status</label>

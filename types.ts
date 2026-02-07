@@ -9,6 +9,7 @@ export interface Project {
   status: 'active' | 'archived' | 'completed';
   year: string;
   image?: string;
+  architecture?: string; // Mermaid diagram code
 }
 
 export interface Achievement {
