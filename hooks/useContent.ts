@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { OpenSourceContribution } from '../types';
 
 const API_BASE = '/api';
 
@@ -20,6 +21,7 @@ const NAV_ITEMS = [
     { id: 'projects', label: '_projects' },
     { id: 'achievements', label: '_achievements' },
     { id: 'notes', label: '_log' },
+    { id: 'opensource', label: '_opensource' },
 ];
 
 async function fetchContent(type: string) {
@@ -42,19 +44,20 @@ export function useContent() {
     const [projects, setProjects] = useState<any[]>([]);
     const [achievements, setAchievements] = useState<any[]>([]);
     const [notes, setNotes] = useState<any[]>([]);
+    const [opensource, setOpensource] = useState<OpenSourceContribution[]>([]);
     const [navItems] = useState(NAV_ITEMS);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         async function loadContent() {
-            const [profileData, projectsData, achievementsData, notesData] = await Promise.all([
+            const [profileData, projectsData, achievementsData, notesData, opensourceData] = await Promise.all([
                 fetchContent('profile'),
                 fetchContent('projects'),
                 fetchContent('achievements'),
                 fetchContent('notes'),
+                fetchContent('opensource'),
             ]);
 
-            // Set data from API
             if (profileData && typeof profileData === 'object') {
                 setProfile(profileData);
             }
@@ -71,11 +74,15 @@ export function useContent() {
                 setNotes(notesData);
             }
 
+            if (Array.isArray(opensourceData)) {
+                setOpensource(opensourceData);
+            }
+
             setLoading(false);
         }
 
         loadContent();
     }, []);
 
-    return { profile, projects, achievements, notes, navItems, loading };
+    return { profile, projects, achievements, notes, opensource, navItems, loading };
 }

@@ -12,12 +12,13 @@ import { AchievementDetail } from './components/AchievementDetail';
 import { NoteDetail } from './components/NoteDetail';
 import { ParticleField } from './components/ParticleField';
 import { useContent } from './hooks/useContent';
-import { ViewState, Project, Achievement, Note } from './types';
+import { ViewState, Project, Achievement, Note, OpenSourceContribution } from './types';
+import { GitPullRequest, Star, ExternalLink } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 
 function App() {
   // Dynamic content from API (falls back to constants)
-  const { profile, projects, achievements, notes, navItems, loading } = useContent();
+  const { profile, projects, achievements, notes, opensource, navItems, loading } = useContent();
 
   const [currentView, setCurrentView] = useState<ViewState>('home');
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
@@ -212,6 +213,47 @@ function App() {
               </motion.div>
             </Section>
 
+            {/* Open Source Glance Section */}
+            {opensource.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.7, ease: [0.2, 0.8, 0.2, 1] }}
+                className="border-t border-border pt-12"
+              >
+                <div className="flex items-center justify-between mb-8">
+                  <h3 className="text-xs font-mono text-secondaryText uppercase tracking-widest opacity-60">Open Source Contributions</h3>
+                  <button
+                    onClick={() => handleViewChange('opensource')}
+                    className="text-xs font-mono text-accent hover:text-accent/80 transition-colors flex items-center gap-1"
+                  >
+                    View all <ExternalLink size={12} />
+                  </button>
+                </div>
+                <div className="grid gap-4 md:grid-cols-2">
+                  {opensource.slice(0, 4).map((contrib) => (
+                    <a
+                      key={contrib.id}
+                      href={contrib.prUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group p-4 rounded-xl bg-white/5 border border-white/10 hover:border-accent/30 transition-all duration-300 hover:bg-white/8"
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="mt-1">
+                          <GitPullRequest size={16} className="text-green-500" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-primaryText truncate group-hover:text-accent transition-colors">{contrib.title}</p>
+                          <p className="text-xs text-secondaryText/60 mt-1">{contrib.repo} #{contrib.prNumber}</p>
+                        </div>
+                      </div>
+                    </a>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
             <ScrollTrigger
               nextSection="Selected Work"
               onClick={() => handleViewChange('projects')}
@@ -390,7 +432,75 @@ function App() {
               ))}
             </motion.div>
 
-            {/* End of content - no next section, or loop back? Usually nothing or "Back to Top" */}
+            <ScrollTrigger
+              nextSection="Open Source"
+              onClick={() => handleViewChange('opensource')}
+            />
+          </div>
+        );
+
+      case 'opensource':
+        return (
+          <div className="max-w-5xl mx-auto">
+            <Section className="space-y-8">
+              <div className="space-y-4">
+                <h2 className="text-4xl md:text-5xl font-semibold tracking-tight">
+                  Open Source
+                </h2>
+                <p className="text-secondaryText text-lg max-w-2xl">
+                  Contributing to projects that power millions of developers. Here are some of my merged pull requests.
+                </p>
+              </div>
+
+              <div className="space-y-4 pt-8">
+                {opensource.map((contrib, index) => (
+                  <motion.a
+                    key={contrib.id}
+                    href={contrib.prUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                    className="group flex flex-col md:flex-row md:items-center gap-4 p-6 rounded-xl bg-white/5 border border-white/10 hover:border-accent/30 transition-all duration-300 hover:bg-white/8"
+                  >
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <div className="p-2 rounded-lg bg-green-500/10">
+                        <GitPullRequest size={20} className="text-green-500" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-primaryText group-hover:text-accent transition-colors">{contrib.title}</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <a
+                            href={contrib.repoUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sm text-secondaryText/60 hover:text-accent transition-colors"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            {contrib.repo}
+                          </a>
+                          <span className="text-secondaryText/30">•</span>
+                          <span className="text-sm text-secondaryText/60">#{contrib.prNumber}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      {contrib.labels?.map((label) => (
+                        <span key={label} className="text-xs px-2 py-1 rounded-full bg-accent/10 text-accent">
+                          {label}
+                        </span>
+                      ))}
+                      <span className="text-xs text-secondaryText/40">{contrib.date}</span>
+                      <span className="text-xs px-2 py-1 rounded-full bg-green-500/10 text-green-500 font-medium">
+                        {contrib.status}
+                      </span>
+                    </div>
+                  </motion.a>
+                ))}
+              </div>
+            </Section>
+
             <div className="h-32 flex items-center justify-center opacity-30">
               <span className="font-mono text-xs">EOF</span>
             </div>

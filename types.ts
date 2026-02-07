@@ -25,9 +25,23 @@ export interface Note {
   date: string;
   tags: string[];
   readTime: string;
+  content?: string;
 }
 
-export type ViewState = 'home' | 'projects' | 'achievements' | 'notes';
+export interface OpenSourceContribution {
+  id: string;
+  repo: string;
+  repoUrl: string;
+  title: string;
+  prNumber: number;
+  prUrl: string;
+  status: 'merged' | 'open' | 'closed';
+  labels: string[];
+  date: string;
+  description?: string;
+}
+
+export type ViewState = 'home' | 'projects' | 'achievements' | 'notes' | 'opensource';
 
 export interface NavItem {
   id: ViewState;
