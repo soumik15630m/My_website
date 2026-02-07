@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { Project } from '../types';
 import { motion, MotionValue, useTransform, useMotionValue } from 'framer-motion';
 import { ArrowRight, Layers, Code2, GitBranch } from 'lucide-react';
-import { MermaidDiagram } from './MermaidDiagram';
+
+// Lazy load MermaidDiagram for better code splitting
+const MermaidDiagram = React.lazy(() => import('./MermaidDiagram').then(mod => ({ default: mod.MermaidDiagram })));
 
 interface ProjectCardProps {
   project: Project;
@@ -169,10 +171,16 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onOpen, activ
             {/* Diagram Container - centered with proper spacing */}
             <div className="flex-1 flex items-center justify-center pt-16 pb-12">
               <div className="w-full h-full max-h-[340px] rounded-xl bg-black/40 border border-white/5 p-6 flex items-center justify-center overflow-auto">
-                <MermaidDiagram
-                  chart={project.architecture!}
-                  className="w-full"
-                />
+                <Suspense fallback={
+                  <div className="flex items-center justify-center p-4">
+                    <div className="w-5 h-5 border-2 border-accent/30 border-t-accent rounded-full animate-spin" />
+                  </div>
+                }>
+                  <MermaidDiagram
+                    chart={project.architecture!}
+                    className="w-full"
+                  />
+                </Suspense>
               </div>
             </div>
 
