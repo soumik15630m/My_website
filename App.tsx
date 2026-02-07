@@ -169,7 +169,7 @@ function App() {
                   transition={{ duration: 0.6, delay: 0.1, ease: [0.2, 0.8, 0.2, 1] }}
                   className="block"
                 >
-                  Systems Engineer
+                  {profile.role || 'Systems Engineer'}
                 </motion.span>
                 <motion.span
                   initial={{ opacity: 0, y: 30, filter: 'blur(8px)' }}
@@ -177,15 +177,7 @@ function App() {
                   transition={{ duration: 0.6, delay: 0.2, ease: [0.2, 0.8, 0.2, 1] }}
                   className="block text-secondaryText"
                 >
-                  crafting zero-cost
-                </motion.span>
-                <motion.span
-                  initial={{ opacity: 0, y: 30, filter: 'blur(8px)' }}
-                  animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                  transition={{ duration: 0.6, delay: 0.3, ease: [0.2, 0.8, 0.2, 1] }}
-                  className="block"
-                >
-                  abstractions.
+                  {profile.tagline || 'crafting zero-cost abstractions.'}
                 </motion.span>
               </h1>
 
