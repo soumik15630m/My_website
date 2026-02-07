@@ -87,7 +87,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onOpen, activ
                 {project.year}
               </span>
               <span className={`flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-wider ${project.status === 'active' ? 'text-green-400' : 'text-secondaryText'}`}>
-                <span className={`w-1.5 h-1.5 rounded-full ${project.status === 'active' ? 'bg-green-400' : 'bg-secondaryText'}`} />
+                <span className={`w-1.5 h-1.5 rounded-full ${project.status === 'active' ? 'bg-green-400' : 'bg-secondaryText'} mt-0.5`} />
                 {project.status}
               </span>
             </div>
@@ -117,7 +117,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onOpen, activ
             )}
           </div>
 
-          <div className="absolute bottom-8 left-8">
+          <div className="absolute bottom-11 left-8">
             <p className="text-xs font-mono text-secondaryText/60 uppercase tracking-widest">
               01 // Overview
             </p>
@@ -152,7 +152,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onOpen, activ
             </div>
           </div>
 
-          <div className="absolute bottom-8 left-8">
+          <div className="absolute bottom-11 left-8">
             <p className="text-xs font-mono text-secondaryText/60 uppercase tracking-widest">
               02 // Details
             </p>
@@ -195,7 +195,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onOpen, activ
             </div>
 
             {/* Footer label */}
-            <div className="absolute bottom-8 left-8">
+            <div className="absolute bottom-11 left-8">
               <p className="text-xs font-mono text-secondaryText/60 uppercase tracking-widest">
                 03 // Architecture
               </p>
@@ -218,7 +218,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onOpen, activ
             </button>
           </div>
 
-          <div className="absolute bottom-8 left-8">
+          <div className="absolute bottom-11 left-8">
             <p className="text-xs font-mono text-secondaryText/60 uppercase tracking-widest">
               {hasArchitecture ? '04' : '03'} // Action
             </p>
