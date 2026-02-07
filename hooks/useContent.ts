@@ -21,7 +21,7 @@ const NAV_ITEMS = [
     { id: 'projects', label: '_projects' },
     { id: 'opensource', label: '_opensource' },
     { id: 'achievements', label: '_achievements' },
-    { id: 'notes', label: '_log' },
+    { id: 'notes', label: '_writings' },
 ];
 
 async function fetchContent(type: string) {

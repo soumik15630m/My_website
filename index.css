@@ -87,6 +87,29 @@ body {
   display: none;
 }
 
+/* Custom Scrollbar - For contained scroll areas */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(138, 180, 248, 0.2);
+  border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(138, 180, 248, 0.4);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
 /* ===============================
    UTILITY ANIMATIONS
    =============================== */

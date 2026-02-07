@@ -14,7 +14,7 @@ import { OpenSourceDetail } from './components/OpenSourceDetail';
 import { ParticleField } from './components/ParticleField';
 import { useContent } from './hooks/useContent';
 import { ViewState, Project, Achievement, Note, OpenSourceContribution } from './types';
-import { GitPullRequest, Star, ExternalLink } from 'lucide-react';
+import { GitPullRequest, Star, ExternalLink, Search, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 
 function App() {
@@ -27,6 +27,8 @@ function App() {
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
   const [selectedOSS, setSelectedOSS] = useState<OpenSourceContribution | null>(null);
   const [direction, setDirection] = useState(0);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   // Use a ref for the lock to ensure instant access inside event listeners without closure staleness
   const isTransitioningRef = useRef(false);
@@ -410,29 +412,121 @@ function App() {
         );
 
       case 'notes':
+        // Extract all unique tags from notes
+        const allTags: string[] = Array.from(new Set(notes.flatMap(n => n.tags)));
+
+        // Filter notes based on search and selected tags
+        const filteredNotes = notes.filter(note => {
+          const matchesSearch = searchQuery === '' ||
+            note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            note.summary.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            note.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+
+          const matchesTags = selectedTags.length === 0 ||
+            selectedTags.some(tag => note.tags.includes(tag));
+
+          return matchesSearch && matchesTags;
+        });
+
+        const toggleTag = (tag: string) => {
+          setSelectedTags(prev =>
+            prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
+          );
+        };
+
         return (
-          <div className="max-w-3xl mx-auto">
-            <Section className="mb-20 text-center md:text-left">
-              <h2 className="text-4xl md:text-5xl font-semibold text-primaryText mb-6 tracking-tight">Engineering Log</h2>
-              <p className="text-xl text-secondaryText font-light max-w-2xl leading-relaxed mx-auto md:mx-0">
-                Technical deep dives into specific problem spaces.
+          <div className="max-w-4xl mx-auto">
+            <Section className="mb-8 text-center md:text-left">
+              <h2 className="text-4xl md:text-5xl font-semibold text-primaryText mb-4 tracking-tight">Writings</h2>
+              <p className="text-lg text-secondaryText font-light max-w-2xl leading-relaxed mx-auto md:mx-0">
+                Technical explorations and deep dives.
               </p>
             </Section>
-            <motion.div
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-              className="space-y-4"
-            >
-              {notes.map((note, index) => (
-                <NoteCard
-                  key={note.id}
-                  note={note}
-                  index={index}
-                  onClick={() => setSelectedNote(note)}
+
+            {/* Search & Filter Bar */}
+            <div className="mb-6 space-y-4">
+              {/* Search Input */}
+              <div className="relative">
+                <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-secondaryText/40" />
+                <input
+                  type="text"
+                  placeholder="Search writings..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-12 pr-10 py-3 bg-white/5 border border-white/10 rounded-xl text-primaryText placeholder-secondaryText/40 focus:outline-none focus:border-accent/50 transition-colors font-mono text-sm"
                 />
-              ))}
-            </motion.div>
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-secondaryText/40 hover:text-primaryText transition-colors"
+                  >
+                    <X size={16} />
+                  </button>
+                )}
+              </div>
+
+              {/* Tag Filters */}
+              <div className="flex flex-wrap gap-2">
+                {allTags.map(tag => (
+                  <button
+                    key={tag}
+                    onClick={() => toggleTag(tag)}
+                    className={`text-xs font-mono px-3 py-1.5 rounded-full border transition-all duration-200 ${selectedTags.includes(tag)
+                      ? 'bg-accent/20 border-accent/50 text-accent'
+                      : 'bg-white/5 border-white/10 text-secondaryText/60 hover:border-white/20 hover:text-secondaryText'
+                      }`}
+                  >
+                    {tag}
+                  </button>
+                ))}
+                {selectedTags.length > 0 && (
+                  <button
+                    onClick={() => setSelectedTags([])}
+                    className="text-xs font-mono px-3 py-1.5 text-secondaryText/40 hover:text-secondaryText transition-colors"
+                  >
+                    Clear filters
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Scrollable Container */}
+            <div className="relative rounded-2xl border border-white/10 bg-white/[0.02] overflow-hidden">
+              {/* Results count */}
+              <div className="px-6 py-3 border-b border-white/5 flex items-center justify-between">
+                <span className="text-xs font-mono text-secondaryText/40">
+                  {filteredNotes.length} {filteredNotes.length === 1 ? 'article' : 'articles'}
+                </span>
+                {(searchQuery || selectedTags.length > 0) && (
+                  <span className="text-xs font-mono text-accent/60">filtered</span>
+                )}
+              </div>
+
+              {/* Scrollable Notes List */}
+              <div className="max-h-[60vh] overflow-y-auto custom-scrollbar">
+                <motion.div
+                  variants={containerVariants}
+                  initial="hidden"
+                  animate="visible"
+                  className="p-4 space-y-3"
+                >
+                  {filteredNotes.length > 0 ? (
+                    filteredNotes.map((note, index) => (
+                      <NoteCard
+                        key={note.id}
+                        note={note}
+                        index={index}
+                        onClick={() => setSelectedNote(note)}
+                      />
+                    ))
+                  ) : (
+                    <div className="py-16 text-center">
+                      <p className="text-secondaryText/40 font-mono text-sm">No articles match your search.</p>
+                    </div>
+                  )}
+                </motion.div>
+              </div>
+            </div>
 
             <ScrollTrigger
               nextSection="End"
