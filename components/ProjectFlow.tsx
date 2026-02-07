@@ -1,7 +1,10 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Project } from '../types';
-import { X, ArrowRight, Github, Layers, Cpu, CheckCircle2 } from 'lucide-react';
+import { X, ArrowRight, Github, Layers, Cpu, CheckCircle2, GitBranch } from 'lucide-react';
+
+// Lazy load MermaidDiagram
+const MermaidDiagram = React.lazy(() => import('./MermaidDiagram').then(mod => ({ default: mod.MermaidDiagram })));
 
 interface ProjectFlowProps {
     project: Project | null;
@@ -24,7 +27,7 @@ export const ProjectFlow: React.FC<ProjectFlowProps> = ({ project, onClose }) =>
     if (!project) return null;
 
     // Window/Slide common styles - Cleaner, no heavy borders, more subtle
-    const slideClass = "w-[85vw] md:w-[60vw] h-[75vh] flex-shrink-0 snap-center bg-surface/50 backdrop-blur-sm border border-white/5 rounded-[2rem] p-10 md:p-16 relative flex flex-col justify-between overflow-hidden shadow-2xl";
+    const slideClass = "w-[85vw] md:w-[60vw] h-[75vh] flex-shrink-0 snap-center bg-surface/50 backdrop-blur-sm border border-white/5 rounded-[2rem] p-8 md:p-12 relative flex flex-col justify-between overflow-hidden shadow-2xl";
 
     return (
         <motion.div
@@ -57,8 +60,8 @@ export const ProjectFlow: React.FC<ProjectFlowProps> = ({ project, onClose }) =>
                         transition={{ delay: 0.2, duration: 0.6, ease: [0.2, 0.8, 0.2, 1] }}
                         className={slideClass}
                     >
-                        <div className="space-y-8">
-                            <div className="flex items-center gap-3">
+                        <div className="flex flex-col h-full">
+                            <div className="flex items-center gap-3 mb-6 shrink-0">
                                 <span className="font-mono text-xs text-accent border border-accent/20 px-3 py-1.5 rounded-full uppercase tracking-widest">
                                     {project.year}
                                 </span>
@@ -68,16 +71,30 @@ export const ProjectFlow: React.FC<ProjectFlowProps> = ({ project, onClose }) =>
                                 </span>
                             </div>
 
-                            <h2 className="text-5xl md:text-8xl font-bold text-primaryText tracking-tighter leading-none">
-                                {project.title}
-                            </h2>
+                            <div className="flex-1 flex flex-col md:flex-row gap-8 overflow-hidden">
+                                <div className="space-y-6 flex-1 overflow-y-auto pr-2 scrollbar-thin">
+                                    <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold text-primaryText tracking-tighter leading-none">
+                                        {project.title}
+                                    </h2>
 
-                            <p className="text-xl md:text-3xl text-secondaryText font-light leading-relaxed max-w-4xl">
-                                {project.description}
-                            </p>
+                                    <p className="text-lg md:text-xl text-secondaryText font-light leading-relaxed">
+                                        {project.description}
+                                    </p>
+                                </div>
+
+                                {project.image && (
+                                    <div className="w-full md:w-1/3 aspect-video md:aspect-[3/4] shrink-0 rounded-xl overflow-hidden bg-surface border border-white/5 self-start md:self-auto">
+                                        <img
+                                            src={project.image}
+                                            alt={project.title}
+                                            className="w-full h-full object-cover opacity-80"
+                                        />
+                                    </div>
+                                )}
+                            </div>
                         </div>
 
-                        <div className="flex items-center gap-4 text-xs font-mono text-secondaryText/40 uppercase tracking-widest">
+                        <div className="flex items-center gap-4 text-xs font-mono text-secondaryText/40 uppercase tracking-widest mt-6 shrink-0">
                             <span>Scroll</span>
                             <ArrowRight size={14} />
                         </div>
@@ -102,8 +119,41 @@ export const ProjectFlow: React.FC<ProjectFlowProps> = ({ project, onClose }) =>
                         </div>
                     </motion.div>
 
+                    {/* === WINDOW 3: ARCHITECTURE DIAGRAM === */}
+                    {project.architecture && (
+                        <motion.div
+                            initial={{ y: 40, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            transition={{ delay: 0.35, duration: 0.6, ease: [0.2, 0.8, 0.2, 1] }}
+                            className={`${slideClass} bg-black/40`}
+                        >
+                            <div className="flex items-center gap-4 text-secondaryText mb-4 shrink-0">
+                                <div className="p-3 bg-white/5 rounded-xl"><GitBranch size={24} /></div>
+                                <h3 className="text-sm font-mono uppercase tracking-widest">System Architecture</h3>
+                            </div>
 
-                    {/* === WINDOW 3: TECHNICAL ARCHITECTURE === */}
+                            <div className="flex-1 w-full flex items-center justify-center overflow-hidden rounded-xl bg-black/40 border border-white/5 relative group/diagram">
+                                {/* Zoom hint */}
+                                <div className="absolute top-4 right-4 p-2 rounded-lg bg-black/50 border border-white/10 text-white/20 opacity-0 group-hover/diagram:opacity-100 transition-opacity pointer-events-none z-10">
+                                    <GitBranch size={16} />
+                                </div>
+
+                                <div className="w-full h-full p-6 overflow-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+                                    <div className="min-w-full min-h-full flex items-center justify-center">
+                                        <Suspense fallback={
+                                            <div className="flex items-center justify-center p-4">
+                                                <div className="w-5 h-5 border-2 border-accent/30 border-t-accent rounded-full animate-spin" />
+                                            </div>
+                                        }>
+                                            <MermaidDiagram chart={project.architecture} className="w-full" />
+                                        </Suspense>
+                                    </div>
+                                </div>
+                            </div>
+                        </motion.div>
+                    )}
+
+                    {/* === WINDOW 4: TECHNICAL DETAILS === */}
                     <motion.div
                         initial={{ y: 40, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
@@ -111,21 +161,21 @@ export const ProjectFlow: React.FC<ProjectFlowProps> = ({ project, onClose }) =>
                         className={slideClass}
                     >
                         <div className="flex flex-col h-full">
-                            <div className="flex items-center gap-4 text-accent mb-12">
+                            <div className="flex items-center gap-4 text-accent mb-8 shrink-0">
                                 <div className="p-3 bg-accent/10 rounded-xl"><Layers size={24} /></div>
                                 <h3 className="text-sm font-mono uppercase tracking-widest">Architecture Decisions</h3>
                             </div>
 
-                            <ul className="space-y-6 overflow-y-auto pr-4 scrollbar-thin flex-1">
+                            <ul className="space-y-6 overflow-y-auto pr-4 scrollbar-thin flex-1 min-h-0">
                                 {project.technicalDecisions.map((decision, i) => (
                                     <li key={i} className="flex items-start gap-6">
                                         <CheckCircle2 size={24} className="mt-1 text-accent shrink-0" />
-                                        <span className="text-xl text-primaryText/90 font-light leading-relaxed">{decision}</span>
+                                        <span className="text-lg md:text-xl text-primaryText/90 font-light leading-relaxed">{decision}</span>
                                     </li>
                                 ))}
                             </ul>
 
-                            <div className="pt-10 mt-10 border-t border-white/5">
+                            <div className="pt-8 mt-6 border-t border-white/5 shrink-0">
                                 <div className="flex flex-wrap gap-3">
                                     {project.techStack.map((tech) => (
                                         <span key={tech} className="text-sm font-medium text-secondaryText bg-white/5 px-4 py-2 rounded-full hover:bg-white/10 transition-colors">
@@ -137,7 +187,7 @@ export const ProjectFlow: React.FC<ProjectFlowProps> = ({ project, onClose }) =>
                         </div>
                     </motion.div>
 
-                    {/* === WINDOW 4: LINKS & ACTION === */}
+                    {/* === WINDOW 5: LINKS & ACTION === */}
                     <motion.div
                         initial={{ y: 40, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
