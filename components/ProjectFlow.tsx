@@ -94,9 +94,14 @@ export const ProjectFlow: React.FC<ProjectFlowProps> = ({ project, onClose }) =>
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-4 text-xs font-mono text-secondaryText/40 uppercase tracking-widest mt-6 shrink-0">
-                            <span>Scroll</span>
-                            <ArrowRight size={14} />
+                        <div className="flex items-center justify-between mt-6 shrink-0">
+                            <div className="flex items-center gap-4 text-xs font-mono text-secondaryText/40 uppercase tracking-widest">
+                                <span>Scroll</span>
+                                <ArrowRight size={14} />
+                            </div>
+                            <p className="text-xs font-mono text-secondaryText/60 uppercase tracking-widest">
+                                01 // Overview
+                            </p>
                         </div>
                     </motion.div>
 
@@ -115,6 +120,12 @@ export const ProjectFlow: React.FC<ProjectFlowProps> = ({ project, onClose }) =>
                         <div className="flex-1 flex items-center justify-center">
                             <p className="text-2xl md:text-4xl text-primaryText font-light leading-tight text-center max-w-4xl">
                                 "{project.problemStatement}"
+                            </p>
+                        </div>
+
+                        <div className="absolute bottom-12 right-12">
+                            <p className="text-xs font-mono text-secondaryText/60 uppercase tracking-widest">
+                                02 // Problem
                             </p>
                         </div>
                     </motion.div>
@@ -150,6 +161,12 @@ export const ProjectFlow: React.FC<ProjectFlowProps> = ({ project, onClose }) =>
                                     </div>
                                 </div>
                             </div>
+
+                            <div className="absolute bottom-12 right-12">
+                                <p className="text-xs font-mono text-secondaryText/60 uppercase tracking-widest">
+                                    03 // Architecture
+                                </p>
+                            </div>
                         </motion.div>
                     )}
 
@@ -168,8 +185,10 @@ export const ProjectFlow: React.FC<ProjectFlowProps> = ({ project, onClose }) =>
 
                             <ul className="space-y-6 overflow-y-auto pr-4 scrollbar-thin flex-1 min-h-0">
                                 {project.technicalDecisions.map((decision, i) => (
-                                    <li key={i} className="flex items-start gap-6">
-                                        <CheckCircle2 size={24} className="mt-1 text-accent shrink-0" />
+                                    <li key={i} className="flex items-start gap-4">
+                                        <div className="mt-1.5 shrink-0">
+                                            <CheckCircle2 size={20} className="text-accent" />
+                                        </div>
                                         <span className="text-lg md:text-xl text-primaryText/90 font-light leading-relaxed">{decision}</span>
                                     </li>
                                 ))}
@@ -184,6 +203,12 @@ export const ProjectFlow: React.FC<ProjectFlowProps> = ({ project, onClose }) =>
                                     ))}
                                 </div>
                             </div>
+                        </div>
+
+                        <div className="absolute bottom-12 right-12">
+                            <p className="text-xs font-mono text-secondaryText/60 uppercase tracking-widest">
+                                {project.architecture ? '04' : '03'} // Decisions
+                            </p>
                         </div>
                     </motion.div>
 
@@ -215,6 +240,12 @@ export const ProjectFlow: React.FC<ProjectFlowProps> = ({ project, onClose }) =>
                                 <p className="text-secondaryText font-mono text-base">Contact for access</p>
                             </div>
                         )}
+
+                        <div className="absolute bottom-12 right-12">
+                            <p className="text-xs font-mono text-secondaryText/60 uppercase tracking-widest">
+                                {project.architecture ? '05' : '04'} // Source
+                            </p>
+                        </div>
                     </motion.div>
                     <div className="w-[20vw] h-1 shrink-0" /> {/* End spacer for scroll padding */}
                 </div>
