@@ -465,7 +465,7 @@ function App() {
               ))}
             </motion.div>
 
-            <ScrollTrigger nextSection="Open Source" onClick={() => handleViewChange('opensource')} />
+            <ScrollTrigger nextSection="Writings" onClick={() => handleViewChange('notes')} />
           </div>
         );
 
