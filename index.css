@@ -1,0 +1,210 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===============================
+   ROOT & GLOBAL STYLES
+   =============================== */
+
+:root {
+  /* Premium color palette */
+  --color-accent: #8AB4F8;
+  --color-accent-glow: rgba(138, 180, 248, 0.4);
+  --color-green: #22c55e;
+  --color-green-glow: rgba(34, 197, 94, 0.5);
+}
+
+body {
+  background-color: #0B0D10;
+  color: #E6E8EB;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Text Selection */
+::selection {
+  background: rgba(138, 180, 248, 0.25);
+  color: #8AB4F8;
+}
+
+/* Focus States for Accessibility */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ===============================
+   SCROLLBAR STYLES
+   =============================== */
+
+/* Default Scrollbar - Dark Minimal */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0B0D10;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #1A1D23, #252830);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #2A2D35, #3A3D45);
+}
+
+/* Green Timeline Scrollbar */
+.timeline-scroll::-webkit-scrollbar-track {
+  background: linear-gradient(180deg, #0B0D10 0%, #12151B 50%, #0B0D10 100%);
+  border-left: 1px solid rgba(34, 197, 94, 0.15);
+}
+
+.timeline-scroll::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #22c55e 0%, #16a34a 50%, #22c55e 100%);
+  box-shadow:
+    0 0 8px rgba(34, 197, 94, 0.6),
+    0 0 16px rgba(34, 197, 94, 0.3);
+}
+
+.timeline-scroll::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #4ade80 0%, #22c55e 50%, #4ade80 100%);
+  box-shadow:
+    0 0 12px rgba(34, 197, 94, 0.8),
+    0 0 24px rgba(34, 197, 94, 0.5);
+}
+
+/* Hide Scrollbar - For horizontal card scrollers */
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* ===============================
+   UTILITY ANIMATIONS
+   =============================== */
+
+/* Smooth Hover Transitions */
+.hover-lift {
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 40px -10px rgba(138, 180, 248, 0.15);
+}
+
+/* Subtle Glow Effect */
+.glow-accent {
+  box-shadow: 0 0 20px var(--color-accent-glow),
+    0 0 40px rgba(138, 180, 248, 0.1);
+}
+
+.glow-green {
+  box-shadow: 0 0 15px var(--color-green-glow),
+    0 0 30px rgba(34, 197, 94, 0.2);
+}
+
+/* Gradient Text */
+.gradient-text {
+  background: linear-gradient(135deg, #fff 0%, #8AB4F8 50%, #a3bffa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Glass Morphism */
+.glass {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.glass-strong {
+  background: rgba(11, 13, 16, 0.8);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Underline Animation */
+.underline-grow {
+  position: relative;
+}
+
+.underline-grow::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  width: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-accent), transparent);
+  transition: width 0.3s ease, left 0.3s ease;
+}
+
+.underline-grow:hover::after {
+  width: 100%;
+  left: 0;
+}
+
+/* Pulse Glow Animation */
+@keyframes pulse-glow {
+
+  0%,
+  100% {
+    box-shadow: 0 0 10px var(--color-accent-glow);
+  }
+
+  50% {
+    box-shadow: 0 0 25px var(--color-accent-glow), 0 0 50px rgba(138, 180, 248, 0.15);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+/* Shimmer Effect */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.shimmer {
+  background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.05) 50%,
+      transparent 100%);
+  background-size: 200% 100%;
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+/* ===============================
+   RESPONSIVE ADJUSTMENTS
+   =============================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
