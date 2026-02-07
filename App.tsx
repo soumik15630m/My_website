@@ -31,7 +31,9 @@ function App() {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<'date' | 'oldest' | 'readTime' | 'title'>('date');
   const [showAutocomplete, setShowAutocomplete] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(12);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const loadMoreRef = useRef<HTMLDivElement>(null);
 
   // Use a ref for the lock to ensure instant access inside event listeners without closure staleness
   const isTransitioningRef = useRef(false);
@@ -458,12 +460,18 @@ function App() {
           setSelectedTags(prev =>
             prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
           );
+          setVisibleCount(12); // Reset when filtering
         };
 
         const selectAutocomplete = (title: string) => {
           setSearchQuery(title);
           setShowAutocomplete(false);
+          setVisibleCount(12); // Reset when searching
         };
+
+        // Displayed notes with lazy loading
+        const displayedNotes = sortedNotes.slice(0, visibleCount);
+        const hasMore = visibleCount < sortedNotes.length;
 
         return (
           <div className="max-w-4xl mx-auto">
@@ -488,6 +496,7 @@ function App() {
                     onChange={(e) => {
                       setSearchQuery(e.target.value);
                       setShowAutocomplete(true);
+                      setVisibleCount(12); // Reset when searching
                     }}
                     onFocus={() => setShowAutocomplete(true)}
                     onBlur={() => setTimeout(() => setShowAutocomplete(false), 200)}
@@ -495,7 +504,7 @@ function App() {
                   />
                   {searchQuery && (
                     <button
-                      onClick={() => setSearchQuery('')}
+                      onClick={() => { setSearchQuery(''); setVisibleCount(12); }}
                       className="absolute right-4 top-1/2 -translate-y-1/2 text-secondaryText/40 hover:text-primaryText transition-colors"
                     >
                       <X size={16} />
@@ -553,7 +562,7 @@ function App() {
                   ))}
                   {selectedTags.length > 0 && (
                     <button
-                      onClick={() => setSelectedTags([])}
+                      onClick={() => { setSelectedTags([]); setVisibleCount(12); }}
                       className="text-xs font-mono px-3 py-1.5 text-secondaryText/40 hover:text-secondaryText transition-colors"
                     >
                       Clear
@@ -576,22 +585,44 @@ function App() {
               </div>
 
               {/* Scrollable Notes List */}
-              <div className="max-h-[60vh] overflow-y-auto custom-scrollbar">
+              <div
+                className="max-h-[60vh] overflow-y-auto custom-scrollbar"
+                onScroll={(e) => {
+                  const target = e.target as HTMLDivElement;
+                  const scrollBottom = target.scrollHeight - target.scrollTop - target.clientHeight;
+                  // Load more when within 200px of bottom (buffer zone)
+                  if (scrollBottom < 200 && hasMore) {
+                    setVisibleCount(prev => Math.min(prev + 10, sortedNotes.length));
+                  }
+                }}
+              >
                 <motion.div
                   variants={containerVariants}
                   initial="hidden"
                   animate="visible"
                   className="p-4 space-y-3"
                 >
-                  {sortedNotes.length > 0 ? (
-                    sortedNotes.map((note, index) => (
-                      <NoteCard
-                        key={note.id}
-                        note={note}
-                        index={index}
-                        onClick={() => setSelectedNote(note)}
-                      />
-                    ))
+                  {displayedNotes.length > 0 ? (
+                    <>
+                      {displayedNotes.map((note, index) => (
+                        <NoteCard
+                          key={note.id}
+                          note={note}
+                          index={index}
+                          onClick={() => setSelectedNote(note)}
+                        />
+                      ))}
+
+                      {/* Invisible trigger zone - appears before end for seamless loading */}
+                      {hasMore && (
+                        <div
+                          ref={loadMoreRef}
+                          className="h-4 flex items-center justify-center"
+                        >
+                          <span className="text-xs font-mono text-secondaryText/20">loading...</span>
+                        </div>
+                      )}
+                    </>
                   ) : (
                     <div className="py-16 text-center">
                       <p className="text-secondaryText/40 font-mono text-sm">No articles match your search.</p>
