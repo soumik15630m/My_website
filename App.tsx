@@ -383,7 +383,7 @@ function App() {
               ))}
             </motion.div>
 
-            <ScrollTrigger nextSection="Recognition" onClick={() => handleViewChange('achievements')} />
+            <ScrollTrigger nextSection="Certificates" onClick={() => handleViewChange('achievements')} />
           </div>
         );
 
@@ -391,7 +391,7 @@ function App() {
         return (
           <div className="max-w-3xl mx-auto">
             <Section className="mb-20 text-center md:text-left">
-              <h2 className="text-4xl md:text-5xl font-semibold text-primaryText mb-6 tracking-tight">Recognition</h2>
+              <h2 className="text-4xl md:text-5xl font-semibold text-primaryText mb-6 tracking-tight">Certificates</h2>
               <p className="text-xl text-secondaryText font-light max-w-2xl leading-relaxed mx-auto md:mx-0">
                 Validation through competition and community contribution.
               </p>
