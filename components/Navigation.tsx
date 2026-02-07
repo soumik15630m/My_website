@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { NavItem, ViewState } from '../types';
-import { NAV_ITEMS, PROFILE } from '../constants';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 
 interface NavigationProps {
   currentView: ViewState;
   onChangeView: (view: ViewState) => void;
+  profile: { name: string; handle: string; location: string };
+  navItems: NavItem[];
 }
 
-export const Navigation: React.FC<NavigationProps> = ({ currentView, onChangeView }) => {
+export const Navigation: React.FC<NavigationProps> = ({ currentView, onChangeView, profile, navItems }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -33,8 +34,8 @@ export const Navigation: React.FC<NavigationProps> = ({ currentView, onChangeVie
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.8, ease: [0.2, 0.8, 0.2, 1] }}
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled || mobileMenuOpen
-            ? 'glass-strong shadow-lg shadow-black/20'
-            : 'bg-transparent'
+          ? 'glass-strong shadow-lg shadow-black/20'
+          : 'bg-transparent'
           }`}
       >
         <div className="max-w-7xl mx-auto px-6 md:px-8 h-16 flex items-center justify-between">
@@ -48,16 +49,16 @@ export const Navigation: React.FC<NavigationProps> = ({ currentView, onChangeVie
               onClick={() => handleNavClick('home')}
               className="text-sm font-semibold tracking-tight text-primaryText hover:text-accent transition-colors duration-300"
             >
-              {PROFILE.name}
+              {profile.name || 'Portfolio'}
             </button>
             <span className="text-secondaryText/30 text-xs font-mono hidden sm:inline-block">
-                // {PROFILE.handle}
+                // {profile.handle}
             </span>
           </motion.div>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-1">
-            {NAV_ITEMS.map((item) => {
+            {navItems.map((item) => {
               const isActive = currentView === item.id;
               return (
                 <motion.button
@@ -115,7 +116,7 @@ export const Navigation: React.FC<NavigationProps> = ({ currentView, onChangeVie
             className="fixed inset-0 z-40 glass-strong md:hidden pt-24 px-6"
           >
             <nav className="flex flex-col space-y-2">
-              {NAV_ITEMS.map((item, i) => (
+              {navItems.map((item, i) => (
                 <motion.button
                   key={item.id}
                   initial={{ opacity: 0, x: -30 }}
@@ -124,8 +125,8 @@ export const Navigation: React.FC<NavigationProps> = ({ currentView, onChangeVie
                   transition={{ delay: 0.05 + i * 0.05, duration: 0.3 }}
                   onClick={() => handleNavClick(item.id)}
                   className={`text-2xl font-semibold text-left py-4 px-4 rounded-xl transition-all duration-300 ${currentView === item.id
-                      ? 'text-primaryText bg-white/5'
-                      : 'text-secondaryText/60 hover:text-primaryText hover:bg-white/3'
+                    ? 'text-primaryText bg-white/5'
+                    : 'text-secondaryText/60 hover:text-primaryText hover:bg-white/3'
                     }`}
                 >
                   {item.label.replace('_', '')}
@@ -143,7 +144,7 @@ export const Navigation: React.FC<NavigationProps> = ({ currentView, onChangeVie
                 <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
                 <p className="text-xs font-mono text-green-400 uppercase tracking-widest">Online</p>
               </div>
-              <p className="text-sm text-secondaryText/50">{PROFILE.location}</p>
+              <p className="text-sm text-secondaryText/50">{profile.location}</p>
             </motion.div>
           </motion.div>
         )}
