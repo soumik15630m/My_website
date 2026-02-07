@@ -63,7 +63,7 @@ export const TimelineDot: React.FC<TimelineDotProps> = ({ children, index }) => 
                     y: numberY,
                     filter: "blur(0.5px)"
                 }}
-                className="absolute -left-32 top-1/2 -translate-y-1/2 text-7xl font-bold text-white select-none hidden md:block pointer-events-none font-mono tracking-tighter"
+                className="absolute -left-32 top-11 -translate-y-1/2 text-7xl font-bold text-white select-none hidden md:block pointer-events-none font-mono tracking-tighter"
             >
                 {String(index + 1).padStart(2, '0')}
             </motion.span>
@@ -75,7 +75,7 @@ export const TimelineDot: React.FC<TimelineDotProps> = ({ children, index }) => 
                     scale: glowScale,
                     boxShadow: dotShadow
                 }}
-                className="absolute -left-[1.4rem] top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-green-500 hidden md:block z-10"
+                className="absolute -left-[1.4rem] top-11 -translate-y-1/2 w-4 h-4 rounded-full bg-green-500 hidden md:block z-10"
             />
 
             {childWithProp}
