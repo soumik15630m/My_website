@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { sql } from '../lib/db';
-import { verifyToken } from '../lib/auth';
+import { neon } from '@neondatabase/serverless';
+
+const sql = neon(process.env.DATABASE_URL || '');
 
 // Content types and their default values
 const CONTENT_DEFAULTS: Record<string, any> = {
@@ -26,6 +27,15 @@ const CONTENT_DEFAULTS: Record<string, any> = {
     ]
 };
 
+function verifyToken(token: string): { userId: number; email: string } | null {
+    try {
+        const jwt = require('jsonwebtoken');
+        return jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret') as { userId: number; email: string };
+    } catch {
+        return null;
+    }
+}
+
 function getAuthToken(req: VercelRequest): string | null {
     const authHeader = req.headers.authorization;
     if (authHeader && authHeader.startsWith('Bearer ')) {
@@ -41,15 +51,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(400).json({ error: 'Content type is required' });
     }
 
-    // GET - public, no auth needed for fetching content
+    // GET - public, no auth needed
     if (req.method === 'GET') {
         try {
-            const content = await sql`
-        SELECT data FROM site_content WHERE key = ${type}
-      `;
+            const content = await sql`SELECT data FROM site_content WHERE key = ${type}`;
 
             if (content.length === 0) {
-                // Return default content
                 return res.status(200).json({
                     data: CONTENT_DEFAULTS[type] || null,
                     isDefault: true
@@ -60,9 +67,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 data: content[0].data,
                 isDefault: false
             });
-        } catch (error) {
+        } catch (error: any) {
             console.error('Get content error:', error);
-            return res.status(500).json({ error: 'Internal server error' });
+            return res.status(200).json({
+                data: CONTENT_DEFAULTS[type] || null,
+                isDefault: true,
+                dbError: true
+            });
         }
     }
 
@@ -93,9 +104,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       `;
 
             return res.status(200).json({ success: true });
-        } catch (error) {
+        } catch (error: any) {
             console.error('Update content error:', error);
-            return res.status(500).json({ error: 'Internal server error' });
+            return res.status(500).json({ error: 'Internal server error', details: error?.message });
         }
     }
 

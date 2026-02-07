@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { sql } from '../lib/db';
-import { generateToken } from '../lib/auth';
+import { neon } from '@neondatabase/serverless';
+import jwt from 'jsonwebtoken';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (req.method !== 'POST') {
@@ -14,29 +14,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             return res.status(400).json({ error: 'Email and OTP are required' });
         }
 
-        // Get user
-        const users = await sql`
-      SELECT id, email
-      FROM admin_users
-      WHERE email = ${email.toLowerCase()}
-    `;
-
-        if (users.length === 0) {
-            return res.status(403).json({ error: 'Access denied' });
-        }
-
-        const user = users[0];
+        const normalizedEmail = email.toLowerCase().trim();
+        const sql = neon(process.env.DATABASE_URL || '');
 
         // Verify OTP
         const otpRecords = await sql`
-      SELECT id, code, expires_at
-      FROM otp_codes
-      WHERE email = ${email.toLowerCase()}
-        AND code = ${otp}
-        AND used = false
-        AND expires_at > NOW()
-      ORDER BY id DESC
-      LIMIT 1
+      SELECT id, code, expires_at FROM otp_codes
+      WHERE email = ${normalizedEmail} AND code = ${otp} AND used = false AND expires_at > NOW()
+      ORDER BY id DESC LIMIT 1
     `;
 
         if (otpRecords.length === 0) {
@@ -44,22 +29,28 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         }
 
         // Mark OTP as used
-        await sql`
-      UPDATE otp_codes
-      SET used = true
-      WHERE id = ${otpRecords[0].id}
-    `;
+        await sql`UPDATE otp_codes SET used = true WHERE id = ${otpRecords[0].id}`;
 
-        // Generate JWT token
-        const token = generateToken({ userId: user.id, email: user.email });
+        // Get or create user
+        let users = await sql`SELECT id, email FROM admin_users WHERE email = ${normalizedEmail}`;
 
-        return res.status(200).json({
-            success: true,
-            token,
-            user: { id: user.id, email: user.email }
-        });
-    } catch (error) {
+        if (users.length === 0) {
+            const result = await sql`
+        INSERT INTO admin_users (email) VALUES (${normalizedEmail}) RETURNING id, email
+      `;
+            users = result;
+        }
+
+        const user = users[0];
+        const token = jwt.sign(
+            { userId: user.id, email: user.email },
+            process.env.JWT_SECRET || 'fallback-secret',
+            { expiresIn: '7d' }
+        );
+
+        return res.status(200).json({ success: true, token, user: { id: user.id, email: user.email } });
+    } catch (error: any) {
         console.error('Verify OTP error:', error);
-        return res.status(500).json({ error: 'Internal server error' });
+        return res.status(500).json({ error: 'Internal server error', details: error?.message });
     }
 }
