@@ -52,28 +52,228 @@ const FAKE_PROJECTS = [
     A2 <-.->|Gossip| B2
     A1 --> R1[(RocksDB)]
     B1 --> R2[(RocksDB)]` },
-    { id: 'p4', title: "Real-time Metrics Engine", description: "Time-series database for application monitoring.", problemStatement: "Existing solutions too expensive for startups.", technicalDecisions: ["Gorilla compression", "Custom query language", "Streaming aggregation"], techStack: ["Go", "ClickHouse", "Grafana"], status: 'completed', year: "2023", githubUrl: "#", image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=300&fit=crop" },
-    { id: 'p5', title: "WASM Runtime", description: "Lightweight WebAssembly runtime for edge computing.", problemStatement: "V8 too heavy for constrained environments.", technicalDecisions: ["Single-pass compilation", "Linear memory model", "WASI support"], techStack: ["Rust", "LLVM"], status: 'active', year: "2024", githubUrl: "#", image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=400&h=300&fit=crop" },
-    { id: 'p6', title: "Git Internals Explorer", description: "Educational tool for visualizing git object model.", problemStatement: "Developers struggle to understand git's data structures.", technicalDecisions: ["D3.js visualization", "Interactive object graph", "Diff algorithms"], techStack: ["TypeScript", "React", "D3.js"], status: 'completed', year: "2023", githubUrl: "#", image: "https://images.unsplash.com/photo-1556075798-4825dfaaf498?w=400&h=300&fit=crop" },
-    { id: 'p7', title: "Static Analysis Framework", description: "Pluggable framework for custom linting rules.", problemStatement: "Existing linters don't support domain-specific rules.", technicalDecisions: ["AST visitor pattern", "Data flow analysis", "Incremental checking"], techStack: ["Python", "libcst"], status: 'completed', year: "2023", githubUrl: "#", image: "https://images.unsplash.com/photo-1516116216624-53e697fedbea?w=400&h=300&fit=crop" },
-    { id: 'p8', title: "Lock-Free Queue", description: "Multi-producer multi-consumer queue without locks.", problemStatement: "Mutex contention in high-throughput message passing.", technicalDecisions: ["Compare-and-swap operations", "Memory ordering", "Hazard pointers"], techStack: ["C++", "Atomics"], status: 'completed', year: "2023", githubUrl: "#", image: "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=400&h=300&fit=crop" },
-    { id: 'p9', title: "Container Runtime", description: "Minimal OCI-compliant container runtime.", problemStatement: "Docker too heavy for development environments.", technicalDecisions: ["Namespace isolation", "Cgroup v2", "Rootless mode"], techStack: ["Go", "Linux syscalls"], status: 'archived', year: "2022", githubUrl: "#", image: "https://images.unsplash.com/photo-1605745341112-85968b19335b?w=400&h=300&fit=crop" },
-    { id: 'p10', title: "Incremental Compiler", description: "Fast recompilation by caching intermediate results.", problemStatement: "Full rebuilds too slow for large codebases.", technicalDecisions: ["Dependency graph", "Content hashing", "Parallel compilation"], techStack: ["Rust", "LLVM"], status: 'active', year: "2024", githubUrl: "#", image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400&h=300&fit=crop" },
-    { id: 'p11', title: "HTTP/3 Client", description: "QUIC-based HTTP client library.", problemStatement: "Need for faster connections with built-in encryption.", technicalDecisions: ["QUIC implementation", "0-RTT connections", "Multiplexed streams"], techStack: ["Rust", "quinn"], status: 'completed', year: "2024", githubUrl: "#", image: "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=400&h=300&fit=crop" },
-    { id: 'p12', title: "Memory Profiler", description: "Low-overhead heap profiler for production.", problemStatement: "Valgrind too slow for production profiling.", technicalDecisions: ["eBPF probes", "Sampling-based", "Flame graphs"], techStack: ["C", "eBPF", "Python"], status: 'completed', year: "2023", githubUrl: "#", image: "https://images.unsplash.com/photo-1504639725590-34d0984388bd?w=400&h=300&fit=crop" },
-    { id: 'p13', title: "Protocol Buffer Compiler", description: "Alternative protobuf compiler with better error messages.", problemStatement: "protoc errors are cryptic and unhelpful.", technicalDecisions: ["LSP support", "Incremental parsing", "Rich diagnostics"], techStack: ["Rust", "tower-lsp"], status: 'active', year: "2024", githubUrl: "#", image: "https://images.unsplash.com/photo-1587620962725-abab7fe55159?w=400&h=300&fit=crop" },
-    { id: 'p14', title: "Regex Engine", description: "JIT-compiled regular expression engine.", problemStatement: "Backtracking regex vulnerable to ReDoS.", technicalDecisions: ["NFA to DFA conversion", "JIT compilation", "Linear time guarantee"], techStack: ["C++", "LLVM"], status: 'completed', year: "2023", githubUrl: "#", image: "https://images.unsplash.com/photo-1509228627152-72ae9ae6848d?w=400&h=300&fit=crop" },
-    { id: 'p15', title: "Event Sourcing Framework", description: "CQRS/ES framework for domain-driven design.", problemStatement: "Audit trails and temporal queries needed for compliance.", technicalDecisions: ["Immutable event log", "Projections", "Snapshotting"], techStack: ["TypeScript", "PostgreSQL", "EventStore"], status: 'completed', year: "2023", githubUrl: "#", image: "https://images.unsplash.com/photo-1551434678-e076c223a692?w=400&h=300&fit=crop" },
-    { id: 'p16', title: "Service Mesh", description: "Lightweight service mesh for Kubernetes.", problemStatement: "Istio too complex for small clusters.", technicalDecisions: ["eBPF data plane", "mTLS", "L7 load balancing"], techStack: ["Go", "eBPF", "Envoy"], status: 'archived', year: "2022", githubUrl: "#", image: "https://images.unsplash.com/photo-1667372393119-3d4c48d07fc9?w=400&h=300&fit=crop" },
-    { id: 'p17', title: "Binary Patch Tool", description: "Differential updates for large binaries.", problemStatement: "Full downloads waste bandwidth for small changes.", technicalDecisions: ["Rolling hash", "Delta encoding", "Merkle trees"], techStack: ["Rust"], status: 'completed', year: "2023", githubUrl: "#", image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=400&h=300&fit=crop" },
-    { id: 'p18', title: "Fuzzing Framework", description: "Coverage-guided fuzzer for finding bugs.", problemStatement: "Random testing insufficient for complex parsers.", technicalDecisions: ["Instrumentation", "Corpus minimization", "Mutation strategies"], techStack: ["C++", "LLVM SanitizerCoverage"], status: 'completed', year: "2024", githubUrl: "#", image: "https://images.unsplash.com/photo-1563206767-5b18f218e8de?w=400&h=300&fit=crop" },
-    { id: 'p19', title: "LSP Server Generator", description: "Generate language servers from grammar files.", problemStatement: "Building LSP servers from scratch is repetitive.", technicalDecisions: ["Tree-sitter integration", "Semantic tokens", "Code actions"], techStack: ["TypeScript", "tree-sitter"], status: 'active', year: "2024", githubUrl: "#", image: "https://images.unsplash.com/photo-1542831371-29b0f74f9713?w=400&h=300&fit=crop" },
-    { id: 'p20', title: "Scheduling Algorithm Visualizer", description: "Interactive visualization of OS schedulers.", problemStatement: "Students struggle to understand scheduling algorithms.", technicalDecisions: ["Step-by-step execution", "Gantt charts", "Multiple algorithms"], techStack: ["React", "Canvas API"], status: 'completed', year: "2022", githubUrl: "#", image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=300&fit=crop" },
-    { id: 'p21', title: "Network Packet Analyzer", description: "Wireshark-like tool for custom protocols.", problemStatement: "Debugging proprietary protocols is difficult.", technicalDecisions: ["BPF filters", "Protocol dissectors", "Timeline view"], techStack: ["Python", "Scapy", "PyQt"], status: 'completed', year: "2023", githubUrl: "#", image: "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=400&h=300&fit=crop" },
-    { id: 'p22', title: "Build Cache Server", description: "Distributed build cache for CI/CD.", problemStatement: "Redundant builds waste compute resources.", technicalDecisions: ["Content-addressable storage", "LRU eviction", "S3 backend"], techStack: ["Go", "gRPC", "BadgerDB"], status: 'completed', year: "2023", githubUrl: "#", image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400&h=300&fit=crop" },
-    { id: 'p23', title: "Code Review Bot", description: "AI-powered code review suggestions.", problemStatement: "Manual reviews miss common patterns.", technicalDecisions: ["AST analysis", "LLM integration", "GitHub Actions"], techStack: ["Python", "OpenAI API"], status: 'active', year: "2024", githubUrl: "#", image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&h=300&fit=crop" },
-    { id: 'p24', title: "Terminal Emulator", description: "GPU-accelerated terminal with ligature support.", problemStatement: "Existing terminals slow with large output.", technicalDecisions: ["wgpu rendering", "PTY handling", "Unicode handling"], techStack: ["Rust", "wgpu"], status: 'archived', year: "2022", githubUrl: "#", image: "https://images.unsplash.com/photo-1629654297299-c8506221ca97?w=400&h=300&fit=crop" },
-    { id: 'p25', title: "API Gateway", description: "High-performance gateway with plugin system.", problemStatement: "Need for custom middleware and rate limiting.", technicalDecisions: ["Lua scripting", "Circuit breakers", "Request coalescing"], techStack: ["Go", "BadgerDB"], status: 'completed', year: "2024", githubUrl: "#", image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=400&h=300&fit=crop" }
+    {
+        id: 'p4', title: "Real-time Metrics Engine", description: "Time-series database for application monitoring.", problemStatement: "Existing solutions too expensive for startups.", technicalDecisions: ["Gorilla compression", "Custom query language", "Streaming aggregation"], techStack: ["Go", "ClickHouse", "Grafana"], status: 'completed', year: "2023", githubUrl: "#", image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=300&fit=crop", architecture: `graph LR
+    A[Metrics SDK] --> B[Collector]
+    B --> C[Aggregator]
+    C --> D[(ClickHouse)]
+    D --> E[Query Engine]
+    E --> F[Grafana]
+    B --> G[Buffer]` },
+    {
+        id: 'p5', title: "WASM Runtime", description: "Lightweight WebAssembly runtime for edge computing.", problemStatement: "V8 too heavy for constrained environments.", technicalDecisions: ["Single-pass compilation", "Linear memory model", "WASI support"], techStack: ["Rust", "LLVM"], status: 'active', year: "2024", githubUrl: "#", image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=400&h=300&fit=crop", architecture: `graph TD
+    A[WASM Module] --> B[Parser]
+    B --> C[Validator]
+    C --> D[Compiler]
+    D --> E[Native Code]
+    E --> F[Runtime]
+    F --> G[WASI Layer]
+    G --> H[Host OS]` },
+    {
+        id: 'p6', title: "Git Internals Explorer", description: "Educational tool for visualizing git object model.", problemStatement: "Developers struggle to understand git's data structures.", technicalDecisions: ["D3.js visualization", "Interactive object graph", "Diff algorithms"], techStack: ["TypeScript", "React", "D3.js"], status: 'completed', year: "2023", githubUrl: "#", image: "https://images.unsplash.com/photo-1556075798-4825dfaaf498?w=400&h=300&fit=crop", architecture: `graph TB
+    A[Git Repository] --> B[Object Parser]
+    B --> C[Commit Graph]
+    B --> D[Tree Objects]
+    B --> E[Blob Objects]
+    C --> F[D3 Renderer]
+    D --> F
+    E --> F
+    F --> G[Interactive UI]` },
+    {
+        id: 'p7', title: "Static Analysis Framework", description: "Pluggable framework for custom linting rules.", problemStatement: "Existing linters don't support domain-specific rules.", technicalDecisions: ["AST visitor pattern", "Data flow analysis", "Incremental checking"], techStack: ["Python", "libcst"], status: 'completed', year: "2023", githubUrl: "#", image: "https://images.unsplash.com/photo-1516116216624-53e697fedbea?w=400&h=300&fit=crop", architecture: `graph TD
+    A[Source Code] --> B[Parser]
+    B --> C[AST]
+    C --> D[Rule Engine]
+    D --> E[Visitor 1]
+    D --> F[Visitor 2]
+    D --> G[Visitor N]
+    E --> H[Diagnostics]
+    F --> H
+    G --> H` },
+    {
+        id: 'p8', title: "Lock-Free Queue", description: "Multi-producer multi-consumer queue without locks.", problemStatement: "Mutex contention in high-throughput message passing.", technicalDecisions: ["Compare-and-swap operations", "Memory ordering", "Hazard pointers"], techStack: ["C++", "Atomics"], status: 'completed', year: "2023", githubUrl: "#", image: "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=400&h=300&fit=crop", architecture: `graph LR
+    subgraph Producers
+        P1[Producer 1]
+        P2[Producer 2]
+    end
+    subgraph Queue
+        H[Head] --> N1[Node]
+        N1 --> N2[Node]
+        N2 --> T[Tail]
+    end
+    subgraph Consumers
+        C1[Consumer 1]
+        C2[Consumer 2]
+    end
+    P1 --> T
+    P2 --> T
+    H --> C1
+    H --> C2` },
+    {
+        id: 'p9', title: "Container Runtime", description: "Minimal OCI-compliant container runtime.", problemStatement: "Docker too heavy for development environments.", technicalDecisions: ["Namespace isolation", "Cgroup v2", "Rootless mode"], techStack: ["Go", "Linux syscalls"], status: 'archived', year: "2022", githubUrl: "#", image: "https://images.unsplash.com/photo-1605745341112-85968b19335b?w=400&h=300&fit=crop", architecture: `graph TD
+    A[OCI Bundle] --> B[Runtime]
+    B --> C[Namespace Setup]
+    B --> D[Cgroup Config]
+    B --> E[Seccomp Filter]
+    C --> F[Container Process]
+    D --> F
+    E --> F
+    F --> G[Rootfs]` },
+    {
+        id: 'p10', title: "Incremental Compiler", description: "Fast recompilation by caching intermediate results.", problemStatement: "Full rebuilds too slow for large codebases.", technicalDecisions: ["Dependency graph", "Content hashing", "Parallel compilation"], techStack: ["Rust", "LLVM"], status: 'active', year: "2024", githubUrl: "#", image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400&h=300&fit=crop", architecture: `graph TD
+    A[Source Files] --> B[File Watcher]
+    B --> C[Dependency Graph]
+    C --> D{Changed?}
+    D -->|Yes| E[Parse]
+    D -->|No| F[Cache Hit]
+    E --> G[Compile]
+    G --> H[Cache Store]
+    F --> I[Link]
+    H --> I` },
+    {
+        id: 'p11', title: "HTTP/3 Client", description: "QUIC-based HTTP client library.", problemStatement: "Need for faster connections with built-in encryption.", technicalDecisions: ["QUIC implementation", "0-RTT connections", "Multiplexed streams"], techStack: ["Rust", "quinn"], status: 'completed', year: "2024", githubUrl: "#", image: "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=400&h=300&fit=crop", architecture: `graph LR
+    A[Application] --> B[HTTP/3 Layer]
+    B --> C[QUIC Transport]
+    C --> D[TLS 1.3]
+    D --> E[UDP Socket]
+    C --> F[Stream Mux]
+    F --> G[Flow Control]` },
+    {
+        id: 'p12', title: "Memory Profiler", description: "Low-overhead heap profiler for production.", problemStatement: "Valgrind too slow for production profiling.", technicalDecisions: ["eBPF probes", "Sampling-based", "Flame graphs"], techStack: ["C", "eBPF", "Python"], status: 'completed', year: "2023", githubUrl: "#", image: "https://images.unsplash.com/photo-1504639725590-34d0984388bd?w=400&h=300&fit=crop", architecture: `graph TD
+    A[Target Process] --> B[eBPF Probes]
+    B --> C[Ring Buffer]
+    C --> D[Sampler]
+    D --> E[Stack Unwinder]
+    E --> F[Aggregator]
+    F --> G[Flame Graph]
+    F --> H[Timeline View]` },
+    {
+        id: 'p13', title: "Protocol Buffer Compiler", description: "Alternative protobuf compiler with better error messages.", problemStatement: "protoc errors are cryptic and unhelpful.", technicalDecisions: ["LSP support", "Incremental parsing", "Rich diagnostics"], techStack: ["Rust", "tower-lsp"], status: 'active', year: "2024", githubUrl: "#", image: "https://images.unsplash.com/photo-1587620962725-abab7fe55159?w=400&h=300&fit=crop", architecture: `graph TD
+    A[Proto Files] --> B[Lexer]
+    B --> C[Parser]
+    C --> D[Semantic Analysis]
+    D --> E[Code Generator]
+    D --> F[LSP Server]
+    F --> G[Diagnostics]
+    F --> H[Completions]
+    E --> I[Output Files]` },
+    {
+        id: 'p14', title: "Regex Engine", description: "JIT-compiled regular expression engine.", problemStatement: "Backtracking regex vulnerable to ReDoS.", technicalDecisions: ["NFA to DFA conversion", "JIT compilation", "Linear time guarantee"], techStack: ["C++", "LLVM"], status: 'completed', year: "2023", githubUrl: "#", image: "https://images.unsplash.com/photo-1509228627152-72ae9ae6848d?w=400&h=300&fit=crop", architecture: `graph LR
+    A[Regex Pattern] --> B[Parser]
+    B --> C[NFA]
+    C --> D[DFA]
+    D --> E[JIT Compiler]
+    E --> F[Native Code]
+    G[Input String] --> F
+    F --> H[Match Result]` },
+    {
+        id: 'p15', title: "Event Sourcing Framework", description: "CQRS/ES framework for domain-driven design.", problemStatement: "Audit trails and temporal queries needed for compliance.", technicalDecisions: ["Immutable event log", "Projections", "Snapshotting"], techStack: ["TypeScript", "PostgreSQL", "EventStore"], status: 'completed', year: "2023", githubUrl: "#", image: "https://images.unsplash.com/photo-1551434678-e076c223a692?w=400&h=300&fit=crop", architecture: `graph TD
+    A[Command] --> B[Command Handler]
+    B --> C[Aggregate]
+    C --> D[Event Store]
+    D --> E[Projector]
+    E --> F[Read Model]
+    G[Query] --> F
+    D --> H[Snapshots]` },
+    {
+        id: 'p16', title: "Service Mesh", description: "Lightweight service mesh for Kubernetes.", problemStatement: "Istio too complex for small clusters.", technicalDecisions: ["eBPF data plane", "mTLS", "L7 load balancing"], techStack: ["Go", "eBPF", "Envoy"], status: 'archived', year: "2022", githubUrl: "#", image: "https://images.unsplash.com/photo-1667372393119-3d4c48d07fc9?w=400&h=300&fit=crop", architecture: `graph TB
+    subgraph Control Plane
+        A[Mesh Controller]
+        B[Certificate Authority]
+    end
+    subgraph Data Plane
+        C[Sidecar A] <--> D[Sidecar B]
+    end
+    A --> C
+    A --> D
+    B --> C
+    B --> D` },
+    {
+        id: 'p17', title: "Binary Patch Tool", description: "Differential updates for large binaries.", problemStatement: "Full downloads waste bandwidth for small changes.", technicalDecisions: ["Rolling hash", "Delta encoding", "Merkle trees"], techStack: ["Rust"], status: 'completed', year: "2023", githubUrl: "#", image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=400&h=300&fit=crop", architecture: `graph LR
+    A[Old Binary] --> B[Chunker]
+    C[New Binary] --> B
+    B --> D[Hash Index]
+    D --> E[Diff Engine]
+    E --> F[Delta Patch]
+    F --> G[Compressor]
+    G --> H[Patch File]` },
+    {
+        id: 'p18', title: "Fuzzing Framework", description: "Coverage-guided fuzzer for finding bugs.", problemStatement: "Random testing insufficient for complex parsers.", technicalDecisions: ["Instrumentation", "Corpus minimization", "Mutation strategies"], techStack: ["C++", "LLVM SanitizerCoverage"], status: 'completed', year: "2024", githubUrl: "#", image: "https://images.unsplash.com/photo-1563206767-5b18f218e8de?w=400&h=300&fit=crop", architecture: `graph TD
+    A[Seed Corpus] --> B[Mutator]
+    B --> C[Test Input]
+    C --> D[Instrumented Target]
+    D --> E{Crash?}
+    E -->|Yes| F[Crash Report]
+    E -->|No| G[Coverage Analysis]
+    G --> H{New Coverage?}
+    H -->|Yes| A
+    H -->|No| B` },
+    {
+        id: 'p19', title: "LSP Server Generator", description: "Generate language servers from grammar files.", problemStatement: "Building LSP servers from scratch is repetitive.", technicalDecisions: ["Tree-sitter integration", "Semantic tokens", "Code actions"], techStack: ["TypeScript", "tree-sitter"], status: 'active', year: "2024", githubUrl: "#", image: "https://images.unsplash.com/photo-1542831371-29b0f74f9713?w=400&h=300&fit=crop", architecture: `graph TD
+    A[Grammar File] --> B[Tree-sitter]
+    B --> C[Parser Generator]
+    C --> D[LSP Template]
+    D --> E[Server Code]
+    E --> F[Semantic Tokens]
+    E --> G[Completions]
+    E --> H[Diagnostics]` },
+    {
+        id: 'p20', title: "Scheduling Algorithm Visualizer", description: "Interactive visualization of OS schedulers.", problemStatement: "Students struggle to understand scheduling algorithms.", technicalDecisions: ["Step-by-step execution", "Gantt charts", "Multiple algorithms"], techStack: ["React", "Canvas API"], status: 'completed', year: "2022", githubUrl: "#", image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=300&fit=crop", architecture: `graph LR
+    A[Process List] --> B[Scheduler]
+    B --> C{Algorithm}
+    C --> D[FCFS]
+    C --> E[SJF]
+    C --> F[RR]
+    D --> G[Gantt Renderer]
+    E --> G
+    F --> G
+    G --> H[Canvas]` },
+    {
+        id: 'p21', title: "Network Packet Analyzer", description: "Wireshark-like tool for custom protocols.", problemStatement: "Debugging proprietary protocols is difficult.", technicalDecisions: ["BPF filters", "Protocol dissectors", "Timeline view"], techStack: ["Python", "Scapy", "PyQt"], status: 'completed', year: "2023", githubUrl: "#", image: "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=400&h=300&fit=crop", architecture: `graph TD
+    A[Network Interface] --> B[BPF Filter]
+    B --> C[Packet Capture]
+    C --> D[Dissector Chain]
+    D --> E[Protocol Parser]
+    E --> F[Packet Store]
+    F --> G[Timeline View]
+    F --> H[Hex View]` },
+    {
+        id: 'p22', title: "Build Cache Server", description: "Distributed build cache for CI/CD.", problemStatement: "Redundant builds waste compute resources.", technicalDecisions: ["Content-addressable storage", "LRU eviction", "S3 backend"], techStack: ["Go", "gRPC", "BadgerDB"], status: 'completed', year: "2023", githubUrl: "#", image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400&h=300&fit=crop", architecture: `graph TD
+    A[Build Client] --> B[gRPC API]
+    B --> C{Cache Hit?}
+    C -->|Yes| D[BadgerDB]
+    C -->|No| E[Build]
+    E --> F[Store Artifact]
+    F --> D
+    D --> G[S3 Backend]
+    D --> H[LRU Eviction]` },
+    {
+        id: 'p23', title: "Code Review Bot", description: "AI-powered code review suggestions.", problemStatement: "Manual reviews miss common patterns.", technicalDecisions: ["AST analysis", "LLM integration", "GitHub Actions"], techStack: ["Python", "OpenAI API"], status: 'active', year: "2024", githubUrl: "#", image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&h=300&fit=crop", architecture: `graph LR
+    A[PR Webhook] --> B[GitHub Action]
+    B --> C[Diff Parser]
+    C --> D[AST Analyzer]
+    D --> E[LLM API]
+    E --> F[Suggestions]
+    F --> G[PR Comments]` },
+    {
+        id: 'p24', title: "Terminal Emulator", description: "GPU-accelerated terminal with ligature support.", problemStatement: "Existing terminals slow with large output.", technicalDecisions: ["wgpu rendering", "PTY handling", "Unicode handling"], techStack: ["Rust", "wgpu"], status: 'archived', year: "2022", githubUrl: "#", image: "https://images.unsplash.com/photo-1629654297299-c8506221ca97?w=400&h=300&fit=crop", architecture: `graph TD
+    A[PTY Master] --> B[Input Handler]
+    B --> C[ANSI Parser]
+    C --> D[Cell Grid]
+    D --> E[Font Rasterizer]
+    E --> F[wgpu Renderer]
+    F --> G[GPU]
+    G --> H[Display]` },
+    {
+        id: 'p25', title: "API Gateway", description: "High-performance gateway with plugin system.", problemStatement: "Need for custom middleware and rate limiting.", technicalDecisions: ["Lua scripting", "Circuit breakers", "Request coalescing"], techStack: ["Go", "BadgerDB"], status: 'completed', year: "2024", githubUrl: "#", image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=400&h=300&fit=crop", architecture: `graph LR
+    A[Client] --> B[Gateway]
+    B --> C[Auth Plugin]
+    C --> D[Rate Limiter]
+    D --> E[Circuit Breaker]
+    E --> F{Route}
+    F --> G[Service A]
+    F --> H[Service B]
+    F --> I[Service C]` }
 ];
 
 // Real certificates based on GitHub contributions
