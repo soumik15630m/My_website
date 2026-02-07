@@ -160,20 +160,23 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onOpen, activ
         {/* === SLIDE 3: ARCHITECTURE DIAGRAM (conditional) === */}
         {hasArchitecture && (
           <div className={`${slideClass} bg-black/20`}>
-            <div className="h-full flex flex-col">
-              <div className="flex items-center gap-3 text-secondaryText mb-4">
-                <GitBranch size={20} />
-                <h4 className="text-xs font-mono uppercase tracking-widest opacity-70">Architecture</h4>
-              </div>
+            {/* Header */}
+            <div className="absolute top-8 left-8 flex items-center gap-3 text-secondaryText">
+              <GitBranch size={18} />
+              <h4 className="text-xs font-mono uppercase tracking-widest opacity-70">Architecture</h4>
+            </div>
 
-              <div className="flex-1 flex items-center justify-center overflow-hidden rounded-xl bg-black/30 border border-white/5 p-4">
+            {/* Diagram Container - centered with proper spacing */}
+            <div className="flex-1 flex items-center justify-center pt-16 pb-12">
+              <div className="w-full h-full max-h-[340px] rounded-xl bg-black/40 border border-white/5 p-6 flex items-center justify-center overflow-auto">
                 <MermaidDiagram
                   chart={project.architecture!}
-                  className="w-full h-full max-h-[320px]"
+                  className="w-full"
                 />
               </div>
             </div>
 
+            {/* Footer label */}
             <div className="absolute bottom-8 left-8">
               <p className="text-xs font-mono text-secondaryText/60 uppercase tracking-widest">
                 03 // Architecture

@@ -218,6 +218,49 @@ body {
 }
 
 /* ===============================
+   MERMAID DIAGRAM STYLES
+   =============================== */
+
+.mermaid-diagram svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.mermaid-diagram .node rect,
+.mermaid-diagram .node circle,
+.mermaid-diagram .node ellipse,
+.mermaid-diagram .node polygon,
+.mermaid-diagram .node path {
+  stroke: #3C4043 !important;
+  stroke-width: 1px !important;
+}
+
+.mermaid-diagram .edgePath path {
+  stroke: #8AB4F8 !important;
+  stroke-width: 1.5px !important;
+}
+
+.mermaid-diagram .edgeLabel {
+  background-color: #1A1A1A !important;
+  color: #E8EAED !important;
+}
+
+.mermaid-diagram .cluster rect {
+  fill: #1A1A1A !important;
+  stroke: #3C4043 !important;
+}
+
+.mermaid-diagram text {
+  fill: #E8EAED !important;
+  font-family: ui-monospace, monospace !important;
+  font-size: 11px !important;
+}
+
+.mermaid-diagram .label {
+  color: #E8EAED !important;
+}
+
+/* ===============================
    RESPONSIVE ADJUSTMENTS
    =============================== */
 
