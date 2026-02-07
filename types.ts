@@ -8,6 +8,7 @@ export interface Project {
   githubUrl?: string;
   status: 'active' | 'archived' | 'completed';
   year: string;
+  image?: string;
 }
 
 export interface Achievement {
@@ -16,6 +17,7 @@ export interface Achievement {
   context: string;
   year: string;
   verificationLink?: string;
+  image?: string;
 }
 
 export interface Note {
@@ -26,6 +28,7 @@ export interface Note {
   tags: string[];
   readTime: string;
   content?: string;
+  image?: string;
 }
 
 export interface OpenSourceContribution {

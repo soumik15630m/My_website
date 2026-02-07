@@ -97,6 +97,19 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onOpen, activ
             <p className="text-lg text-secondaryText font-light leading-relaxed line-clamp-3">
               {project.description}
             </p>
+
+            {/* Project Image Preview */}
+            {project.image && (
+              <div className="relative w-full h-32 rounded-xl overflow-hidden bg-surface border border-white/5">
+                <img
+                  src={project.image}
+                  alt={project.title}
+                  className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+              </div>
+            )}
           </div>
 
           <div className="absolute bottom-8 left-8">

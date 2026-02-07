@@ -28,10 +28,21 @@ export const NoteCard: React.FC<NoteCardProps> = ({ note, index, onClick }) => {
       className="group block py-6 border border-transparent border-b-white/5 px-5 -mx-5 rounded-2xl cursor-pointer transition-all hover:shadow-lg hover:shadow-accent/5"
     >
       <div className="flex gap-5">
-        {/* Icon */}
-        <div className="w-10 h-10 rounded-xl bg-accent/5 border border-accent/10 flex items-center justify-center shrink-0 group-hover:bg-accent/10 group-hover:border-accent/20 transition-all">
-          <BookOpen size={16} className="text-accent/50 group-hover:text-accent transition-colors" />
-        </div>
+        {/* Image or Icon */}
+        {note.image ? (
+          <div className="w-20 h-16 rounded-xl overflow-hidden shrink-0 bg-surface border border-white/5">
+            <img
+              src={note.image}
+              alt={note.title}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              loading="lazy"
+            />
+          </div>
+        ) : (
+          <div className="w-10 h-10 rounded-xl bg-accent/5 border border-accent/10 flex items-center justify-center shrink-0 group-hover:bg-accent/10 group-hover:border-accent/20 transition-all">
+            <BookOpen size={16} className="text-accent/50 group-hover:text-accent transition-colors" />
+          </div>
+        )}
 
         <div className="flex-1 min-w-0">
           {/* Meta */}

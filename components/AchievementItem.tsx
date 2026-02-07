@@ -31,10 +31,21 @@ export const AchievementItem: React.FC<AchievementItemProps> = ({ achievement, i
         {achievement.year}
       </div>
 
-      {/* Icon */}
-      <div className="w-8 h-8 rounded-lg bg-accent/5 border border-accent/10 flex items-center justify-center shrink-0 group-hover:bg-accent/10 transition-colors">
-        <Award size={14} className="text-accent/60 group-hover:text-accent transition-colors" />
-      </div>
+      {/* Image or Icon */}
+      {achievement.image ? (
+        <div className="w-16 h-12 rounded-lg overflow-hidden shrink-0 bg-surface border border-white/5">
+          <img
+            src={achievement.image}
+            alt={achievement.title}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            loading="lazy"
+          />
+        </div>
+      ) : (
+        <div className="w-8 h-8 rounded-lg bg-accent/5 border border-accent/10 flex items-center justify-center shrink-0 group-hover:bg-accent/10 transition-colors">
+          <Award size={14} className="text-accent/60 group-hover:text-accent transition-colors" />
+        </div>
+      )}
 
       {/* Content */}
       <div className="flex-1 min-w-0">

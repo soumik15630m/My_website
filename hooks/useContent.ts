@@ -20,7 +20,7 @@ const NAV_ITEMS = [
     { id: 'home', label: '_home' },
     { id: 'projects', label: '_projects' },
     { id: 'opensource', label: '_opensource' },
-    { id: 'achievements', label: '_achievements' },
+    { id: 'achievements', label: '_certificates' },
     { id: 'notes', label: '_writings' },
 ];
 
