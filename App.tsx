@@ -14,7 +14,7 @@ import { OpenSourceDetail } from './components/OpenSourceDetail';
 import { ParticleField } from './components/ParticleField';
 import { useContent } from './hooks/useContent';
 import { ViewState, Project, Achievement, Note, OpenSourceContribution } from './types';
-import { GitPullRequest, Star, ExternalLink, Search, X } from 'lucide-react';
+import { GitPullRequest, Star, ExternalLink, Search, X, ChevronDown, Clock, ArrowUpDown } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 
 function App() {
@@ -29,6 +29,10 @@ function App() {
   const [direction, setDirection] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [sortBy, setSortBy] = useState<'date' | 'readTime' | 'title'>('date');
+  const [showAutocomplete, setShowAutocomplete] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(10);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Use a ref for the lock to ensure instant access inside event listeners without closure staleness
   const isTransitioningRef = useRef(false);
@@ -428,10 +432,46 @@ function App() {
           return matchesSearch && matchesTags;
         });
 
+        // Sort filtered notes
+        const sortedNotes = [...filteredNotes].sort((a, b) => {
+          switch (sortBy) {
+            case 'date':
+              return new Date(b.date).getTime() - new Date(a.date).getTime();
+            case 'readTime':
+              return parseInt(a.readTime) - parseInt(b.readTime);
+            case 'title':
+              return a.title.localeCompare(b.title);
+            default:
+              return 0;
+          }
+        });
+
+        // Lazy load - show only visibleCount items
+        const displayedNotes = sortedNotes.slice(0, visibleCount);
+        const hasMore = visibleCount < sortedNotes.length;
+
+        // Autocomplete suggestions
+        const autocompleteSuggestions = searchQuery.length > 0
+          ? notes
+            .filter(n => n.title.toLowerCase().includes(searchQuery.toLowerCase()))
+            .slice(0, 5)
+          : [];
+
         const toggleTag = (tag: string) => {
           setSelectedTags(prev =>
             prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
           );
+          setVisibleCount(10); // Reset to initial count when filtering
+        };
+
+        const handleLoadMore = () => {
+          setVisibleCount(prev => prev + 10);
+        };
+
+        const selectAutocomplete = (title: string) => {
+          setSearchQuery(title);
+          setShowAutocomplete(false);
+          setVisibleCount(10);
         };
 
         return (
@@ -443,50 +483,92 @@ function App() {
               </p>
             </Section>
 
-            {/* Search & Filter Bar */}
+            {/* Search & Sort Bar */}
             <div className="mb-6 space-y-4">
-              {/* Search Input */}
-              <div className="relative">
-                <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-secondaryText/40" />
-                <input
-                  type="text"
-                  placeholder="Search writings..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-12 pr-10 py-3 bg-white/5 border border-white/10 rounded-xl text-primaryText placeholder-secondaryText/40 focus:outline-none focus:border-accent/50 transition-colors font-mono text-sm"
-                />
-                {searchQuery && (
-                  <button
-                    onClick={() => setSearchQuery('')}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-secondaryText/40 hover:text-primaryText transition-colors"
+              <div className="flex gap-3">
+                {/* Search Input with Autocomplete */}
+                <div className="relative flex-1">
+                  <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-secondaryText/40" />
+                  <input
+                    ref={searchInputRef}
+                    type="text"
+                    placeholder="Search writings..."
+                    value={searchQuery}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+                      setShowAutocomplete(true);
+                      setVisibleCount(10);
+                    }}
+                    onFocus={() => setShowAutocomplete(true)}
+                    onBlur={() => setTimeout(() => setShowAutocomplete(false), 200)}
+                    className="w-full pl-12 pr-10 py-3 bg-white/5 border border-white/10 rounded-xl text-primaryText placeholder-secondaryText/40 focus:outline-none focus:border-accent/50 transition-colors font-mono text-sm"
+                  />
+                  {searchQuery && (
+                    <button
+                      onClick={() => { setSearchQuery(''); setVisibleCount(10); }}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-secondaryText/40 hover:text-primaryText transition-colors"
+                    >
+                      <X size={16} />
+                    </button>
+                  )}
+
+                  {/* Autocomplete Dropdown */}
+                  {showAutocomplete && autocompleteSuggestions.length > 0 && (
+                    <div className="absolute top-full left-0 right-0 mt-2 bg-surface border border-white/10 rounded-xl overflow-hidden shadow-xl z-50">
+                      {autocompleteSuggestions.map(note => (
+                        <button
+                          key={note.id}
+                          onClick={() => selectAutocomplete(note.title)}
+                          className="w-full px-4 py-3 text-left hover:bg-white/5 transition-colors border-b border-white/5 last:border-0"
+                        >
+                          <p className="text-sm text-primaryText truncate">{note.title}</p>
+                          <p className="text-xs text-secondaryText/40 mt-0.5">{note.tags.slice(0, 3).join(' • ')}</p>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Sort Dropdown */}
+                <div className="relative">
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value as 'date' | 'readTime' | 'title')}
+                    className="appearance-none px-4 py-3 pr-10 bg-white/5 border border-white/10 rounded-xl text-secondaryText font-mono text-sm focus:outline-none focus:border-accent/50 transition-colors cursor-pointer"
                   >
-                    <X size={16} />
-                  </button>
-                )}
+                    <option value="date">Latest</option>
+                    <option value="readTime">Quick reads</option>
+                    <option value="title">A-Z</option>
+                  </select>
+                  <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-secondaryText/40 pointer-events-none" />
+                </div>
               </div>
 
-              {/* Tag Filters */}
-              <div className="flex flex-wrap gap-2">
-                {allTags.map(tag => (
-                  <button
-                    key={tag}
-                    onClick={() => toggleTag(tag)}
-                    className={`text-xs font-mono px-3 py-1.5 rounded-full border transition-all duration-200 ${selectedTags.includes(tag)
-                      ? 'bg-accent/20 border-accent/50 text-accent'
-                      : 'bg-white/5 border-white/10 text-secondaryText/60 hover:border-white/20 hover:text-secondaryText'
-                      }`}
-                  >
-                    {tag}
-                  </button>
-                ))}
-                {selectedTags.length > 0 && (
-                  <button
-                    onClick={() => setSelectedTags([])}
-                    className="text-xs font-mono px-3 py-1.5 text-secondaryText/40 hover:text-secondaryText transition-colors"
-                  >
-                    Clear filters
-                  </button>
-                )}
+              {/* Skills Filter Section */}
+              <div className="space-y-2">
+                <span className="text-xs font-mono text-secondaryText/40 uppercase tracking-wider">Filter by skills</span>
+                <div className="flex flex-wrap gap-2">
+                  {allTags.map(tag => (
+                    <button
+                      key={tag}
+                      onClick={() => toggleTag(tag)}
+                      className={`text-xs font-mono px-3 py-1.5 rounded-full border transition-all duration-200 ${selectedTags.includes(tag)
+                        ? 'bg-accent/20 border-accent/50 text-accent'
+                        : 'bg-white/5 border-white/10 text-secondaryText/60 hover:border-white/20 hover:text-secondaryText'
+                        }`}
+                    >
+                      {tag}
+                    </button>
+                  ))}
+                  {selectedTags.length > 0 && (
+                    <button
+                      onClick={() => { setSelectedTags([]); setVisibleCount(10); }}
+                      className="text-xs font-mono px-3 py-1.5 text-secondaryText/40 hover:text-secondaryText transition-colors"
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -495,7 +577,8 @@ function App() {
               {/* Results count */}
               <div className="px-6 py-3 border-b border-white/5 flex items-center justify-between">
                 <span className="text-xs font-mono text-secondaryText/40">
-                  {filteredNotes.length} {filteredNotes.length === 1 ? 'article' : 'articles'}
+                  {sortedNotes.length} {sortedNotes.length === 1 ? 'article' : 'articles'}
+                  {hasMore && <span className="text-secondaryText/30"> • showing {displayedNotes.length}</span>}
                 </span>
                 {(searchQuery || selectedTags.length > 0) && (
                   <span className="text-xs font-mono text-accent/60">filtered</span>
@@ -510,15 +593,33 @@ function App() {
                   animate="visible"
                   className="p-4 space-y-3"
                 >
-                  {filteredNotes.length > 0 ? (
-                    filteredNotes.map((note, index) => (
-                      <NoteCard
-                        key={note.id}
-                        note={note}
-                        index={index}
-                        onClick={() => setSelectedNote(note)}
-                      />
-                    ))
+                  {displayedNotes.length > 0 ? (
+                    <>
+                      {displayedNotes.map((note, index) => (
+                        <NoteCard
+                          key={note.id}
+                          note={note}
+                          index={index}
+                          onClick={() => setSelectedNote(note)}
+                        />
+                      ))}
+
+                      {/* Load More - appears at bottom, seamless on scroll */}
+                      {hasMore && (
+                        <motion.div
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          className="py-4 flex justify-center"
+                        >
+                          <button
+                            onClick={handleLoadMore}
+                            className="text-xs font-mono px-6 py-2 text-accent/60 hover:text-accent border border-accent/20 hover:border-accent/40 rounded-full transition-all"
+                          >
+                            Load more ({sortedNotes.length - visibleCount} remaining)
+                          </button>
+                        </motion.div>
+                      )}
+                    </>
                   ) : (
                     <div className="py-16 text-center">
                       <p className="text-secondaryText/40 font-mono text-sm">No articles match your search.</p>
