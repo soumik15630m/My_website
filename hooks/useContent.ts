@@ -1,7 +1,26 @@
 import { useState, useEffect } from 'react';
-import { PROFILE, PROJECTS, ACHIEVEMENTS, NOTES, NAV_ITEMS } from '../constants';
 
 const API_BASE = '/api';
+
+// Empty defaults - only used while loading
+const EMPTY_PROFILE = {
+    name: "",
+    handle: "",
+    role: "",
+    tagline: "",
+    location: "",
+    availability: "",
+    email: "",
+    github: "",
+    about: ""
+};
+
+const NAV_ITEMS = [
+    { id: 'home', label: '_home' },
+    { id: 'projects', label: '_projects' },
+    { id: 'achievements', label: '_achievements' },
+    { id: 'notes', label: '_log' },
+];
 
 async function fetchContent(type: string) {
     try {
@@ -11,7 +30,6 @@ async function fetchContent(type: string) {
             return null;
         }
         const json = await res.json();
-        console.log(`Fetched ${type}:`, json);
         return json.data;
     } catch (error) {
         console.error(`Error fetching ${type}:`, error);
@@ -20,17 +38,15 @@ async function fetchContent(type: string) {
 }
 
 export function useContent() {
-    const [profile, setProfile] = useState(PROFILE);
-    const [projects, setProjects] = useState(PROJECTS);
-    const [achievements, setAchievements] = useState(ACHIEVEMENTS);
-    const [notes, setNotes] = useState(NOTES);
+    const [profile, setProfile] = useState(EMPTY_PROFILE);
+    const [projects, setProjects] = useState<any[]>([]);
+    const [achievements, setAchievements] = useState<any[]>([]);
+    const [notes, setNotes] = useState<any[]>([]);
     const [navItems] = useState(NAV_ITEMS);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         async function loadContent() {
-            console.log('Loading content from API...');
-
             const [profileData, projectsData, achievementsData, notesData] = await Promise.all([
                 fetchContent('profile'),
                 fetchContent('projects'),
@@ -38,30 +54,24 @@ export function useContent() {
                 fetchContent('notes'),
             ]);
 
-            // Update profile if we got valid data
+            // Set data from API
             if (profileData && typeof profileData === 'object') {
-                console.log('Setting profile:', profileData);
-                setProfile(prev => ({ ...prev, ...profileData }));
+                setProfile(profileData);
             }
 
-            // Update arrays if they have items
-            if (Array.isArray(projectsData) && projectsData.length > 0) {
-                console.log('Setting projects:', projectsData);
+            if (Array.isArray(projectsData)) {
                 setProjects(projectsData);
             }
 
-            if (Array.isArray(achievementsData) && achievementsData.length > 0) {
-                console.log('Setting achievements:', achievementsData);
+            if (Array.isArray(achievementsData)) {
                 setAchievements(achievementsData);
             }
 
-            if (Array.isArray(notesData) && notesData.length > 0) {
-                console.log('Setting notes:', notesData);
+            if (Array.isArray(notesData)) {
                 setNotes(notesData);
             }
 
             setLoading(false);
-            console.log('Content loading complete');
         }
 
         loadContent();
