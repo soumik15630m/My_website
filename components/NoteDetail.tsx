@@ -100,12 +100,50 @@ export const NoteDetail: React.FC<NoteDetailProps> = ({ note, onClose }) => {
                         </p>
                     </div>
 
-                    {/* Placeholder for full content */}
-                    <div className="p-6 bg-white/3 border border-white/5 rounded-2xl">
-                        <p className="text-sm text-secondaryText/50 italic text-center">
-                            Full article content would appear here...
-                        </p>
-                    </div>
+                    {/* Full Article Content */}
+                    {note.content && (
+                        <div className="prose prose-invert prose-sm max-w-none space-y-4">
+                            {note.content.split('\n\n').map((paragraph, idx) => {
+                                // Handle headers
+                                if (paragraph.startsWith('## ')) {
+                                    return <h3 key={idx} className="text-lg font-semibold text-primaryText mt-6 mb-3">{paragraph.replace('## ', '')}</h3>;
+                                }
+                                if (paragraph.startsWith('### ')) {
+                                    return <h4 key={idx} className="text-base font-medium text-primaryText/90 mt-4 mb-2">{paragraph.replace('### ', '')}</h4>;
+                                }
+                                // Handle code blocks
+                                if (paragraph.startsWith('```')) {
+                                    const lines = paragraph.split('\n');
+                                    const lang = lines[0].replace('```', '');
+                                    const code = lines.slice(1, -1).join('\n');
+                                    return (
+                                        <pre key={idx} className="bg-black/40 border border-white/10 rounded-xl p-4 overflow-x-auto">
+                                            <code className="text-sm font-mono text-green-400">{code}</code>
+                                        </pre>
+                                    );
+                                }
+                                // Handle bullet points
+                                if (paragraph.includes('\n- ')) {
+                                    const items = paragraph.split('\n- ').filter(Boolean);
+                                    return (
+                                        <ul key={idx} className="list-disc list-inside space-y-1 text-primaryText/80">
+                                            {items.map((item, i) => <li key={i}>{item}</li>)}
+                                        </ul>
+                                    );
+                                }
+                                // Regular paragraph
+                                return <p key={idx} className="text-primaryText/80 leading-relaxed">{paragraph}</p>;
+                            })}
+                        </div>
+                    )}
+
+                    {!note.content && (
+                        <div className="p-6 bg-white/3 border border-white/5 rounded-2xl">
+                            <p className="text-sm text-secondaryText/50 italic text-center">
+                                Content loading...
+                            </p>
+                        </div>
+                    )}
                 </div>
             </motion.div>
         </motion.div>

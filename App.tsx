@@ -10,6 +10,7 @@ import { TimelineTrail } from './components/TimelineTrail';
 import { ScrollTrigger } from './components/ScrollTrigger';
 import { AchievementDetail } from './components/AchievementDetail';
 import { NoteDetail } from './components/NoteDetail';
+import { OpenSourceDetail } from './components/OpenSourceDetail';
 import { ParticleField } from './components/ParticleField';
 import { useContent } from './hooks/useContent';
 import { ViewState, Project, Achievement, Note, OpenSourceContribution } from './types';
@@ -24,6 +25,7 @@ function App() {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [selectedAchievement, setSelectedAchievement] = useState<Achievement | null>(null);
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
+  const [selectedOSS, setSelectedOSS] = useState<OpenSourceContribution | null>(null);
   const [direction, setDirection] = useState(0);
 
   // Use a ref for the lock to ensure instant access inside event listeners without closure staleness
@@ -403,7 +405,7 @@ function App() {
               ))}
             </motion.div>
 
-            <ScrollTrigger nextSection="Engineering Log" onClick={() => handleViewChange('notes')} />
+            <ScrollTrigger nextSection="Open Source" onClick={() => handleViewChange('opensource')} />
           </div>
         );
 
@@ -433,8 +435,8 @@ function App() {
             </motion.div>
 
             <ScrollTrigger
-              nextSection="Open Source"
-              onClick={() => handleViewChange('opensource')}
+              nextSection="End"
+              onClick={() => handleViewChange('home')}
             />
           </div>
         );
@@ -454,15 +456,13 @@ function App() {
 
               <div className="space-y-4 pt-8">
                 {opensource.map((contrib, index) => (
-                  <motion.a
+                  <motion.div
                     key={contrib.id}
-                    href={contrib.prUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    onClick={() => setSelectedOSS(contrib)}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.05 }}
-                    className="group flex flex-col md:flex-row md:items-center gap-4 p-6 rounded-xl bg-white/5 border border-white/10 hover:border-accent/30 transition-all duration-300 hover:bg-white/8"
+                    className="group flex flex-col md:flex-row md:items-center gap-4 p-6 rounded-xl bg-white/5 border border-white/10 hover:border-accent/30 transition-all duration-300 hover:bg-white/8 cursor-pointer"
                   >
                     <div className="flex items-center gap-3 flex-1 min-w-0">
                       <div className="p-2 rounded-lg bg-green-500/10">
@@ -471,15 +471,7 @@ function App() {
                       <div className="flex-1 min-w-0">
                         <p className="font-medium text-primaryText group-hover:text-accent transition-colors">{contrib.title}</p>
                         <div className="flex items-center gap-2 mt-1">
-                          <a
-                            href={contrib.repoUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-sm text-secondaryText/60 hover:text-accent transition-colors"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            {contrib.repo}
-                          </a>
+                          <span className="text-sm text-secondaryText/60">{contrib.repo}</span>
                           <span className="text-secondaryText/30">•</span>
                           <span className="text-sm text-secondaryText/60">#{contrib.prNumber}</span>
                         </div>
@@ -496,14 +488,12 @@ function App() {
                         {contrib.status}
                       </span>
                     </div>
-                  </motion.a>
+                  </motion.div>
                 ))}
               </div>
             </Section>
 
-            <div className="h-32 flex items-center justify-center opacity-30">
-              <span className="font-mono text-xs">EOF</span>
-            </div>
+            <ScrollTrigger nextSection="Recognition" onClick={() => handleViewChange('achievements')} />
           </div>
         );
     }
@@ -551,6 +541,15 @@ function App() {
             <NoteDetail
               note={selectedNote}
               onClose={() => setSelectedNote(null)}
+            />
+          )}
+        </AnimatePresence>
+
+        <AnimatePresence>
+          {selectedOSS && (
+            <OpenSourceDetail
+              contribution={selectedOSS}
+              onClose={() => setSelectedOSS(null)}
             />
           )}
         </AnimatePresence>

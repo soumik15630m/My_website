@@ -19,9 +19,9 @@ const EMPTY_PROFILE = {
 const NAV_ITEMS = [
     { id: 'home', label: '_home' },
     { id: 'projects', label: '_projects' },
+    { id: 'opensource', label: '_opensource' },
     { id: 'achievements', label: '_achievements' },
     { id: 'notes', label: '_log' },
-    { id: 'opensource', label: '_opensource' },
 ];
 
 async function fetchContent(type: string) {
