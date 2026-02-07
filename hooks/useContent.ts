@@ -6,9 +6,15 @@ const API_BASE = '/api';
 async function fetchContent(type: string) {
     try {
         const res = await fetch(`${API_BASE}/content/${type}`);
-        const data = await res.json();
-        return data.data;
-    } catch {
+        if (!res.ok) {
+            console.warn(`Failed to fetch ${type}: ${res.status}`);
+            return null;
+        }
+        const json = await res.json();
+        console.log(`Fetched ${type}:`, json);
+        return json.data;
+    } catch (error) {
+        console.error(`Error fetching ${type}:`, error);
         return null;
     }
 }
@@ -23,6 +29,8 @@ export function useContent() {
 
     useEffect(() => {
         async function loadContent() {
+            console.log('Loading content from API...');
+
             const [profileData, projectsData, achievementsData, notesData] = await Promise.all([
                 fetchContent('profile'),
                 fetchContent('projects'),
@@ -30,12 +38,30 @@ export function useContent() {
                 fetchContent('notes'),
             ]);
 
-            if (profileData) setProfile(profileData);
-            if (projectsData && projectsData.length > 0) setProjects(projectsData);
-            if (achievementsData && achievementsData.length > 0) setAchievements(achievementsData);
-            if (notesData && notesData.length > 0) setNotes(notesData);
+            // Update profile if we got valid data
+            if (profileData && typeof profileData === 'object') {
+                console.log('Setting profile:', profileData);
+                setProfile(prev => ({ ...prev, ...profileData }));
+            }
+
+            // Update arrays if they have items
+            if (Array.isArray(projectsData) && projectsData.length > 0) {
+                console.log('Setting projects:', projectsData);
+                setProjects(projectsData);
+            }
+
+            if (Array.isArray(achievementsData) && achievementsData.length > 0) {
+                console.log('Setting achievements:', achievementsData);
+                setAchievements(achievementsData);
+            }
+
+            if (Array.isArray(notesData) && notesData.length > 0) {
+                console.log('Setting notes:', notesData);
+                setNotes(notesData);
+            }
 
             setLoading(false);
+            console.log('Content loading complete');
         }
 
         loadContent();
