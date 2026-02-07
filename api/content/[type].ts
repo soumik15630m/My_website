@@ -1,5 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { neon } from '@neondatabase/serverless';
+import jwt from 'jsonwebtoken';
 
 const sql = neon(process.env.DATABASE_URL || '');
 
@@ -29,9 +30,10 @@ const CONTENT_DEFAULTS: Record<string, any> = {
 
 function verifyToken(token: string): { userId: number; email: string } | null {
     try {
-        const jwt = require('jsonwebtoken');
-        return jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret') as { userId: number; email: string };
-    } catch {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret');
+        return decoded as { userId: number; email: string };
+    } catch (error) {
+        console.error('Token verification failed:', error);
         return null;
     }
 }
@@ -81,12 +83,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (req.method === 'PUT' || req.method === 'POST') {
         const token = getAuthToken(req);
         if (!token) {
-            return res.status(401).json({ error: 'Authentication required' });
+            return res.status(401).json({ error: 'Authentication required - no token provided' });
         }
 
         const payload = verifyToken(token);
         if (!payload) {
-            return res.status(401).json({ error: 'Invalid token' });
+            return res.status(401).json({ error: 'Invalid token - verification failed' });
         }
 
         try {
