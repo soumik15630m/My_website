@@ -29,9 +29,8 @@ function App() {
   const [direction, setDirection] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [sortBy, setSortBy] = useState<'date' | 'readTime' | 'title'>('date');
+  const [sortBy, setSortBy] = useState<'date' | 'oldest' | 'readTime' | 'title'>('date');
   const [showAutocomplete, setShowAutocomplete] = useState(false);
-  const [visibleCount, setVisibleCount] = useState(10);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Use a ref for the lock to ensure instant access inside event listeners without closure staleness
@@ -437,6 +436,8 @@ function App() {
           switch (sortBy) {
             case 'date':
               return new Date(b.date).getTime() - new Date(a.date).getTime();
+            case 'oldest':
+              return new Date(a.date).getTime() - new Date(b.date).getTime();
             case 'readTime':
               return parseInt(a.readTime) - parseInt(b.readTime);
             case 'title':
@@ -445,10 +446,6 @@ function App() {
               return 0;
           }
         });
-
-        // Lazy load - show only visibleCount items
-        const displayedNotes = sortedNotes.slice(0, visibleCount);
-        const hasMore = visibleCount < sortedNotes.length;
 
         // Autocomplete suggestions
         const autocompleteSuggestions = searchQuery.length > 0
@@ -461,17 +458,11 @@ function App() {
           setSelectedTags(prev =>
             prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
           );
-          setVisibleCount(10); // Reset to initial count when filtering
-        };
-
-        const handleLoadMore = () => {
-          setVisibleCount(prev => prev + 10);
         };
 
         const selectAutocomplete = (title: string) => {
           setSearchQuery(title);
           setShowAutocomplete(false);
-          setVisibleCount(10);
         };
 
         return (
@@ -497,7 +488,6 @@ function App() {
                     onChange={(e) => {
                       setSearchQuery(e.target.value);
                       setShowAutocomplete(true);
-                      setVisibleCount(10);
                     }}
                     onFocus={() => setShowAutocomplete(true)}
                     onBlur={() => setTimeout(() => setShowAutocomplete(false), 200)}
@@ -505,7 +495,7 @@ function App() {
                   />
                   {searchQuery && (
                     <button
-                      onClick={() => { setSearchQuery(''); setVisibleCount(10); }}
+                      onClick={() => setSearchQuery('')}
                       className="absolute right-4 top-1/2 -translate-y-1/2 text-secondaryText/40 hover:text-primaryText transition-colors"
                     >
                       <X size={16} />
@@ -533,10 +523,11 @@ function App() {
                 <div className="relative">
                   <select
                     value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value as 'date' | 'readTime' | 'title')}
-                    className="appearance-none px-4 py-3 pr-10 bg-white/5 border border-white/10 rounded-xl text-secondaryText font-mono text-sm focus:outline-none focus:border-accent/50 transition-colors cursor-pointer"
+                    onChange={(e) => setSortBy(e.target.value as 'date' | 'oldest' | 'readTime' | 'title')}
+                    className="appearance-none px-4 py-3 pr-10 bg-surface border border-white/10 rounded-xl text-secondaryText font-mono text-sm focus:outline-none focus:border-accent/50 transition-colors cursor-pointer [&>option]:bg-surface [&>option]:text-primaryText"
                   >
                     <option value="date">Latest</option>
+                    <option value="oldest">Oldest</option>
                     <option value="readTime">Quick reads</option>
                     <option value="title">A-Z</option>
                   </select>
@@ -562,7 +553,7 @@ function App() {
                   ))}
                   {selectedTags.length > 0 && (
                     <button
-                      onClick={() => { setSelectedTags([]); setVisibleCount(10); }}
+                      onClick={() => setSelectedTags([])}
                       className="text-xs font-mono px-3 py-1.5 text-secondaryText/40 hover:text-secondaryText transition-colors"
                     >
                       Clear
@@ -578,7 +569,6 @@ function App() {
               <div className="px-6 py-3 border-b border-white/5 flex items-center justify-between">
                 <span className="text-xs font-mono text-secondaryText/40">
                   {sortedNotes.length} {sortedNotes.length === 1 ? 'article' : 'articles'}
-                  {hasMore && <span className="text-secondaryText/30"> • showing {displayedNotes.length}</span>}
                 </span>
                 {(searchQuery || selectedTags.length > 0) && (
                   <span className="text-xs font-mono text-accent/60">filtered</span>
@@ -593,33 +583,15 @@ function App() {
                   animate="visible"
                   className="p-4 space-y-3"
                 >
-                  {displayedNotes.length > 0 ? (
-                    <>
-                      {displayedNotes.map((note, index) => (
-                        <NoteCard
-                          key={note.id}
-                          note={note}
-                          index={index}
-                          onClick={() => setSelectedNote(note)}
-                        />
-                      ))}
-
-                      {/* Load More - appears at bottom, seamless on scroll */}
-                      {hasMore && (
-                        <motion.div
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          className="py-4 flex justify-center"
-                        >
-                          <button
-                            onClick={handleLoadMore}
-                            className="text-xs font-mono px-6 py-2 text-accent/60 hover:text-accent border border-accent/20 hover:border-accent/40 rounded-full transition-all"
-                          >
-                            Load more ({sortedNotes.length - visibleCount} remaining)
-                          </button>
-                        </motion.div>
-                      )}
-                    </>
+                  {sortedNotes.length > 0 ? (
+                    sortedNotes.map((note, index) => (
+                      <NoteCard
+                        key={note.id}
+                        note={note}
+                        index={index}
+                        onClick={() => setSelectedNote(note)}
+                      />
+                    ))
                   ) : (
                     <div className="py-16 text-center">
                       <p className="text-secondaryText/40 font-mono text-sm">No articles match your search.</p>
