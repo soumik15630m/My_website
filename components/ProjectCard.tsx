@@ -169,18 +169,28 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onOpen, activ
             </div>
 
             {/* Diagram Container - centered with proper spacing */}
-            <div className="flex-1 flex items-center justify-center pt-16 pb-12">
-              <div className="w-full h-full max-h-[340px] rounded-xl bg-black/40 border border-white/5 p-6 flex items-center justify-center overflow-auto">
-                <Suspense fallback={
-                  <div className="flex items-center justify-center p-4">
-                    <div className="w-5 h-5 border-2 border-accent/30 border-t-accent rounded-full animate-spin" />
+            <div className="flex-1 w-full flex items-center justify-center p-4 pt-12 pb-12 overflow-hidden">
+              <div className="w-full h-full rounded-xl bg-black/40 border border-white/5 flex items-center justify-center overflow-hidden relative group/diagram">
+
+                {/* Zoom hint */}
+                <div className="absolute top-2 right-2 p-1.5 rounded-lg bg-black/50 border border-white/10 text-white/20 opacity-0 group-hover/diagram:opacity-100 transition-opacity pointer-events-none z-10">
+                  <GitBranch size={12} />
+                </div>
+
+                <div className="w-full h-full p-4 overflow-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+                  <div className="min-w-full min-h-full flex items-center justify-center">
+                    <Suspense fallback={
+                      <div className="flex items-center justify-center p-4">
+                        <div className="w-5 h-5 border-2 border-accent/30 border-t-accent rounded-full animate-spin" />
+                      </div>
+                    }>
+                      <MermaidDiagram
+                        chart={project.architecture!}
+                        className="w-full"
+                      />
+                    </Suspense>
                   </div>
-                }>
-                  <MermaidDiagram
-                    chart={project.architecture!}
-                    className="w-full"
-                  />
-                </Suspense>
+                </div>
               </div>
             </div>
 
