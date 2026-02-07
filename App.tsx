@@ -170,68 +170,68 @@ function App() {
     switch (currentView) {
       case 'home':
         return (
-          <div className="space-y-24 max-w-5xl mx-auto min-h-[80vh]">
-            <Section className="space-y-16 py-12 md:py-20 text-center md:text-left">
-              <h1 className="text-5xl md:text-7xl lg:text-8xl font-semibold tracking-tight text-primaryText leading-[0.95] mx-auto md:mx-0 max-w-4xl">
-                <motion.span
-                  initial={{ opacity: 0, y: 30, filter: 'blur(8px)' }}
-                  animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                  transition={{ duration: 0.6, delay: 0.1, ease: [0.2, 0.8, 0.2, 1] }}
-                  className="block"
-                >
-                  {profile.role || 'Systems Engineer'}
-                </motion.span>
-                <motion.span
-                  initial={{ opacity: 0, y: 30, filter: 'blur(8px)' }}
-                  animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                  transition={{ duration: 0.6, delay: 0.2, ease: [0.2, 0.8, 0.2, 1] }}
-                  className="block text-secondaryText"
-                >
-                  {profile.tagline || 'crafting zero-cost abstractions.'}
-                </motion.span>
-              </h1>
-
-              <motion.div
+          <div className="max-w-6xl mx-auto min-h-[80vh]">
+            {/* Hero Section */}
+            <Section className="py-16 md:py-24">
+              <motion.h1
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.5, ease: [0.2, 0.8, 0.2, 1] }}
-                className="flex flex-col md:flex-row gap-12 md:gap-24 border-t border-border pt-12 items-start justify-between"
+                transition={{ duration: 0.7, ease: [0.2, 0.8, 0.2, 1] }}
+                className="text-5xl md:text-7xl lg:text-8xl font-semibold tracking-tight leading-[1.05] max-w-5xl"
               >
-                <div className="max-w-xl text-left">
-                  <h3 className="text-xs font-mono text-secondaryText uppercase tracking-widest mb-6 opacity-60">About</h3>
-                  <p className="text-lg md:text-xl text-primaryText/90 leading-relaxed font-light">
-                    {profile.about}
-                  </p>
-                </div>
-                <div className="flex flex-col gap-8 text-left min-w-[200px]">
-                  <div>
-                    <h3 className="text-xs font-mono text-secondaryText uppercase tracking-widest mb-2 opacity-60">Location</h3>
-                    <p className="text-primaryText font-medium">{profile.location}</p>
-                  </div>
-                  <div>
-                    <h3 className="text-xs font-mono text-secondaryText uppercase tracking-widest mb-2 opacity-60">Status</h3>
-                    <div className="flex items-center gap-2">
-                      <span className="relative flex h-2 w-2">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-accent"></span>
-                      </span>
-                      <p className="text-accent font-medium">{profile.availability}</p>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
+                <span className="text-primaryText block">
+                  {profile.role || 'Systems Engineer'}
+                </span>
+                <span className="text-secondaryText/60 block mt-2">
+                  {profile.tagline || 'Open Source Contributor | Building performant systems'}
+                </span>
+              </motion.h1>
             </Section>
+
+            {/* About + Info Grid */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3, ease: [0.2, 0.8, 0.2, 1] }}
+              className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-16 py-12 border-t border-white/5"
+            >
+              {/* About Column */}
+              <div className="md:col-span-2">
+                <h3 className="text-[10px] font-mono text-secondaryText/40 uppercase tracking-[0.2em] mb-6">About</h3>
+                <p className="text-base md:text-lg text-primaryText/80 leading-relaxed font-light max-w-xl">
+                  {profile.about}
+                </p>
+              </div>
+
+              {/* Info Column */}
+              <div className="space-y-8">
+                <div>
+                  <h3 className="text-[10px] font-mono text-secondaryText/40 uppercase tracking-[0.2em] mb-3">Location</h3>
+                  <p className="text-primaryText font-medium">{profile.location}</p>
+                </div>
+                <div>
+                  <h3 className="text-[10px] font-mono text-secondaryText/40 uppercase tracking-[0.2em] mb-3">Status</h3>
+                  <div className="flex items-center gap-2">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-accent"></span>
+                    </span>
+                    <p className="text-accent font-medium">{profile.availability}</p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
 
             {/* Open Source Glance Section */}
             {opensource.length > 0 && (
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.7, ease: [0.2, 0.8, 0.2, 1] }}
-                className="border-t border-border pt-12"
+                transition={{ duration: 0.6, delay: 0.5, ease: [0.2, 0.8, 0.2, 1] }}
+                className="py-12 border-t border-white/5"
               >
                 <div className="flex items-center justify-between mb-8">
-                  <h3 className="text-xs font-mono text-secondaryText uppercase tracking-widest opacity-60">Open Source Contributions</h3>
+                  <h3 className="text-[10px] font-mono text-secondaryText/40 uppercase tracking-[0.2em]">Open Source Contributions</h3>
                   <button
                     onClick={() => handleViewChange('opensource')}
                     className="text-xs font-mono text-accent hover:text-accent/80 transition-colors flex items-center gap-1"
@@ -246,7 +246,7 @@ function App() {
                       href={contrib.prUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="group p-4 rounded-xl bg-white/5 border border-white/10 hover:border-accent/30 transition-all duration-300 hover:bg-white/8"
+                      className="group p-4 rounded-xl bg-white/[0.02] border border-white/5 hover:border-accent/30 transition-all duration-300 hover:bg-white/[0.04]"
                     >
                       <div className="flex items-start gap-3">
                         <div className="mt-1">
@@ -254,7 +254,7 @@ function App() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-primaryText truncate group-hover:text-accent transition-colors">{contrib.title}</p>
-                          <p className="text-xs text-secondaryText/60 mt-1">{contrib.repo} #{contrib.prNumber}</p>
+                          <p className="text-xs text-secondaryText/50 mt-1">{contrib.repo} #{contrib.prNumber}</p>
                         </div>
                       </div>
                     </a>
