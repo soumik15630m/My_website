@@ -10,6 +10,7 @@ export interface Project {
   year: string;
   image?: string;
   architecture?: string; // Mermaid diagram code
+  pinned?: boolean;
 }
 
 export interface Achievement {

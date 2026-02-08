@@ -169,8 +169,11 @@ function App() {
   const renderContent = () => {
     switch (currentView) {
       case 'home':
-        // Get pinned/active projects for side panel
-        const pinnedProjects = projects.filter(p => p.status === 'active').slice(0, 3);
+        // Get pinned projects for side panel (fallback to first 3 active if none pinned)
+        let pinnedProjects = projects.filter(p => p.pinned);
+        if (pinnedProjects.length === 0) {
+          pinnedProjects = projects.filter(p => p.status === 'active').slice(0, 3);
+        }
 
         return (
           <div className="max-w-7xl mx-auto min-h-[80vh]">
