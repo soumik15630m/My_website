@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { motion, useTransform, MotionValue } from 'framer-motion';
 
 interface TimelineDotProps {
@@ -9,19 +9,51 @@ interface TimelineDotProps {
 }
 
 export const TimelineDot: React.FC<TimelineDotProps> = ({ children, index, total, globalProgress }) => {
-    // Determine the exact progress point where this dot sits on the line.
-    // 0 = Top (Index 0), 1 = Bottom (Index total-1).
-    const threshold = total > 1 ? index / (total - 1) : 0;
+    const dotRef = useRef<HTMLDivElement>(null);
+    const [threshold, setThreshold] = useState(1); // Default to 1 (bottom) so it doesn't glow initially
 
-    // Define a small "activation window" around the threshold.
-    // When the line approaches (threshold - buffer), we start glowing.
-    // buffer = 0.05 means "5% of section height before the dot".
-    const buffer = 0.05;
+    useEffect(() => {
+        const calculateThreshold = () => {
+            if (dotRef.current && dotRef.current.offsetParent) {
+                const element = dotRef.current;
+                const parent = element.offsetParent as HTMLElement;
+                const relativeTop = element.offsetTop;
+                const parentHeight = parent.scrollHeight;
+
+                // Calculate exact percentage position of the dot (centered vertically in the card wrapper)
+                // The dot is at top-1/2 of this wrapper. 'offsetTop' is the top of this wrapper.
+                // We want the center, so relativeTop + element.offsetHeight / 2
+                // Force a minimum height if 0 to avoid NaN
+                const height = element.offsetHeight || 0;
+                const dotCenter = relativeTop + (height / 2);
+
+                if (parentHeight > 0) {
+                    setThreshold(dotCenter / parentHeight);
+                }
+            }
+        };
+
+        // Calculate initially and on resize
+        calculateThreshold();
+        // Small delay to ensure layout is stable
+        const timer = setTimeout(calculateThreshold, 100);
+
+        window.addEventListener('resize', calculateThreshold);
+        return () => {
+            window.removeEventListener('resize', calculateThreshold);
+            clearTimeout(timer);
+        };
+    }, []);
+
+    // Define a tighter activation window.
+    // buffer = 0.005 means "0.5% tolerance".
+    // 0.05 was too generous (5%), causing pre-glow.
+    const buffer = 0.005;
     const start = Math.max(0, threshold - buffer);
     const end = Math.min(1, threshold);
 
     // Transform global progress to local glow values
-    // Opacity: Fades in as line approaches
+    // Opacity: Fades in sharply as line hits
     const glowOpacity = useTransform(globalProgress, [start, end], [0.1, 1]);
 
     // Scale: Pops up as line hits it
@@ -43,17 +75,14 @@ export const TimelineDot: React.FC<TimelineDotProps> = ({ children, index, total
     const numberScale = useTransform(globalProgress, [start, end, end + 0.1], [0.9, 1.1, 1]);
     const numberY = useTransform(globalProgress, [start, end, end + 0.1], [20, 0, 0]);
 
-    // Pass a "local" 0-1 progress to child if it needs it (Optional)
-    // We map 0..1 global to "Active" boolean or similar if needed, 
-    // but for now we pass the raw value or a derived signal.
-    // Let's pass the 'glowOpacity' as a proxy for "how active I am"
+    // Pass a "local" active value to child
     const childWithProp = React.cloneElement(children, {
         activeValue: glowOpacity,
         // @ts-ignore
     });
 
     return (
-        <div className="relative">
+        <div ref={dotRef} className="relative">
             {/* Serial number */}
             <motion.span
                 style={{
