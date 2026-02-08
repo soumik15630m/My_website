@@ -47,8 +47,8 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ profile }) => {
                                     initial={{ width: 0 }}
                                     animate={{ width: 400 }}
                                     transition={{
-                                        duration: 2.5,
-                                        ease: [0.22, 1, 0.36, 1], // Custom tech/sharp ease
+                                        duration: 3.5, // Slower reveal
+                                        ease: [0.22, 1, 0.36, 1],
                                     }}
                                 />
                             </mask>
