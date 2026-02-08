@@ -846,11 +846,18 @@ function JsonImportSection({ itemName, template, onImport }: {
                     <div className="flex items-center justify-between">
                         <span className="text-xs text-secondaryText">Paste JSON array (will be ADDED to existing {itemName.toLowerCase()})</span>
                         <button
-                            onClick={() => { setJsonText(template); setError(null); }}
+                            onClick={() => {
+                                if (jsonText === template) {
+                                    setJsonText('');
+                                } else {
+                                    setJsonText(template);
+                                }
+                                setError(null);
+                            }}
                             className="flex items-center gap-1 text-xs text-accent hover:underline"
                         >
                             <Copy size={12} />
-                            Show Template
+                            {jsonText === template ? 'Hide Template' : 'Show Template'}
                         </button>
                     </div>
                     <textarea
