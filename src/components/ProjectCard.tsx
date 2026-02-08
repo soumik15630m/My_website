@@ -57,7 +57,7 @@ function ProjectCardComponent({ project, onOpen, activeValue, index = 0, total =
       }}
       transition={{ duration: 0.4, ease: [0.2, 0.8, 0.2, 1] }}
       onClick={() => onOpen(project)} // Whole card clickable
-      className="group relative w-full h-[480px] border border-border bg-[#050505] rounded-[2rem] overflow-hidden hover:border-white/10 transition-colors cursor-pointer will-change-transform"
+      className="group relative w-full h-[480px] border border-border bg-surface/40 backdrop-blur-md rounded-[2rem] overflow-hidden hover:border-white/10 transition-colors cursor-pointer will-change-transform"
     >
       {/* Dynamic Arrow Indicator - Appears when focused */}
       <motion.div
