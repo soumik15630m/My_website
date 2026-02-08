@@ -296,6 +296,58 @@ function ProfileEditor({ profile, onChange, onSave, saving }: any) {
     );
 }
 
+// Collapsible Item Component for cleaner UI
+function CollapsibleItem({
+    title,
+    subtitle,
+    isNew,
+    onDelete,
+    children
+}: {
+    title: string;
+    subtitle?: string;
+    isNew?: boolean;
+    onDelete: () => void;
+    children: React.ReactNode;
+}) {
+    const [expanded, setExpanded] = React.useState(isNew || false);
+
+    return (
+        <div className="bg-surface border border-border rounded-xl overflow-hidden">
+            <div
+                onClick={() => setExpanded(!expanded)}
+                className="flex items-center justify-between p-4 cursor-pointer hover:bg-background/50 transition-colors"
+            >
+                <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <ChevronRight
+                        size={18}
+                        className={`text-secondaryText transition-transform flex-shrink-0 ${expanded ? 'rotate-90' : ''}`}
+                    />
+                    <div className="min-w-0">
+                        <h3 className="font-medium text-primaryText truncate">
+                            {title || <span className="text-secondaryText/50 italic">Untitled</span>}
+                        </h3>
+                        {subtitle && !expanded && (
+                            <p className="text-xs text-secondaryText truncate">{subtitle}</p>
+                        )}
+                    </div>
+                </div>
+                <button
+                    onClick={(e) => { e.stopPropagation(); onDelete(); }}
+                    className="p-2 text-red-400 hover:bg-red-400/10 rounded-lg transition-colors flex-shrink-0"
+                >
+                    <Trash2 size={16} />
+                </button>
+            </div>
+            {expanded && (
+                <div className="p-4 pt-0 space-y-4 border-t border-border">
+                    {children}
+                </div>
+            )}
+        </div>
+    );
+}
+
 // Projects Editor
 function ProjectsEditor({ projects, onChange, onSave, saving }: any) {
     const addProject = () => {
@@ -418,17 +470,13 @@ function ProjectsEditor({ projects, onChange, onSave, saving }: any) {
             {filteredProjects.map((project: any) => {
                 const index = getOriginalIndex(project);
                 return (
-                    <div key={project.id || index} className="bg-surface border border-border rounded-xl p-6 space-y-4">
-                        <div className="flex justify-between items-start">
-                            <h3 className="text-lg font-medium text-primaryText">Project {index + 1}</h3>
-                            <button
-                                onClick={() => removeProject(index)}
-                                className="p-2 text-red-400 hover:bg-red-400/10 rounded-lg transition-colors"
-                            >
-                                <Trash2 size={18} />
-                            </button>
-                        </div>
-
+                    <CollapsibleItem
+                        key={project.id || index}
+                        title={project.title || `Project ${index + 1}`}
+                        subtitle={project.description || project.techStack?.join(', ')}
+                        isNew={!project.title}
+                        onDelete={() => removeProject(index)}
+                    >
                         <div className="grid grid-cols-2 gap-4">
                             <Input label="Title" value={project.title} onChange={(v: string) => updateProject(index, { title: v })} />
                             <Input label="Year" value={project.year} onChange={(v: string) => updateProject(index, { year: v })} />
@@ -477,7 +525,7 @@ function ProjectsEditor({ projects, onChange, onSave, saving }: any) {
                                 <option value="archived">Archived</option>
                             </select>
                         </div>
-                    </div>
+                    </CollapsibleItem>
                 );
             })}
 
@@ -600,20 +648,20 @@ function AchievementsEditor({ achievements, onChange, onSave, saving }: any) {
             {filteredAchievements.map((achievement: any) => {
                 const index = getOriginalIndex(achievement);
                 return (
-                    <div key={achievement.id || index} className="bg-surface border border-border rounded-xl p-6 space-y-4">
-                        <div className="flex justify-between items-start">
-                            <h3 className="text-lg font-medium text-primaryText">Achievement {index + 1}</h3>
-                            <button onClick={() => removeAchievement(index)} className="p-2 text-red-400 hover:bg-red-400/10 rounded-lg transition-colors">
-                                <Trash2 size={18} />
-                            </button>
-                        </div>
+                    <CollapsibleItem
+                        key={achievement.id || index}
+                        title={achievement.title || `Achievement ${index + 1}`}
+                        subtitle={achievement.context || achievement.year}
+                        isNew={!achievement.title}
+                        onDelete={() => removeAchievement(index)}
+                    >
                         <Input label="Title" value={achievement.title} onChange={(v: string) => updateAchievement(index, { title: v })} />
                         <Input label="Context" value={achievement.context} onChange={(v: string) => updateAchievement(index, { context: v })} />
                         <div className="grid grid-cols-2 gap-4">
                             <Input label="Year" value={achievement.year} onChange={(v: string) => updateAchievement(index, { year: v })} />
                             <Input label="Verification Link" value={achievement.verificationLink} onChange={(v: string) => updateAchievement(index, { verificationLink: v })} />
                         </div>
-                    </div>
+                    </CollapsibleItem>
                 );
             })}
 
@@ -744,13 +792,13 @@ function NotesEditor({ notes, onChange, onSave, saving }: any) {
             {filteredNotes.map((note: any) => {
                 const index = getOriginalIndex(note);
                 return (
-                    <div key={note.id || index} className="bg-surface border border-border rounded-xl p-6 space-y-4">
-                        <div className="flex justify-between items-start">
-                            <h3 className="text-lg font-medium text-primaryText">Note {index + 1}</h3>
-                            <button onClick={() => removeNote(index)} className="p-2 text-red-400 hover:bg-red-400/10 rounded-lg transition-colors">
-                                <Trash2 size={18} />
-                            </button>
-                        </div>
+                    <CollapsibleItem
+                        key={note.id || index}
+                        title={note.title || `Note ${index + 1}`}
+                        subtitle={note.date || note.summary}
+                        isNew={!note.title}
+                        onDelete={() => removeNote(index)}
+                    >
                         <Input label="Title" value={note.title} onChange={(v: string) => updateNote(index, { title: v })} />
                         <Input label="Summary" value={note.summary} onChange={(v: string) => updateNote(index, { summary: v })} multiline />
                         <div className="grid grid-cols-3 gap-4">
@@ -773,7 +821,7 @@ function NotesEditor({ notes, onChange, onSave, saving }: any) {
                                 rows={3}
                             />
                         </div>
-                    </div>
+                    </CollapsibleItem>
                 );
             })}
 
