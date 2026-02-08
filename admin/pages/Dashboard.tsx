@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 import { getContent, updateContent } from '../api';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Home, FolderOpen, Award, FileText, LogOut, Save, Plus, Trash2, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Upload, Download, Copy, FileUp, Settings, Search, X, GitPullRequest } from 'lucide-react';
+import { Home, FolderOpen, Award, FileText, LogOut, Save, Plus, Trash2, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Upload, Download, Copy, FileUp, Search, X, GitPullRequest } from 'lucide-react';
 
-type Tab = 'profile' | 'projects' | 'achievements' | 'notes' | 'settings';
+type Tab = 'profile' | 'projects' | 'achievements' | 'notes' | 'opensource';
 
 export function Dashboard() {
     const { user, token, logout } = useAuth();
@@ -22,7 +22,7 @@ export function Dashboard() {
     const [achievements, setAchievements] = useState<any[]>([]);
     const [notes, setNotes] = useState<any[]>([]);
     const [opensource, setOpensource] = useState<any[]>([]);
-    const [settings, setSettings] = useState<any>({ particleMode: 'default' });
+
 
     useEffect(() => {
         loadAllContent();
@@ -31,20 +31,18 @@ export function Dashboard() {
     const loadAllContent = async () => {
         setLoading(true);
         try {
-            const [profileRes, projectsRes, achievementsRes, notesRes, opensourceRes, settingsRes] = await Promise.all([
+            const [profileRes, projectsRes, achievementsRes, notesRes, opensourceRes] = await Promise.all([
                 getContent('profile'),
                 getContent('projects'),
                 getContent('achievements'),
                 getContent('notes'),
                 getContent('opensource'),
-                getContent('settings'),
             ]);
             setProfile(profileRes.data || {});
             setProjects(projectsRes.data || []);
             setAchievements(achievementsRes.data || []);
             setNotes(notesRes.data || []);
             setOpensource(opensourceRes.data || []);
-            setSettings(settingsRes.data || { particleMode: 'default' });
         } catch (error) {
             showMessage('error', 'Failed to load content');
         }
@@ -83,7 +81,7 @@ export function Dashboard() {
         { id: 'achievements' as Tab, label: 'Achievements', icon: Award },
         { id: 'notes' as Tab, label: 'Notes', icon: FileText },
         { id: 'opensource' as Tab, label: 'Open Source', icon: GitPullRequest },
-        { id: 'settings' as Tab, label: 'Settings', icon: Settings },
+
     ];
 
     // JSON Import/Export handlers
@@ -196,11 +194,15 @@ export function Dashboard() {
                                     onSave={() => saveContent('profile', profile)}
                                     saving={saving}
                                     projects={projects}
-                                    setProjects={setProjects}
+                                    onUpdateProjects={(newProjects: any[]) => {
+                                        setProjects(newProjects);
+                                        saveContent('projects', newProjects);
+                                    }}
                                     opensource={opensource}
-                                    setOpensource={setOpensource}
-                                    onSaveProjects={() => saveContent('projects', projects)}
-                                    onSaveOpensource={() => saveContent('opensource', opensource)}
+                                    onUpdateOpensource={(newOpensource: any[]) => {
+                                        setOpensource(newOpensource);
+                                        saveContent('opensource', newOpensource);
+                                    }}
                                 />
                             )}
                             {activeTab === 'projects' && (
@@ -233,14 +235,7 @@ export function Dashboard() {
                                     onExport={handleExportJSON}
                                 />
                             )}
-                            {activeTab === 'settings' && (
-                                <SettingsEditor
-                                    settings={settings}
-                                    onChange={setSettings}
-                                    onSave={() => saveContent('settings', settings)}
-                                    saving={saving}
-                                />
-                            )}
+
                             {activeTab === 'opensource' && (
                                 <OpenSourceEditor
                                     opensource={opensource}
@@ -288,24 +283,22 @@ function ProfileEditor({
     onSave,
     saving,
     projects,
-    setProjects,
     opensource,
-    setOpensource,
-    onSaveProjects,
-    onSaveOpensource
+    onUpdateProjects,
+    onUpdateOpensource
 }: any) {
     const update = (key: string, value: any) => onChange({ ...profile, [key]: value });
 
     const toggleProjectPin = (index: number) => {
         const newProjects = [...projects];
         newProjects[index] = { ...newProjects[index], pinned: !newProjects[index].pinned };
-        setProjects(newProjects);
+        onUpdateProjects(newProjects);
     };
 
     const toggleOssPin = (index: number) => {
         const newOss = [...opensource];
         newOss[index] = { ...newOss[index], pinned: !newOss[index].pinned };
-        setOpensource(newOss);
+        onUpdateOpensource(newOss);
     };
 
     return (
@@ -347,9 +340,7 @@ function ProfileEditor({
                     <div className="space-y-4">
                         <div className="flex items-center justify-between">
                             <h4 className="text-sm font-medium text-secondaryText uppercase tracking-wider">Pinned Projects</h4>
-                            <button onClick={onSaveProjects} disabled={saving} className="text-xs text-accent hover:text-accent/80">
-                                Save Changes
-                            </button>
+                            <span className="text-xs text-secondaryText/50">Auto-saves</span>
                         </div>
                         <div className="bg-surface/50 rounded-xl border border-border overflow-hidden">
                             {projects?.filter((p: any) => p.pinned).length === 0 ? (
@@ -392,9 +383,7 @@ function ProfileEditor({
                     <div className="space-y-4">
                         <div className="flex items-center justify-between">
                             <h4 className="text-sm font-medium text-secondaryText uppercase tracking-wider">Pinned Open Source</h4>
-                            <button onClick={onSaveOpensource} disabled={saving} className="text-xs text-accent hover:text-accent/80">
-                                Save Changes
-                            </button>
+                            <span className="text-xs text-secondaryText/50">Auto-saves</span>
                         </div>
                         <div className="bg-surface/50 rounded-xl border border-border overflow-hidden">
                             {opensource?.filter((o: any) => o.pinned).length === 0 ? (
@@ -1395,59 +1384,7 @@ function ImportExportEditor({ onImport, onExport }: { onImport: (data: any) => v
     );
 }
 
-// Settings Editor Component
-function SettingsEditor({ settings, onChange, onSave, saving }: any) {
-    const particleModes = [
-        { value: 'default', label: 'Default - Depth Layers + Mesh', description: 'Particles at different depths with connection lines' },
-        { value: 'aurora', label: 'Aurora - Gradient Blobs', description: 'Flowing gradient orbs with subtle particles' },
-        { value: 'antigravity', label: 'Antigravity - Plus Signs', description: '+ shaped particles that repel from mouse' },
-    ];
 
-    return (
-        <div className="space-y-6">
-            <div className="bg-surface border border-border rounded-xl p-6 space-y-6">
-                <div>
-                    <h3 className="text-lg font-medium text-primaryText mb-2">Background Animation</h3>
-                    <p className="text-sm text-secondaryText mb-4">Choose the particle animation style for your portfolio background.</p>
-                </div>
-
-                <div className="space-y-3">
-                    {particleModes.map((mode) => (
-                        <label
-                            key={mode.value}
-                            className={`flex items-start gap-4 p-4 rounded-xl border cursor-pointer transition-all ${settings.particleMode === mode.value
-                                ? 'border-accent bg-accent/10'
-                                : 'border-border hover:border-accent/50 hover:bg-surface/50'
-                                }`}
-                        >
-                            <input
-                                type="radio"
-                                name="particleMode"
-                                value={mode.value}
-                                checked={settings.particleMode === mode.value}
-                                onChange={(e) => onChange({ ...settings, particleMode: e.target.value })}
-                                className="mt-1 accent-accent"
-                            />
-                            <div>
-                                <div className="font-medium text-primaryText">{mode.label}</div>
-                                <div className="text-sm text-secondaryText">{mode.description}</div>
-                            </div>
-                        </label>
-                    ))}
-                </div>
-
-                <button
-                    onClick={onSave}
-                    disabled={saving}
-                    className="flex items-center gap-2 px-4 py-2 bg-accent text-background rounded-lg hover:bg-accent/90 transition-colors disabled:opacity-50"
-                >
-                    <Save size={18} />
-                    {saving ? 'Saving...' : 'Save Settings'}
-                </button>
-            </div>
-        </div>
-    );
-}
 
 // Inline JSON Import Section (per-page, appends data)
 function JsonImportSection({ itemName, template, onImport }: {
