@@ -54,7 +54,7 @@ export const Navigation: React.FC<NavigationProps> = ({ currentView, onChangeVie
               {logoSrc ? (
                 <img src={logoSrc} alt="Logo" className="w-8 h-8 rounded-full object-cover border border-white/10" />
               ) : null}
-              <span>{profile.logoText || profile.name || 'Portfolio'}</span>
+              <span>{profile.name || profile.logoText || 'Portfolio'}</span>
             </button>
             <span className="text-secondaryText/30 text-xs font-mono hidden sm:inline-block">
                 // {profile.handle}

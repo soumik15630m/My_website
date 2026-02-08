@@ -237,7 +237,7 @@ function App() {
           <LoadingScreen key="loading" profile={profile} />
         ) : (
           <div key="content">
-            <ParticleField />
+            <ParticleField text="STK" />
             <Navigation currentView={currentView} onChangeView={handleViewChange} profile={profile} navItems={navItems} />
 
             <main className="min-h-screen w-full px-6 pt-32 pb-24 md:px-8 md:pt-40 lg:pt-48">
