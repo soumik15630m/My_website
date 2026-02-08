@@ -40,8 +40,7 @@ export const HomeSection: React.FC<HomeSectionProps> = ({
                             className="text-4xl md:text-6xl lg:text-7xl font-semibold tracking-tight leading-tight"
                         >
                             <span
-                                className="text-liquid-fill block cursor-default w-fit relative"
-                                data-text={profile.role || 'Systems Engineer'}
+                                className="text-fluid-metal block cursor-default w-fit"
                             >
                                 {profile.role || 'Systems Engineer'}
                             </span>
