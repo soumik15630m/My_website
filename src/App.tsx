@@ -229,7 +229,7 @@ function App() {
     <div className="min-h-screen bg-background text-primaryText font-sans selection:bg-accent/20 selection:text-accent overflow-x-hidden">
       <AnimatePresence mode="wait">
         {isLoading ? (
-          <LoadingScreen key="loading" />
+          <LoadingScreen key="loading" profile={profile} />
         ) : (
           <div key="content">
             <ParticleField />

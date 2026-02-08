@@ -14,7 +14,9 @@ const EMPTY_PROFILE = {
     availability: "",
     email: "",
     github: "",
-    about: ""
+    about: "",
+    logoText: "0x1A",
+    logoImage: ""
 };
 
 const NAV_ITEMS = [
@@ -28,10 +30,15 @@ const NAV_ITEMS = [
 async function fetchContent(type: string) {
     try {
         const res = await fetch(`${API_BASE}/content/${type}`);
-        if (!res.ok) {
-            console.warn(`Failed to fetch ${type}: ${res.status}`);
+        const contentType = res.headers.get("content-type");
+
+        if (!res.ok || !contentType || !contentType.includes("application/json")) {
+            if (process.env.NODE_ENV === 'development') {
+                console.warn(`[Mock] Failed to fetch ${type}: ${res.status} ${contentType}`);
+            }
             return null;
         }
+
         const json = await res.json();
         return json.data;
     } catch (error) {

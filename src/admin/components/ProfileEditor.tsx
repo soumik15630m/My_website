@@ -40,6 +40,14 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({
     return (
         <div className="space-y-8">
             <div className="max-w-2xl space-y-6">
+                <div className="p-4 bg-surface/30 rounded-xl border border-border mb-6">
+                    <h3 className="text-sm font-medium text-secondaryText mb-4 uppercase tracking-wider">Branding</h3>
+                    <div className="grid grid-cols-2 gap-4">
+                        <Input label="Logo Text" value={profile.logoText} onChange={(v: string) => update('logoText', v)} placeholder="0x1A" />
+                        <Input label="Logo Image URL" value={profile.logoImage} onChange={(v: string) => update('logoImage', v)} placeholder="https://..." />
+                    </div>
+                </div>
+
                 <div className="grid grid-cols-2 gap-4">
                     <Input label="Name" value={profile.name} onChange={(v: string) => update('name', v)} placeholder="Your name" />
                     <Input label="Handle" value={profile.handle} onChange={(v: string) => update('handle', v)} placeholder="@handle" />

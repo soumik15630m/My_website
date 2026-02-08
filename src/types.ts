@@ -66,4 +66,6 @@ export interface Profile {
   email: string;
   github: string;
   about: string;
+  logoText?: string;
+  logoImage?: string;
 }

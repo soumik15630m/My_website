@@ -1,5 +1,7 @@
 import React, { useRef, useEffect, useCallback } from 'react';
 
+export type ParticleMode = 'default' | 'performance';
+
 interface Particle {
     x: number;
     y: number;

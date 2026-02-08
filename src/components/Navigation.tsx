@@ -6,7 +6,7 @@ import { Menu, X } from 'lucide-react';
 interface NavigationProps {
   currentView: ViewState;
   onChangeView: (view: ViewState) => void;
-  profile: { name: string; handle: string; location: string };
+  profile: { name: string; handle: string; location: string; logoText?: string; logoImage?: string };
   navItems: NavItem[];
 }
 
@@ -47,9 +47,12 @@ export const Navigation: React.FC<NavigationProps> = ({ currentView, onChangeVie
           >
             <button
               onClick={() => handleNavClick('home')}
-              className="text-sm font-semibold tracking-tight text-primaryText hover:text-accent transition-colors duration-300"
+              className="flex items-center gap-3 text-sm font-semibold tracking-tight text-primaryText hover:text-accent transition-colors duration-300"
             >
-              {profile.name || 'Portfolio'}
+              {profile.logoImage ? (
+                <img src={profile.logoImage} alt="Logo" className="w-8 h-8 rounded-full object-cover border border-white/10" />
+              ) : null}
+              <span>{profile.logoText || profile.name || 'Portfolio'}</span>
             </button>
             <span className="text-secondaryText/30 text-xs font-mono hidden sm:inline-block">
                 // {profile.handle}
