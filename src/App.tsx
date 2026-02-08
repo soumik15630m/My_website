@@ -37,12 +37,17 @@ function App() {
 
   useEffect(() => {
     // Simulate minimum loading time for premium feel
+    // BUT also wait for content to be ready
     const timer = setTimeout(() => {
-      setIsLoading(false);
+      // Only set to false if content is also ready (handled by derived state below)
+      setIsMinLoadComplete(true);
     }, 2000);
 
     return () => clearTimeout(timer);
   }, []);
+
+  const [isMinLoadComplete, setIsMinLoadComplete] = useState(false);
+  const showLoading = !isMinLoadComplete || loading;
 
   const handleViewChange = useCallback((newView: ViewState) => {
     if (newView === currentView) return;
@@ -228,7 +233,7 @@ function App() {
   return (
     <div className="min-h-screen bg-background text-primaryText font-sans selection:bg-accent/20 selection:text-accent overflow-x-hidden">
       <AnimatePresence mode="wait">
-        {isLoading ? (
+        {showLoading ? (
           <LoadingScreen key="loading" profile={profile} />
         ) : (
           <div key="content">

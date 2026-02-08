@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { getOptimizedImageUrl } from '../utils/imageUtils';
 
 interface LoadingScreenProps {
     profile?: {
@@ -10,6 +11,8 @@ interface LoadingScreenProps {
 }
 
 export const LoadingScreen: React.FC<LoadingScreenProps> = ({ profile }) => {
+    const logoSrc = getOptimizedImageUrl(profile?.logoImage);
+
     return (
         <motion.div
             initial={{ opacity: 1 }}
@@ -28,10 +31,10 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ profile }) => {
                     transition={{ duration: 0.5, ease: "easeOut" }}
                     className="relative z-10 flex flex-col items-center"
                 >
-                    {profile?.logoImage ? (
+                    {logoSrc ? (
                         <div className="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden mb-6 border-4 border-accent/20 shadow-[0_0_40px_-10px_rgba(var(--accent-rgb),0.3)]">
                             <img
-                                src={profile.logoImage}
+                                src={logoSrc}
                                 alt="Logo"
                                 className="w-full h-full object-cover"
                             />
