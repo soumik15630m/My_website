@@ -5,7 +5,7 @@ import { getContent, updateContent } from '../api';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Home, FolderOpen, Award, FileText, LogOut, Save, Plus, Trash2, ChevronLeft, ChevronRight, Upload, Download, Copy, FileUp, Settings } from 'lucide-react';
 
-type Tab = 'profile' | 'projects' | 'achievements' | 'notes' | 'settings' | 'import';
+type Tab = 'profile' | 'projects' | 'achievements' | 'notes' | 'settings';
 
 export function Dashboard() {
     const { user, token, logout } = useAuth();
@@ -80,7 +80,6 @@ export function Dashboard() {
         { id: 'achievements' as Tab, label: 'Achievements', icon: Award },
         { id: 'notes' as Tab, label: 'Notes', icon: FileText },
         { id: 'settings' as Tab, label: 'Settings', icon: Settings },
-        { id: 'import' as Tab, label: 'Import/Export', icon: Upload },
     ];
 
     // JSON Import/Export handlers
@@ -410,6 +409,12 @@ function ProjectsEditor({ projects, onChange, onSave, saving }: any) {
                     {saving ? 'Saving...' : 'Save All Projects'}
                 </button>
             </div>
+
+            <JsonImportSection
+                itemName="Projects"
+                template={PROJECT_TEMPLATE}
+                onImport={(items) => onChange([...projects, ...items])}
+            />
         </div>
     );
 }
@@ -462,6 +467,12 @@ function AchievementsEditor({ achievements, onChange, onSave, saving }: any) {
                     {saving ? 'Saving...' : 'Save All'}
                 </button>
             </div>
+
+            <JsonImportSection
+                itemName="Achievements"
+                template={ACHIEVEMENT_TEMPLATE}
+                onImport={(items) => onChange([...achievements, ...items])}
+            />
         </div>
     );
 }
@@ -538,6 +549,12 @@ function NotesEditor({ notes, onChange, onSave, saving }: any) {
                     {saving ? 'Saving...' : 'Save All'}
                 </button>
             </div>
+
+            <JsonImportSection
+                itemName="Notes"
+                template={NOTE_TEMPLATE}
+                onImport={(items) => onChange([...notes, ...items])}
+            />
         </div>
     );
 }
@@ -751,8 +768,8 @@ function SettingsEditor({ settings, onChange, onSave, saving }: any) {
                         <label
                             key={mode.value}
                             className={`flex items-start gap-4 p-4 rounded-xl border cursor-pointer transition-all ${settings.particleMode === mode.value
-                                    ? 'border-accent bg-accent/10'
-                                    : 'border-border hover:border-accent/50 hover:bg-surface/50'
+                                ? 'border-accent bg-accent/10'
+                                : 'border-border hover:border-accent/50 hover:bg-surface/50'
                                 }`}
                         >
                             <input
@@ -784,4 +801,117 @@ function SettingsEditor({ settings, onChange, onSave, saving }: any) {
     );
 }
 
+// Inline JSON Import Section (per-page, appends data)
+function JsonImportSection({ itemName, template, onImport }: {
+    itemName: string;
+    template: string;
+    onImport: (items: any[]) => void;
+}) {
+    const [expanded, setExpanded] = React.useState(false);
+    const [jsonText, setJsonText] = React.useState('');
+    const [error, setError] = React.useState<string | null>(null);
 
+    const handleImport = () => {
+        try {
+            const parsed = JSON.parse(jsonText);
+            const items = Array.isArray(parsed) ? parsed : [parsed];
+
+            // Add unique IDs if missing
+            const itemsWithIds = items.map((item: any, index: number) => ({
+                ...item,
+                id: item.id || `imported_${Date.now()}_${index}`
+            }));
+
+            onImport(itemsWithIds);
+            setJsonText('');
+            setError(null);
+            setExpanded(false);
+        } catch (e) {
+            setError('Invalid JSON format');
+        }
+    };
+
+    return (
+        <div className="border border-dashed border-border rounded-xl p-4 bg-background/50">
+            <button
+                onClick={() => setExpanded(!expanded)}
+                className="flex items-center gap-2 text-sm text-secondaryText hover:text-primaryText transition-colors"
+            >
+                <FileUp size={16} />
+                {expanded ? 'Hide' : `Import ${itemName} from JSON`}
+            </button>
+
+            {expanded && (
+                <div className="mt-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                        <span className="text-xs text-secondaryText">Paste JSON array (will be ADDED to existing {itemName.toLowerCase()})</span>
+                        <button
+                            onClick={() => { setJsonText(template); setError(null); }}
+                            className="flex items-center gap-1 text-xs text-accent hover:underline"
+                        >
+                            <Copy size={12} />
+                            Show Template
+                        </button>
+                    </div>
+                    <textarea
+                        value={jsonText}
+                        onChange={(e) => { setJsonText(e.target.value); setError(null); }}
+                        placeholder={`Paste ${itemName.toLowerCase()} JSON here...`}
+                        className="w-full px-3 py-2 bg-background border border-border rounded-lg text-primaryText text-xs font-mono placeholder:text-secondaryText/30 focus:outline-none focus:border-accent transition-colors resize-none"
+                        rows={6}
+                    />
+                    {error && (
+                        <div className="text-xs text-red-400">{error}</div>
+                    )}
+                    <div className="flex gap-2">
+                        <button
+                            onClick={handleImport}
+                            disabled={!jsonText.trim()}
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-accent text-background text-xs rounded-lg hover:bg-accent/90 transition-colors disabled:opacity-50"
+                        >
+                            <Upload size={14} />
+                            Add {itemName}
+                        </button>
+                        <button
+                            onClick={() => { setExpanded(false); setJsonText(''); setError(null); }}
+                            className="px-3 py-1.5 text-xs text-secondaryText hover:text-primaryText transition-colors"
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                    <div className="text-xs text-amber-400/70">
+                        Note: Imported items will be ADDED to your existing {itemName.toLowerCase()}, not replace them.
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}
+
+// JSON Templates for each section
+const PROJECT_TEMPLATE = `[
+  {
+    "title": "Project Name",
+    "description": "Description",
+    "techStack": ["React", "TypeScript"],
+    "year": "2024",
+    "status": "active"
+  }
+]`;
+
+const ACHIEVEMENT_TEMPLATE = `[
+  {
+    "title": "Achievement Title",
+    "context": "Organization",
+    "year": "2024"
+  }
+]`;
+
+const NOTE_TEMPLATE = `[
+  {
+    "title": "Note Title",
+    "summary": "Brief summary",
+    "date": "2024-01-15",
+    "tags": ["tag1", "tag2"]
+  }
+]`;
