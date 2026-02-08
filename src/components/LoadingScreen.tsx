@@ -152,8 +152,8 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ profile }) => {
                                 initial={{ opacity: 0, filter: "blur(10px)", y: 5 }}
                                 animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
                                 transition={{
-                                    duration: 0.8,
-                                    delay: 1.5 + (index * 0.03), // Stagger effect
+                                    duration: 1.5, // Slower fade-in
+                                    delay: 2.0 + (index * 0.1), // Much slower stagger (starts later too)
                                     ease: "easeOut"
                                 }}
                                 className="text-white/40 text-[10px] tracking-widest font-light uppercase inline-block"
