@@ -8,6 +8,7 @@ import { useContent } from './hooks/useContent';
 import { ViewState, Project, Achievement, Note, OpenSourceContribution } from './types';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ParticleField } from './components/ParticleField';
+import { LoadingScreen } from './components/LoadingScreen';
 
 // Import Sections
 import { HomeSection } from './components/sections/HomeSection';
@@ -26,12 +27,22 @@ function App() {
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
   const [selectedOSS, setSelectedOSS] = useState<OpenSourceContribution | null>(null);
   const [direction, setDirection] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Use a ref for the lock to ensure instant access inside event listeners without closure staleness
   const isTransitioningRef = useRef(false);
 
   // Helper to determine order
   const VIEW_ORDER: ViewState[] = navItems.map(n => n.id);
+
+  useEffect(() => {
+    // Simulate minimum loading time for premium feel
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleViewChange = useCallback((newView: ViewState) => {
     if (newView === currentView) return;
@@ -216,60 +227,68 @@ function App() {
 
   return (
     <div className="min-h-screen bg-background text-primaryText font-sans selection:bg-accent/20 selection:text-accent overflow-x-hidden">
-      <ParticleField />
-      <Navigation currentView={currentView} onChangeView={handleViewChange} profile={profile} navItems={navItems} />
+      <AnimatePresence mode="wait">
+        {isLoading ? (
+          <LoadingScreen key="loading" />
+        ) : (
+          <div key="content">
+            <ParticleField />
+            <Navigation currentView={currentView} onChangeView={handleViewChange} profile={profile} navItems={navItems} />
 
-      <main className="min-h-screen w-full px-6 pt-32 pb-24 md:px-8 md:pt-40 lg:pt-48">
-        <AnimatePresence mode="wait" custom={direction}>
-          <motion.div
-            key={currentView}
-            custom={direction}
-            variants={pageVariants}
-            initial="enter"
-            animate="center"
-            exit="exit"
-            className="w-full"
-          >
-            {renderContent()}
-          </motion.div>
-        </AnimatePresence>
+            <main className="min-h-screen w-full px-6 pt-32 pb-24 md:px-8 md:pt-40 lg:pt-48">
+              <AnimatePresence mode="wait" custom={direction}>
+                <motion.div
+                  key={currentView}
+                  custom={direction}
+                  variants={pageVariants}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  className="w-full"
+                >
+                  {renderContent()}
+                </motion.div>
+              </AnimatePresence>
 
-        <AnimatePresence>
-          {selectedProject && (
-            <ProjectFlow
-              project={selectedProject}
-              onClose={() => setSelectedProject(null)}
-            />
-          )}
-        </AnimatePresence>
+              <AnimatePresence>
+                {selectedProject && (
+                  <ProjectFlow
+                    project={selectedProject}
+                    onClose={() => setSelectedProject(null)}
+                  />
+                )}
+              </AnimatePresence>
 
-        <AnimatePresence>
-          {selectedAchievement && (
-            <AchievementDetail
-              achievement={selectedAchievement}
-              onClose={() => setSelectedAchievement(null)}
-            />
-          )}
-        </AnimatePresence>
+              <AnimatePresence>
+                {selectedAchievement && (
+                  <AchievementDetail
+                    achievement={selectedAchievement}
+                    onClose={() => setSelectedAchievement(null)}
+                  />
+                )}
+              </AnimatePresence>
 
-        <AnimatePresence>
-          {selectedNote && (
-            <NoteDetail
-              note={selectedNote}
-              onClose={() => setSelectedNote(null)}
-            />
-          )}
-        </AnimatePresence>
+              <AnimatePresence>
+                {selectedNote && (
+                  <NoteDetail
+                    note={selectedNote}
+                    onClose={() => setSelectedNote(null)}
+                  />
+                )}
+              </AnimatePresence>
 
-        <AnimatePresence>
-          {selectedOSS && (
-            <OpenSourceDetail
-              contribution={selectedOSS}
-              onClose={() => setSelectedOSS(null)}
-            />
-          )}
-        </AnimatePresence>
-      </main>
+              <AnimatePresence>
+                {selectedOSS && (
+                  <OpenSourceDetail
+                    contribution={selectedOSS}
+                    onClose={() => setSelectedOSS(null)}
+                  />
+                )}
+              </AnimatePresence>
+            </main>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
