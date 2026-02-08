@@ -16,7 +16,7 @@ export const TimelineDot: React.FC<TimelineDotProps> = ({ children, index }) => 
 
     // Sync Fix: useSpring configuration matches TimelineTrail exactly.
     const smoothProgress = useSpring(scrollYProgress, {
-        stiffness: 100,
+        stiffness: 40,
         damping: 30,
         restDelta: 0.001
     });

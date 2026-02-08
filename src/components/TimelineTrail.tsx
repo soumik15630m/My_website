@@ -13,7 +13,7 @@ export const TimelineTrail: React.FC = () => {
     });
 
     const scaleY = useSpring(scrollYProgress, {
-        stiffness: 100,
+        stiffness: 40,
         damping: 30,
         restDelta: 0.001
     });
