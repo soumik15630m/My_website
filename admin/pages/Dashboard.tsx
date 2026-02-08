@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 import { getContent, updateContent } from '../api';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Home, FolderOpen, Award, FileText, LogOut, Save, Plus, Trash2, ChevronLeft, ChevronRight, Upload, Download, Copy, FileUp } from 'lucide-react';
+import { Home, FolderOpen, Award, FileText, LogOut, Save, Plus, Trash2, ChevronLeft, ChevronRight, Upload, Download, Copy, FileUp, Settings } from 'lucide-react';
 
-type Tab = 'profile' | 'projects' | 'achievements' | 'notes' | 'import';
+type Tab = 'profile' | 'projects' | 'achievements' | 'notes' | 'settings' | 'import';
 
 export function Dashboard() {
     const { user, token, logout } = useAuth();
@@ -21,6 +21,7 @@ export function Dashboard() {
     const [projects, setProjects] = useState<any[]>([]);
     const [achievements, setAchievements] = useState<any[]>([]);
     const [notes, setNotes] = useState<any[]>([]);
+    const [settings, setSettings] = useState<any>({ particleMode: 'default' });
 
     useEffect(() => {
         loadAllContent();
@@ -29,16 +30,18 @@ export function Dashboard() {
     const loadAllContent = async () => {
         setLoading(true);
         try {
-            const [profileRes, projectsRes, achievementsRes, notesRes] = await Promise.all([
+            const [profileRes, projectsRes, achievementsRes, notesRes, settingsRes] = await Promise.all([
                 getContent('profile'),
                 getContent('projects'),
                 getContent('achievements'),
                 getContent('notes'),
+                getContent('settings'),
             ]);
             setProfile(profileRes.data || {});
             setProjects(projectsRes.data || []);
             setAchievements(achievementsRes.data || []);
             setNotes(notesRes.data || []);
+            setSettings(settingsRes.data || { particleMode: 'default' });
         } catch (error) {
             showMessage('error', 'Failed to load content');
         }
@@ -76,6 +79,7 @@ export function Dashboard() {
         { id: 'projects' as Tab, label: 'Projects', icon: FolderOpen },
         { id: 'achievements' as Tab, label: 'Achievements', icon: Award },
         { id: 'notes' as Tab, label: 'Notes', icon: FileText },
+        { id: 'settings' as Tab, label: 'Settings', icon: Settings },
         { id: 'import' as Tab, label: 'Import/Export', icon: Upload },
     ];
 
@@ -217,6 +221,14 @@ export function Dashboard() {
                                 <ImportExportEditor
                                     onImport={handleImportJSON}
                                     onExport={handleExportJSON}
+                                />
+                            )}
+                            {activeTab === 'settings' && (
+                                <SettingsEditor
+                                    settings={settings}
+                                    onChange={setSettings}
+                                    onSave={() => saveContent('settings', settings)}
+                                    saving={saving}
                                 />
                             )}
                         </>
@@ -717,4 +729,59 @@ function ImportExportEditor({ onImport, onExport }: { onImport: (data: any) => v
         </div>
     );
 }
+
+// Settings Editor Component
+function SettingsEditor({ settings, onChange, onSave, saving }: any) {
+    const particleModes = [
+        { value: 'default', label: 'Default - Depth Layers + Mesh', description: 'Particles at different depths with connection lines' },
+        { value: 'aurora', label: 'Aurora - Gradient Blobs', description: 'Flowing gradient orbs with subtle particles' },
+        { value: 'antigravity', label: 'Antigravity - Plus Signs', description: '+ shaped particles that repel from mouse' },
+    ];
+
+    return (
+        <div className="space-y-6">
+            <div className="bg-surface border border-border rounded-xl p-6 space-y-6">
+                <div>
+                    <h3 className="text-lg font-medium text-primaryText mb-2">Background Animation</h3>
+                    <p className="text-sm text-secondaryText mb-4">Choose the particle animation style for your portfolio background.</p>
+                </div>
+
+                <div className="space-y-3">
+                    {particleModes.map((mode) => (
+                        <label
+                            key={mode.value}
+                            className={`flex items-start gap-4 p-4 rounded-xl border cursor-pointer transition-all ${settings.particleMode === mode.value
+                                    ? 'border-accent bg-accent/10'
+                                    : 'border-border hover:border-accent/50 hover:bg-surface/50'
+                                }`}
+                        >
+                            <input
+                                type="radio"
+                                name="particleMode"
+                                value={mode.value}
+                                checked={settings.particleMode === mode.value}
+                                onChange={(e) => onChange({ ...settings, particleMode: e.target.value })}
+                                className="mt-1 accent-accent"
+                            />
+                            <div>
+                                <div className="font-medium text-primaryText">{mode.label}</div>
+                                <div className="text-sm text-secondaryText">{mode.description}</div>
+                            </div>
+                        </label>
+                    ))}
+                </div>
+
+                <button
+                    onClick={onSave}
+                    disabled={saving}
+                    className="flex items-center gap-2 px-4 py-2 bg-accent text-background rounded-lg hover:bg-accent/90 transition-colors disabled:opacity-50"
+                >
+                    <Save size={18} />
+                    {saving ? 'Saving...' : 'Save Settings'}
+                </button>
+            </div>
+        </div>
+    );
+}
+
 

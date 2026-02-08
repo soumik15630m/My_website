@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { OpenSourceContribution } from '../types';
+import { ParticleMode } from '../components/ParticleField';
 
 const API_BASE = '/api';
 
@@ -45,17 +46,19 @@ export function useContent() {
     const [achievements, setAchievements] = useState<any[]>([]);
     const [notes, setNotes] = useState<any[]>([]);
     const [opensource, setOpensource] = useState<OpenSourceContribution[]>([]);
+    const [settings, setSettings] = useState<{ particleMode: ParticleMode }>({ particleMode: 'default' });
     const [navItems] = useState(NAV_ITEMS);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         async function loadContent() {
-            const [profileData, projectsData, achievementsData, notesData, opensourceData] = await Promise.all([
+            const [profileData, projectsData, achievementsData, notesData, opensourceData, settingsData] = await Promise.all([
                 fetchContent('profile'),
                 fetchContent('projects'),
                 fetchContent('achievements'),
                 fetchContent('notes'),
                 fetchContent('opensource'),
+                fetchContent('settings'),
             ]);
 
             if (profileData && typeof profileData === 'object') {
@@ -78,11 +81,15 @@ export function useContent() {
                 setOpensource(opensourceData);
             }
 
+            if (settingsData && typeof settingsData === 'object') {
+                setSettings({ particleMode: settingsData.particleMode || 'default' });
+            }
+
             setLoading(false);
         }
 
         loadContent();
     }, []);
 
-    return { profile, projects, achievements, notes, opensource, navItems, loading };
+    return { profile, projects, achievements, notes, opensource, settings, navItems, loading };
 }

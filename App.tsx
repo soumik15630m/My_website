@@ -19,7 +19,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 
 function App() {
   // Dynamic content from API (falls back to constants)
-  const { profile, projects, achievements, notes, opensource, navItems, loading } = useContent();
+  const { profile, projects, achievements, notes, opensource, settings, navItems, loading } = useContent();
 
   const [currentView, setCurrentView] = useState<ViewState>('home');
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
@@ -807,7 +807,7 @@ function App() {
       </main>
 
       {/* Particle Field - Background Layer */}
-      <ParticleField />
+      <ParticleField mode={settings.particleMode} />
 
     </div>
   );
