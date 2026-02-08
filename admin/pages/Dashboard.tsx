@@ -888,30 +888,45 @@ function JsonImportSection({ itemName, template, onImport }: {
     );
 }
 
-// JSON Templates for each section
+// JSON Templates for each section (complete structure)
 const PROJECT_TEMPLATE = `[
   {
     "title": "Project Name",
-    "description": "Description",
-    "techStack": ["React", "TypeScript"],
+    "description": "Brief project description",
+    "problemStatement": "What problem does this solve?",
+    "technicalDecisions": [
+      "Decision 1: Why we chose this approach",
+      "Decision 2: Trade-offs considered"
+    ],
+    "techStack": ["React", "TypeScript", "Node.js"],
+    "status": "active",
     "year": "2024",
-    "status": "active"
+    "githubUrl": "https://github.com/username/repo",
+    "imageUrl": "https://drive.google.com/uc?export=view&id=...",
+    "architecture": "graph TD\\n    A[Client] --> B[API]\\n    B --> C[(Database)]"
   }
 ]`;
 
 const ACHIEVEMENT_TEMPLATE = `[
   {
-    "title": "Achievement Title",
-    "context": "Organization",
-    "year": "2024"
+    "title": "Achievement/Certificate Title",
+    "context": "Issuing Organization or Context",
+    "year": "2024",
+    "verificationLink": "https://verify.example.com/cert/123"
   }
 ]`;
 
 const NOTE_TEMPLATE = `[
   {
-    "title": "Note Title",
-    "summary": "Brief summary",
+    "title": "Note/Article Title",
+    "summary": "Brief summary of what this note is about. Can be multiple sentences describing the content.",
     "date": "2024-01-15",
-    "tags": ["tag1", "tag2"]
+    "readTime": "5 min",
+    "tags": ["technology", "tutorial", "guide"],
+    "image": "https://example.com/featured-image.jpg",
+    "images": [
+      "https://example.com/gallery-image-1.jpg",
+      "https://example.com/gallery-image-2.jpg"
+    ]
   }
 ]`;
