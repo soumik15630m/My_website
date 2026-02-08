@@ -7,6 +7,9 @@ import { TimelineDot } from '../TimelineDot';
 import { ProjectCard } from '../ProjectCard';
 import { Project } from '../../types';
 
+// Lazy load heavy Mermaid diagram component
+const MermaidDiagram = React.lazy(() => import('../MermaidDiagram').then(module => ({ default: module.MermaidDiagram })));
+
 interface ProjectsSectionProps {
     projects: Project[];
     handleViewChange: (view: any) => void;

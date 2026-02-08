@@ -10,7 +10,9 @@ interface Particle {
     baseAlpha: number;
 }
 
-const PARTICLE_COUNT = 200;
+const PARTICLE_COUNT = typeof window !== 'undefined' && window.innerWidth < 768 ? 30 : 100;
+const CONNECTION_DISTANCE = 100;
+const MOUSE_INFLUENCE_RADIUS = 150;
 
 export const ParticleField: React.FC = () => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
