@@ -230,24 +230,24 @@ body {
 /* Dark Fluid Metal Text Effect */
 .text-fluid-metal {
   color: transparent;
-  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.5);
-  /* Crisp outline */
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.3);
+  /* Subtle metallic outline */
   position: relative;
   display: inline-block;
   padding-bottom: 0.15em;
 
-  /* Dark Liquid Gradient (Black/Grey -> Deep Blue Flow) */
+  /* Obsidian/Onyx Liquid Gradient (Pure Black -> Deepest Indigo Flow) */
   background: linear-gradient(90deg,
-      #020617 0%,
-      /* Slate-950 (Black-ish) */
-      #1e3a8a 25%,
-      /* Blue-900 */
-      #3b82f6 50%,
-      /* Blue-500 (Highlight) */
-      #1e3a8a 75%,
-      /* Blue-900 */
-      #020617 100%
-      /* Slate-950 */
+      #000000 0%,
+      /* Pure Black */
+      #0f172a 25%,
+      /* Slate-900 */
+      #172554 50%,
+      /* Blue-950 (Subtle deep blue glint) */
+      #0f172a 75%,
+      /* Slate-900 */
+      #000000 100%
+      /* Pure Black */
     );
   background-size: 200% auto;
   -webkit-background-clip: text;
