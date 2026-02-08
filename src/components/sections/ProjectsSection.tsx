@@ -23,10 +23,21 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
     setSelectedProject,
     containerVariants
 }) => {
+    // Infinite Scroll State
+    const [visibleCount, setVisibleCount] = React.useState(3);
+    const displayedProjects = projects.slice(0, visibleCount);
+    const hasMore = visibleCount < projects.length;
+
+    const loadMore = () => {
+        if (hasMore) {
+            setVisibleCount(prev => Math.min(prev + 3, projects.length));
+        }
+    };
+
     return (
         <div className="max-w-5xl mx-auto relative">
             {/* === DECORATIVE ELEMENTS === */}
-            {/* Floating Ambient Orbs */}
+            {/* Floating Ambient Orbs - Optimized blur radius */}
             <div className="pointer-events-none absolute inset-0 overflow-hidden">
                 {/* Top-right accent orb */}
                 <motion.div
@@ -35,7 +46,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
                         opacity: [0.3, 0.5, 0.3]
                     }}
                     transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-                    className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-accent/10 blur-[100px]"
+                    className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-accent/10 blur-[60px]"
                 />
                 {/* Bottom-left accent orb */}
                 <motion.div
@@ -45,7 +56,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
                         opacity: [0.2, 0.4, 0.2]
                     }}
                     transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-                    className="absolute -bottom-48 -left-32 w-[500px] h-[500px] rounded-full bg-accent/5 blur-[120px]"
+                    className="absolute -bottom-48 -left-32 w-[500px] h-[500px] rounded-full bg-accent/5 blur-[80px]"
                 />
                 {/* Small floating accent */}
                 <motion.div
@@ -123,7 +134,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
                 {/* Global Timeline Trail - fills continuously as you scroll */}
                 <TimelineTrail />
 
-                {projects.map((project, index) => (
+                {displayedProjects.map((project, index) => (
                     <TimelineDot key={project.id} index={index}>
                         <ProjectCard
                             project={project}
@@ -133,6 +144,22 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
                         />
                     </TimelineDot>
                 ))}
+
+                {/* Infinite Scroll Trigger */}
+                {hasMore && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        whileInView={{ opacity: 1 }}
+                        viewport={{ once: false, margin: "200px" }}
+                        onViewportEnter={loadMore}
+                        className="flex justify-center py-12"
+                    >
+                        <div className="flex flex-col items-center gap-2">
+                            <div className="w-6 h-6 border-2 border-accent/30 border-t-accent rounded-full animate-spin" />
+                            <span className="text-xs font-mono text-secondaryText/40 uppercase tracking-widest">Loading Projects...</span>
+                        </div>
+                    </motion.div>
+                )}
             </motion.div>
 
             <ScrollTrigger nextSection="Certificates" onClick={() => handleViewChange('achievements')} />

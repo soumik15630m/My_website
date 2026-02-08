@@ -53,11 +53,11 @@ function ProjectCardComponent({ project, onOpen, activeValue, index = 0, total =
       whileHover={{
         scale: 1.01,
         y: -4,
-        boxShadow: "0 20px 40px -10px rgba(138, 180, 248, 0.15)"
+        boxShadow: "0 10px 30px -10px rgba(138, 180, 248, 0.1)" // Reduced shadow complexity
       }}
       transition={{ duration: 0.4, ease: [0.2, 0.8, 0.2, 1] }}
       onClick={() => onOpen(project)} // Whole card clickable
-      className="group relative w-full h-[480px] border border-border bg-surface/40 rounded-[2rem] overflow-hidden hover:border-white/10 transition-colors cursor-pointer"
+      className="group relative w-full h-[480px] border border-border bg-[#050505] rounded-[2rem] overflow-hidden hover:border-white/10 transition-colors cursor-pointer will-change-transform"
     >
       {/* Dynamic Arrow Indicator - Appears when focused */}
       <motion.div
@@ -67,7 +67,7 @@ function ProjectCardComponent({ project, onOpen, activeValue, index = 0, total =
           scale: arrowScale,
           boxShadow: arrowShadow,
         }}
-        className="absolute bottom-8 right-8 z-50 w-12 h-12 bg-accent/20 rounded-full flex items-center justify-center border border-accent/50 text-accent backdrop-blur-sm shadow-lg pointer-events-none"
+        className="absolute bottom-8 right-8 z-50 w-12 h-12 bg-accent/20 rounded-full flex items-center justify-center border border-accent/50 text-accent shadow-lg pointer-events-none"
       >
         <ArrowRight size={20} />
       </motion.div>
