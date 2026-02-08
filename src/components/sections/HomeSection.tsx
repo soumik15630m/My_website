@@ -24,6 +24,30 @@ export const HomeSection: React.FC<HomeSectionProps> = ({
     // Get pinned projects for side panel (fallback to first 3 active if none pinned)
     const pinnedProjects = projects.filter(p => p.pinned);
 
+    // Typewriter Effect for Tagline (Watermark)
+    const [displayText, setDisplayText] = React.useState('');
+    const tagline = profile.tagline || 'Open Source Contributor | Building performant systems';
+
+    React.useEffect(() => {
+        let i = 0;
+        const targetText = tagline;
+        setDisplayText('');
+
+        const typingInterval = setInterval(() => {
+            if (i < targetText.length) {
+                setDisplayText(prev => prev + targetText.charAt(i));
+                i++;
+            } else {
+                // Determine if we assume "trailing dots" means "add ... at the end"
+                // User said "ends with trailing dots".
+                setDisplayText(prev => prev.endsWith('...') ? prev : prev + '...');
+                clearInterval(typingInterval);
+            }
+        }, 50); // Faster typing speed for a snappy feel
+
+        return () => clearInterval(typingInterval);
+    }, [tagline]);
+
     return (
         <div className="max-w-7xl mx-auto min-h-[80vh]">
             {/* Two Column Layout */}
@@ -44,8 +68,9 @@ export const HomeSection: React.FC<HomeSectionProps> = ({
                             >
                                 {profile.role || 'Systems Engineer'}
                             </span>
-                            <span className="text-secondaryText/50 block mt-2 text-3xl md:text-4xl lg:text-5xl">
-                                {profile.tagline || 'Open Source Contributor | Building performant systems'}
+                            <span className="text-secondaryText/50 block mt-2 text-3xl md:text-4xl lg:text-5xl font-mono">
+                                {displayText}
+                                <span className="animate-pulse text-accent">|</span>
                             </span>
                         </motion.h1>
                     </Section>
