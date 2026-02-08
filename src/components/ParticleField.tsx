@@ -229,9 +229,18 @@ export const ParticleField: React.FC<ParticleFieldProps & { paused?: boolean }> 
                 particle.alpha += (particle.baseAlpha - particle.alpha) * 0.05;
             }
 
-            // Scroll effect
+            // Scroll effect with Hard Cap
             if (Math.abs(scrollVelocity) > 0.5) {
-                particle.vy += scrollVelocity * 0.008;
+                // Cap the scroll influence to prevent chaos
+                const scrollInfluence = Math.max(-2, Math.min(2, scrollVelocity * 0.008));
+                particle.vy += scrollInfluence;
+            }
+
+            // Global Velocity Cap (rendering visual appeal)
+            const MAX_VELOCITY = 4;
+            if (!hasTargets) {
+                particle.vx = Math.max(-MAX_VELOCITY, Math.min(MAX_VELOCITY, particle.vx));
+                particle.vy = Math.max(-MAX_VELOCITY, Math.min(MAX_VELOCITY, particle.vy));
             }
 
             // Apply velocity

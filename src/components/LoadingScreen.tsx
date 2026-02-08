@@ -206,24 +206,31 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ profile }) => {
                         {role}
                     </motion.p>
 
-                    <div className="flex flex-wrap justify-center max-w-[80%] mx-auto text-center gap-y-1">
-                        {tagline.split("").map((char, index) => (
-                            <motion.span
-                                key={index}
-                                initial={{ opacity: 0, filter: "blur(10px)", y: 5 }}
-                                animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
-                                transition={{
-                                    duration: 1.5,
-                                    delay: settings.taglineDelay + (index * settings.taglineStagger), // Configurable Delay & Stagger
-                                    ease: "easeOut"
-                                }}
-                                className="text-white/40 text-xs tracking-widest font-light uppercase inline-block"
-                                style={{
-                                    marginRight: char === " " ? "0.5em" : "0" // Maintain space width
-                                }}
-                            >
-                                {char === " " ? "\u00A0" : char}
-                            </motion.span>
+                    <div className="flex flex-wrap justify-center max-w-[80%] mx-auto text-center gap-x-3 gap-y-1">
+                        {tagline.split(" ").map((word, wordIndex) => (
+                            <div key={wordIndex} className="inline-block whitespace-nowrap">
+                                {word.split("").map((char, charIndex) => {
+                                    // Calculate global index for stagger
+                                    // Use a simpler approximated index based on word to ensure flow
+                                    const delay = settings.taglineDelay + (wordIndex * 0.1) + (charIndex * 0.02);
+
+                                    return (
+                                        <motion.span
+                                            key={`${wordIndex}-${charIndex}`}
+                                            initial={{ opacity: 0, filter: "blur(10px)", y: 5 }}
+                                            animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
+                                            transition={{
+                                                duration: 1.2,
+                                                delay: delay,
+                                                ease: "easeOut"
+                                            }}
+                                            className="text-white/40 text-xs tracking-widest font-light uppercase inline-block"
+                                        >
+                                            {char}
+                                        </motion.span>
+                                    );
+                                })}
+                            </div>
                         ))}
                     </div>
                 </div>
