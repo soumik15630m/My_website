@@ -46,6 +46,7 @@ export interface OpenSourceContribution {
   date: string;
   description?: string;
   image?: string; // Screenshot or diagram
+  pinned?: boolean;
 }
 
 export type ViewState = 'home' | 'projects' | 'achievements' | 'notes' | 'opensource';
