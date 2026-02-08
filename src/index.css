@@ -225,7 +225,7 @@ body {
 }
 
 /* Liquid Gradient Text Animation */
-@keyframes liquid-flow {
+@keyframes liquid-wave {
   0% {
     background-position: 0% 50%;
   }
@@ -240,18 +240,29 @@ body {
 }
 
 .text-gradient-liquid {
-  background: linear-gradient(-45deg,
-      #8AB4F8,
-      #c084fc,
-      #22c55e,
-      #8AB4F8);
-  background-size: 300% 300%;
+  /* High-contrast "Liquid Gloss" effect */
+  background: linear-gradient(120deg,
+      #312e81 0%,
+      /* Dark Indigo */
+      #3b82f6 40%,
+      /* Blue-500 (Shine) */
+      #a855f7 60%,
+      /* Purple-500 */
+      #312e81 100%
+      /* Dark Indigo */
+    );
+  background-size: 200% auto;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  /* Fallback */
   -webkit-text-fill-color: transparent;
-  animation: liquid-flow 6s ease-in-out infinite;
+  animation: liquid-wave 5s linear infinite;
+
+  /* Prevent clipping and ensure shine is visible */
+  padding-bottom: 0.15em;
+  margin-bottom: -0.15em;
+  display: inline-block;
+  /* Ensure transforms work well */
 }
 
 /* ===============================
