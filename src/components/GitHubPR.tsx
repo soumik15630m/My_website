@@ -17,45 +17,70 @@ interface PRData {
     repo: string;
 }
 
-export const GitHubPR: React.FC<GitHubPRProps> = ({ repoUrl, prNumber, initialTitle }) => {
+export const GitHubPR: React.FC<GitHubPRProps> = ({ repoUrl, prNumber, initialTitle, initialStatus = 'open', initialImage }) => {
     const [data, setData] = useState<PRData | null>(null);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(false);
 
-    // Parse owner/repo from URL
-    // Format: https://github.com/owner/repo
+    // Parse owner/repo
     const parts = repoUrl.split('/');
     const owner = parts[parts.length - 2];
     const repo = parts[parts.length - 1];
 
     useEffect(() => {
+        let mounted = true;
         async function fetchData() {
             try {
                 const res = await fetch(`/api/github-status?owner=${owner}&repo=${repo}&number=${prNumber}`);
-                if (!res.ok) throw new Error('Failed to fetch');
+                if (!res.ok) throw new Error('API unavailable');
                 const json = await res.json();
-                setData(json);
+                if (mounted) setData(json);
             } catch (err) {
-                console.error(err);
-                setError(true);
+                // Silent fail
             } finally {
-                setLoading(false);
+                if (mounted) setLoading(false);
             }
         }
 
         fetchData();
+        return () => { mounted = false; };
     }, [owner, repo, prNumber]);
 
-    const getStatusColor = (status?: string) => {
+    // Derived state
+    const currentStatus = data?.status || initialStatus;
+    const currentTitle = data?.title || initialTitle || `PR #${prNumber}`;
+    const currentImage = data?.image || initialImage || `https://opengraph.githubassets.com/1/${owner}/${repo}/pull/${prNumber}`;
+
+    const getStatusStyle = (status: string) => {
         switch (status) {
-            case 'merged': return 'text-purple-400 border-purple-500/30 bg-purple-500/10';
-            case 'closed': return 'text-red-400 border-red-500/30 bg-red-500/10';
-            case 'open': return 'text-green-400 border-green-500/30 bg-green-500/10';
-            default: return 'text-secondaryText border-white/10 bg-white/5';
+            case 'merged': return {
+                badge: 'text-purple-400 border-purple-500/30 bg-purple-500/10',
+                // Neutral border by default, Purple on hover
+                border: 'border-white/5 hover:border-purple-500/50',
+                glow: 'group-hover:shadow-[0_0_20px_-5px_rgba(168,85,247,0.3)]'
+            };
+            case 'closed': return {
+                badge: 'text-red-400 border-red-500/30 bg-red-500/10',
+                // Neutral border by default, Red on hover
+                border: 'border-white/5 hover:border-red-500/50',
+                glow: 'group-hover:shadow-[0_0_20px_-5px_rgba(239,68,68,0.3)]'
+            };
+            case 'open': return {
+                badge: 'text-green-400 border-green-500/30 bg-green-500/10',
+                // Green border ALWAYS (Active state), Green on hover too
+                border: 'border-green-500/30 hover:border-green-500/50',
+                glow: 'group-hover:shadow-[0_0_20px_-5px_rgba(34,197,94,0.3)]'
+            };
+            default: return {
+                badge: 'text-secondaryText border-white/10 bg-white/5',
+                border: 'border-white/5 hover:border-white/10',
+                glow: ''
+            };
         }
     };
 
-    const StatusIcon = ({ status }: { status?: string }) => {
+    const styles = getStatusStyle(currentStatus);
+
+    const StatusIcon = ({ status }: { status: string }) => {
         switch (status) {
             case 'merged': return <GitMerge size={14} />;
             case 'closed': return <XCircle size={14} />;
@@ -63,34 +88,25 @@ export const GitHubPR: React.FC<GitHubPRProps> = ({ repoUrl, prNumber, initialTi
         }
     };
 
-    if (loading) {
-        return (
-            <div className="w-full h-24 rounded-xl bg-white/5 animate-pulse border border-white/5" />
-        );
-    }
-
-    const prTitle = data?.title || initialTitle || `PR #${prNumber}`;
-    const statusStyle = getStatusColor(data?.status);
-
     return (
         <motion.a
             href={`${repoUrl}/pull/${prNumber}`}
             target="_blank"
             rel="noopener noreferrer"
             whileHover={{ y: -4, backgroundColor: "rgba(255, 255, 255, 0.03)" }}
-            className="group block relative w-full p-4 rounded-xl bg-white/[0.02] border border-white/5 hover:border-white/10 transition-all overflow-hidden"
+            className={`group block relative w-full p-4 rounded-xl bg-white/[0.02] border transition-all duration-300 overflow-hidden ${styles.border} ${styles.glow}`}
         >
-            {/* Background Image Effect (Subtle) */}
-            {data?.image && (
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-500 pointer-events-none">
-                    <img src={data.image} alt="" className="w-full h-full object-cover blur-sm" />
+            {/* Background Image Effect (Always visible, faint) */}
+            {currentImage && (
+                <div className="absolute inset-0 opacity-5 group-hover:opacity-10 transition-opacity duration-500 pointer-events-none">
+                    <img src={currentImage} alt="" className="w-full h-full object-cover blur-sm" />
                 </div>
             )}
 
             <div className="relative z-10 flex items-start gap-4">
                 {/* Status Icon Badge */}
-                <div className={`shrink-0 w-8 h-8 rounded-lg flex items-center justify-center border ${statusStyle} transition-colors`}>
-                    <StatusIcon status={data?.status} />
+                <div className={`shrink-0 w-8 h-8 rounded-lg flex items-center justify-center border transition-colors ${styles.badge}`}>
+                    <StatusIcon status={currentStatus} />
                 </div>
 
                 <div className="flex-1 min-w-0">
@@ -102,22 +118,20 @@ export const GitHubPR: React.FC<GitHubPRProps> = ({ repoUrl, prNumber, initialTi
                     </div>
 
                     <h3 className="text-sm font-medium text-primaryText mt-1 leading-snug group-hover:text-accent transition-colors line-clamp-2">
-                        {prTitle}
+                        {currentTitle}
                     </h3>
 
-                    {/* Meta / Status Text */}
                     <div className="flex items-center gap-2 mt-2">
-                        <span className={`text-[10px] uppercase tracking-wider font-mono px-1.5 py-0.5 rounded border ${statusStyle}`}>
-                            {data?.status || 'Active'}
+                        <span className={`text-[10px] uppercase tracking-wider font-mono px-1.5 py-0.5 rounded border ${styles.badge}`}>
+                            {currentStatus}
                         </span>
-                        {/* If we had date, we could put it here */}
                     </div>
                 </div>
 
-                {/* Optional: Small Image Thumbnail if available and not just background */}
-                {data?.image && (
-                    <div className="hidden sm:block w-20 h-16 rounded-lg overflow-hidden border border-white/10 shrink-0 bg-black/20">
-                        <img src={data.image} alt="" className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity" />
+                {/* Thumbnail (Always visible on mobile/desktop) */}
+                {currentImage && (
+                    <div className="w-16 h-12 sm:w-20 sm:h-16 rounded-lg overflow-hidden border border-white/10 shrink-0 bg-black/20">
+                        <img src={currentImage} alt="" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
                     </div>
                 )}
             </div>
