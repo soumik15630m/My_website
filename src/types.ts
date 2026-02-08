@@ -55,3 +55,15 @@ export interface NavItem {
   id: ViewState;
   label: string;
 }
+
+export interface Profile {
+  name: string;
+  handle: string;
+  role: string;
+  tagline: string;
+  location: string;
+  availability: string;
+  email: string;
+  github: string;
+  about: string;
+}
