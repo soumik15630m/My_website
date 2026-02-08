@@ -27,6 +27,10 @@ export default defineConfig(({ mode }) => {
     build: {
       chunkSizeWarningLimit: 600,
       sourcemap: true,
+      // Drop console logs in production
+      esbuild: {
+        drop: mode === 'production' ? ['console', 'debugger'] : [],
+      },
       rollupOptions: {
         output: {
           manualChunks: {

@@ -14,7 +14,10 @@ interface ProjectCardProps {
   total?: number;
 }
 
-export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onOpen, activeValue, index = 0, total = 0 }) => {
+// Memoize the component to prevent re-renders when parent list scrolls
+export const ProjectCard = React.memo(ProjectCardComponent);
+
+function ProjectCardComponent({ project, onOpen, activeValue, index = 0, total = 0 }: ProjectCardProps) {
   const slideClass = "min-w-full h-full p-8 md:p-10 flex flex-col snap-center relative";
 
   // Use fallback motion value if activeValue not provided
@@ -228,4 +231,4 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onOpen, activ
       </div>
     </motion.div>
   );
-};
+}

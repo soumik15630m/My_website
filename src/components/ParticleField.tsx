@@ -14,20 +14,21 @@ interface Particle {
     targetY?: number;
 }
 
-const PARTICLE_COUNT = typeof window !== 'undefined' && window.innerWidth < 768 ? 40 : 250;
+const PARTICLE_COUNT = typeof window !== 'undefined' && window.innerWidth < 768 ? 0 : 250;
 const IDLE_TIMEOUT = 60000; // 1 minute
 
 interface ParticleFieldProps {
     text?: string;
 }
 
-export const ParticleField: React.FC<ParticleFieldProps> = ({ text = "STK" }) => {
+export const ParticleField: React.FC<ParticleFieldProps & { paused?: boolean }> = ({ text = "STK", paused = false }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const mouseRef = useRef({ x: -1000, y: -1000, isClicking: false });
     const particlesRef = useRef<Particle[]>([]);
     const animationRef = useRef<number>();
     const scrollVelocityRef = useRef(0);
     const lastScrollY = useRef(0);
+    const lastTimeRef = useRef(0); // For FPS throttling
 
     // Idle State
     const [isIdle, setIsIdle] = React.useState(false);
@@ -50,7 +51,7 @@ export const ParticleField: React.FC<ParticleFieldProps> = ({ text = "STK" }) =>
         const offscreen = document.createElement('canvas');
         offscreen.width = width;
         offscreen.height = height;
-        const ctx = offscreen.getContext('2d');
+        const ctx = offscreen.getContext('2d', { willReadFrequently: true });
         if (!ctx) return;
 
         // Minimalist - Inter, Heavy weight, Wide spacing
@@ -65,7 +66,7 @@ export const ParticleField: React.FC<ParticleFieldProps> = ({ text = "STK" }) =>
         const points: { x: number, y: number }[] = [];
 
         // Sample pixels
-        const step = 2;
+        const step = 4; // Increased step for performance (less points)
 
         for (let y = 0; y < height; y += step) {
             for (let x = 0; x < width; x += step) {
@@ -86,8 +87,11 @@ export const ParticleField: React.FC<ParticleFieldProps> = ({ text = "STK" }) =>
 
     // Initialize particles
     const initParticles = useCallback((width: number, height: number) => {
+        const isMobile = width < 768;
+        const count = isMobile ? 30 : 150; // Optimized counts
+
         particlesRef.current = [];
-        for (let i = 0; i < PARTICLE_COUNT; i++) {
+        for (let i = 0; i < count; i++) {
             const size = Math.random() * 1.8 + 0.4;
             const baseAlpha = Math.random() * 0.3 + 0.1;
             particlesRef.current.push({
@@ -121,11 +125,24 @@ export const ParticleField: React.FC<ParticleFieldProps> = ({ text = "STK" }) =>
     }, []);
 
     // Animation loop
-    const animate = useCallback(() => {
+    const animate = useCallback((timestamp: number) => {
+        if (paused) return; // Stop completely if paused
+
+        // FPS Throttle (60 FPS)
+        const elapsed = timestamp - lastTimeRef.current;
+        const fpsInterval = 1000 / 60;
+
+        if (elapsed < fpsInterval) {
+            animationRef.current = requestAnimationFrame(animate);
+            return;
+        }
+
+        lastTimeRef.current = timestamp - (elapsed % fpsInterval);
+
         const canvas = canvasRef.current;
         if (!canvas) return;
 
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext('2d', { desynchronized: true });
         if (!ctx) return;
 
         const { width, height } = canvas;
@@ -145,9 +162,10 @@ export const ParticleField: React.FC<ParticleFieldProps> = ({ text = "STK" }) =>
             ctx.restore();
         }
 
-        // Keep only reasonable number of particles
-        if (particlesRef.current.length > PARTICLE_COUNT + 100) {
-            particlesRef.current = particlesRef.current.slice(-PARTICLE_COUNT);
+        // Limit maximum particles (cleanup bursts)
+        const maxParticles = width < 768 ? 50 : 200;
+        if (particlesRef.current.length > maxParticles) {
+            particlesRef.current = particlesRef.current.slice(-maxParticles);
         }
 
         const targets = targetPointsRef.current;
@@ -179,31 +197,33 @@ export const ParticleField: React.FC<ParticleFieldProps> = ({ text = "STK" }) =>
             }
 
             // ACTIVE BEHAVIOR: Mouse Interaction
-            // If idle, we dampen the mouse effect significantly so the watermark "wins"
-            // But we keep it slightly active so user feels it's not "frozen"
             const interactionStrength = hasTargets ? 0.1 : 1.0;
 
             const dx = mouse.x - particle.x;
             const dy = mouse.y - particle.y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-            const maxDistance = 150;
 
-            if (distance < maxDistance && distance > 0) {
-                const angle = Math.atan2(dy, dx);
-                const force = (maxDistance - distance) / maxDistance;
+            // Optimization: Simple box check before expensive sqrt
+            if (Math.abs(dx) < 150 && Math.abs(dy) < 150) {
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                const maxDistance = 150;
 
-                if (mouse.isClicking) {
-                    particle.vx -= Math.cos(angle) * force * 0.8 * interactionStrength;
-                    particle.vy -= Math.sin(angle) * force * 0.8 * interactionStrength;
-                } else {
-                    // Attraction on hover
-                    particle.vx += Math.cos(angle) * force * 0.02 * interactionStrength;
-                    particle.vy += Math.sin(angle) * force * 0.02 * interactionStrength;
-                }
+                if (distance < maxDistance && distance > 0) {
+                    const angle = Math.atan2(dy, dx);
+                    const force = (maxDistance - distance) / maxDistance;
 
-                // Only brighten if Active OR if mouse is VERY close/strong interaction
-                if (!hasTargets) {
-                    particle.alpha = Math.min(0.6, particle.baseAlpha + force * 0.2);
+                    if (mouse.isClicking) {
+                        particle.vx -= Math.cos(angle) * force * 0.8 * interactionStrength;
+                        particle.vy -= Math.sin(angle) * force * 0.8 * interactionStrength;
+                    } else {
+                        // Attraction on hover
+                        particle.vx += Math.cos(angle) * force * 0.02 * interactionStrength;
+                        particle.vy += Math.sin(angle) * force * 0.02 * interactionStrength;
+                    }
+
+                    // Only brighten if Active OR if mouse is VERY close/strong interaction
+                    if (!hasTargets) {
+                        particle.alpha = Math.min(0.6, particle.baseAlpha + force * 0.2);
+                    }
                 }
             } else if (!hasTargets) {
                 particle.alpha += (particle.baseAlpha - particle.alpha) * 0.05;
@@ -218,7 +238,7 @@ export const ParticleField: React.FC<ParticleFieldProps> = ({ text = "STK" }) =>
             particle.x += particle.vx;
             particle.y += particle.vy;
 
-            // Friction (Only apply standard friction if NOT idle, as idle has its own damping)
+            // Friction
             if (!hasTargets) {
                 particle.vx *= 0.995;
                 particle.vy *= 0.995;
@@ -237,14 +257,21 @@ export const ParticleField: React.FC<ParticleFieldProps> = ({ text = "STK" }) =>
             ctx.fill();
         });
 
-        // Draw connections (Disable when idling)
+        // Draw connections (Disable when idling) - OPTIMIZED
         if (!hasTargets) {
-            for (let i = 0; i < particlesRef.current.length; i++) {
-                const p1 = particlesRef.current[i];
-                for (let j = i + 1; j < particlesRef.current.length; j++) {
-                    const p2 = particlesRef.current[j];
+            const particles = particlesRef.current;
+            const len = particles.length;
+
+            for (let i = 0; i < len; i++) {
+                const p1 = particles[i];
+                for (let j = i + 1; j < len; j++) {
+                    const p2 = particles[j];
                     const dx = p1.x - p2.x;
                     const dy = p1.y - p2.y;
+
+                    // OPTIMIZATION: Spatial Cutoff - Skip expensive Math.sqrt if bounding box is too large
+                    if (Math.abs(dx) > 60 || Math.abs(dy) > 60) continue;
+
                     const distance = Math.sqrt(dx * dx + dy * dy);
 
                     if (distance < 60) {
@@ -264,7 +291,7 @@ export const ParticleField: React.FC<ParticleFieldProps> = ({ text = "STK" }) =>
         scrollVelocityRef.current *= 0.95;
 
         animationRef.current = requestAnimationFrame(animate);
-    }, [text, isIdle]);
+    }, [text, isIdle, paused]);
 
     const handleResize = useCallback(() => {
         const canvas = canvasRef.current;
@@ -313,7 +340,11 @@ export const ParticleField: React.FC<ParticleFieldProps> = ({ text = "STK" }) =>
         window.addEventListener('scroll', handleScroll, { passive: true });
         window.addEventListener('resize', handleResize);
 
-        animationRef.current = requestAnimationFrame(animate);
+        // Start loop
+        lastTimeRef.current = performance.now();
+        if (!paused) {
+            animationRef.current = requestAnimationFrame(animate);
+        }
 
         return () => {
             window.removeEventListener('mousemove', handleInput);
@@ -325,13 +356,13 @@ export const ParticleField: React.FC<ParticleFieldProps> = ({ text = "STK" }) =>
             if (animationRef.current) cancelAnimationFrame(animationRef.current);
             if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
         };
-    }, [handleResize, animate, resetIdleTimer, spawnBurst]);
+    }, [handleResize, animate, resetIdleTimer, spawnBurst, paused]);
 
     return (
         <canvas
             ref={canvasRef}
             className="fixed inset-0 z-0 pointer-events-none"
-            style={{ background: 'transparent' }}
+            style={{ background: 'transparent', willChange: 'transform' }}
         />
     );
 };

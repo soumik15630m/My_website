@@ -62,6 +62,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         try {
             const content = await sql`SELECT data FROM site_content WHERE key = ${type}`;
 
+            // Add Edge Caching Headers
+            res.setHeader('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300');
+
             if (content.length === 0) {
                 return res.status(200).json({
                     data: CONTENT_DEFAULTS[type] || null,

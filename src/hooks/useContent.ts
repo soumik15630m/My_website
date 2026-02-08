@@ -54,6 +54,17 @@ async function fetchContent(type: string) {
     }
 }
 
+// In-memory cache to prevent refetching on navigation
+const CACHE: {
+    data: any | null;
+    timestamp: number;
+} = {
+    data: null,
+    timestamp: 0
+};
+
+const CACHE_DURATION = 1000 * 60 * 5; // 5 minutes
+
 export function useContent() {
     const [profile, setProfile] = useState(EMPTY_PROFILE);
     const [projects, setProjects] = useState<any[]>([]);
@@ -66,6 +77,23 @@ export function useContent() {
 
     useEffect(() => {
         async function loadContent() {
+            // Check Cache
+            const now = Date.now();
+            if (CACHE.data && (now - CACHE.timestamp < CACHE_DURATION)) {
+                const { profileData, projectsData, achievementsData, notesData, opensourceData, settingsData } = CACHE.data;
+
+                // Batch updates
+                if (profileData) setProfile({ ...EMPTY_PROFILE, ...profileData, loadingSettings: { ...EMPTY_PROFILE.loadingSettings, ...(profileData.loadingSettings || {}) } });
+                if (projectsData) setProjects(projectsData);
+                if (achievementsData) setAchievements(achievementsData);
+                if (notesData) setNotes(notesData);
+                if (opensourceData) setOpensource(opensourceData);
+                if (settingsData) setSettings({ particleMode: settingsData.particleMode || 'default' });
+
+                setLoading(false);
+                return;
+            }
+
             const [profileData, projectsData, achievementsData, notesData, opensourceData, settingsData] = await Promise.all([
                 fetchContent('profile'),
                 fetchContent('projects'),
@@ -74,6 +102,10 @@ export function useContent() {
                 fetchContent('opensource'),
                 fetchContent('settings'),
             ]);
+
+            // Save to Cache
+            CACHE.data = { profileData, projectsData, achievementsData, notesData, opensourceData, settingsData };
+            CACHE.timestamp = now;
 
             if (profileData && typeof profileData === 'object') {
                 setProfile({

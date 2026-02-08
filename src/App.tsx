@@ -145,8 +145,9 @@ function App() {
       y: direction > 0 ? '100vh' : '-100vh',
       opacity: 0,
       scale: 0.95,
-      filter: 'blur(8px)',
-      zIndex: 1
+      filter: 'blur(4px)',
+      zIndex: 1,
+      willChange: "transform, opacity, filter"
     }),
     center: {
       y: 0,
@@ -157,20 +158,22 @@ function App() {
       transition: {
         type: "spring",
         stiffness: 250,
-        damping: 30,
+        damping: 30, // Slightly increased damping to prevent micro-jitters
         mass: 1
-      }
+      },
+      willChange: "transform, opacity, filter"
     },
     exit: (direction: number) => ({
       y: direction > 0 ? '-100vh' : '100vh',
       opacity: 0,
       scale: 0.95,
-      filter: 'blur(8px)',
+      filter: 'blur(4px)',
       zIndex: 0,
       transition: {
         duration: 0.5,
         ease: [0.2, 0.8, 0.2, 1] as [number, number, number, number]
-      }
+      },
+      willChange: "transform, opacity, filter"
     })
   };
 
