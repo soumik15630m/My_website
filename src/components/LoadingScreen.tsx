@@ -31,21 +31,23 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ profile }) => {
                         <defs>
                             <mask id="text-mask">
                                 <rect x="0" y="0" width="100%" height="100%" fill="black" />
-                                <text x="50%" y="50%" textAnchor="middle" dy=".35em" fill="white" className="text-8xl md:text-9xl font-mono tracking-widest">
+                                <text x="50%" y="54%" textAnchor="middle" dy=".35em" fill="white" className="text-8xl md:text-9xl font-['Orbitron'] font-black tracking-widest" style={{ fontWeight: 900 }}>
                                     STK
                                 </text>
                             </mask>
                             {/* Wave Gradient */}
                             <linearGradient id="wave-gradient" x1="0" x2="0" y1="0" y2="1">
-                                <stop offset="0%" stopColor="#3b82f6" />
-                                <stop offset="100%" stopColor="#60a5fa" />
+                                <stop offset="0%" stopColor="#60a5fa" />
+                                <stop offset="50%" stopColor="#3b82f6" />
+                                <stop offset="100%" stopColor="#2563eb" />
                             </linearGradient>
                         </defs>
 
                         {/* Background Text (Outline/Dim) */}
-                        <text x="50%" y="50%" textAnchor="middle" dy=".35em"
-                            fill="none" stroke="#333" strokeWidth="2"
-                            className="text-8xl md:text-9xl font-mono tracking-widest"
+                        <text x="50%" y="54%" textAnchor="middle" dy=".35em"
+                            fill="none" stroke="#333" strokeWidth="1"
+                            className="text-8xl md:text-9xl font-['Orbitron'] font-black tracking-widest"
+                            style={{ fontWeight: 900 }}
                         >
                             STK
                         </text>
@@ -59,30 +61,47 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ profile }) => {
                                 width="400"
                                 height="200"
                                 fill="url(#wave-gradient)"
-                                animate={{ y: [-50, -250] }}
+                                animate={{ y: [-20, -220] }}
                                 transition={{
-                                    duration: 3,
+                                    duration: 2.5,
                                     ease: "easeInOut",
-                                    repeat: Infinity,
-                                    repeatType: "mirror"
                                 }}
                             />
-                            {/* Horizontal Wave Motion */}
+                            {/* Horizontal Wave Motion 1 */}
                             <motion.path
-                                d="M0,0 Q50,10 100,0 T200,0 T300,0 T400,0 V200 H0 Z"
+                                d="M0,0 Q50,15 100,0 T200,0 T300,0 T400,0 V200 H0 Z"
                                 fill="url(#wave-gradient)"
-                                transform="translate(0, 150)" // Start from bottom
+                                transform="translate(0, 160)"
                                 animate={{
                                     d: [
-                                        "M0,10 Q50,20 100,10 T200,10 T300,10 T400,10 V200 H0 Z",
-                                        "M0,0 Q50,-10 100,0 T200,0 T300,0 T400,0 V200 H0 Z",
-                                        "M0,10 Q50,20 100,10 T200,10 T300,10 T400,10 V200 H0 Z"
+                                        "M0,0 Q50,15 100,0 T200,0 T300,0 T400,0 V200 H0 Z",
+                                        "M0,0 Q50,-15 100,0 T200,0 T300,0 T400,0 V200 H0 Z",
+                                        "M0,0 Q50,15 100,0 T200,0 T300,0 T400,0 V200 H0 Z"
                                     ],
-                                    y: [200, 0] // Rise up
+                                    y: [200, -20]
                                 }}
                                 transition={{
-                                    d: { duration: 2, repeat: Infinity, ease: "linear" },
-                                    y: { duration: 2.5, ease: "easeInOut" } // Fill duration
+                                    d: { duration: 3, repeat: Infinity, ease: "linear" },
+                                    y: { duration: 2.5, ease: "easeInOut" }
+                                }}
+                            />
+                            {/* Horizontal Wave Motion 2 (Offset) */}
+                            <motion.path
+                                d="M0,0 Q50,-10 100,0 T200,0 T300,0 T400,0 V200 H0 Z"
+                                fill="url(#wave-gradient)"
+                                fillOpacity="0.7"
+                                transform="translate(0, 160)"
+                                animate={{
+                                    d: [
+                                        "M0,0 Q50,-10 100,0 T200,0 T300,0 T400,0 V200 H0 Z",
+                                        "M0,0 Q50,10 100,0 T200,0 T300,0 T400,0 V200 H0 Z",
+                                        "M0,0 Q50,-10 100,0 T200,0 T300,0 T400,0 V200 H0 Z"
+                                    ],
+                                    y: [200, -20]
+                                }}
+                                transition={{
+                                    d: { duration: 4, repeat: Infinity, ease: "linear" },
+                                    y: { duration: 2.5, ease: "easeInOut" }
                                 }}
                             />
                         </g>
