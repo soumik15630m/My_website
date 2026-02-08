@@ -7,6 +7,7 @@ import { OpenSourceDetail } from './components/OpenSourceDetail';
 import { useContent } from './hooks/useContent';
 import { ViewState, Project, Achievement, Note, OpenSourceContribution } from './types';
 import { AnimatePresence, motion } from 'framer-motion';
+import { ParticleField } from './components/ParticleField';
 
 // Import Sections
 import { HomeSection } from './components/sections/HomeSection';
@@ -215,6 +216,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-background text-primaryText font-sans selection:bg-accent/20 selection:text-accent overflow-x-hidden">
+      <ParticleField />
       <Navigation currentView={currentView} onChangeView={handleViewChange} profile={profile} navItems={navItems} />
 
       <main className="min-h-screen w-full px-6 pt-32 pb-24 md:px-8 md:pt-40 lg:pt-48">
