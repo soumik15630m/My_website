@@ -11,7 +11,12 @@ interface LoadingScreenProps {
 }
 
 export const LoadingScreen: React.FC<LoadingScreenProps> = ({ profile }) => {
-    const logoSrc = getOptimizedImageUrl(profile?.logoImage);
+    const rawLogoSrc = profile?.logoImage ? getOptimizedImageUrl(profile.logoImage) : undefined;
+    const [imgError, setImgError] = React.useState(false);
+
+    // If we have a source and no error, try showing image. Otherwise fallback to text.
+    const showImage = rawLogoSrc && !imgError;
+    const logoText = profile?.logoText || "0x1A"; // Fallback only if we really have nothing else
 
     return (
         <motion.div
@@ -31,18 +36,19 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ profile }) => {
                     transition={{ duration: 0.5, ease: "easeOut" }}
                     className="relative z-10 flex flex-col items-center"
                 >
-                    {logoSrc ? (
+                    {showImage ? (
                         <div className="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden mb-6 border-4 border-accent/20 shadow-[0_0_40px_-10px_rgba(var(--accent-rgb),0.3)]">
                             <img
-                                src={logoSrc}
+                                src={rawLogoSrc}
                                 alt="Logo"
                                 className="w-full h-full object-cover"
+                                onError={() => setImgError(true)}
                             />
                         </div>
                     ) : (
                         <div className="relative">
-                            <h1 className="text-6xl md:text-8xl font-bold tracking-tighter text-primaryText">
-                                {profile?.logoText || '0x1A'}
+                            <h1 className="text-6xl md:text-8xl font-bold tracking-tighter text-primaryText min-h-[1.2em]">
+                                {profile?.logoText ? logoText : ''}
                             </h1>
                             <div className="h-1 w-full bg-accent mt-2 rounded-full overflow-hidden">
                                 <motion.div

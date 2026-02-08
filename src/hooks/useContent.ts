@@ -15,7 +15,7 @@ const EMPTY_PROFILE = {
     email: "",
     github: "",
     about: "",
-    logoText: "0x1A",
+    logoText: "",
     logoImage: ""
 };
 
