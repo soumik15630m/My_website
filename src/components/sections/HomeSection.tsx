@@ -39,16 +39,12 @@ export const HomeSection: React.FC<HomeSectionProps> = ({
                             transition={{ duration: 0.7, ease: [0.2, 0.8, 0.2, 1] }}
                             className="text-4xl md:text-6xl lg:text-7xl font-semibold tracking-tight leading-tight"
                         >
-                            <motion.span
-                                className="text-gradient-liquid block cursor-default w-fit"
-                                whileHover={{
-                                    x: 10,
-                                    filter: "drop-shadow(0 0 10px rgba(138, 180, 248, 0.5))"
-                                }}
-                                transition={{ type: "spring", stiffness: 300, damping: 10 }}
+                            <span
+                                className="text-liquid-fill block cursor-default w-fit relative"
+                                data-text={profile.role || 'Systems Engineer'}
                             >
                                 {profile.role || 'Systems Engineer'}
-                            </motion.span>
+                            </span>
                             <span className="text-secondaryText/50 block mt-2 text-3xl md:text-4xl lg:text-5xl">
                                 {profile.tagline || 'Open Source Contributor | Building performant systems'}
                             </span>

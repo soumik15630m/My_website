@@ -12,6 +12,9 @@
   --color-accent-glow: rgba(138, 180, 248, 0.4);
   --color-green: #22c55e;
   --color-green-glow: rgba(34, 197, 94, 0.5);
+
+  /* Animation Config */
+  --liquid-speed: 2s;
 }
 
 body {
@@ -224,45 +227,57 @@ body {
   animation: shimmer 3s ease-in-out infinite;
 }
 
-/* Liquid Gradient Text Animation */
-@keyframes liquid-wave {
-  0% {
-    background-position: 0% 50%;
-  }
-
-  50% {
-    background-position: 100% 50%;
-  }
-
-  100% {
-    background-position: 0% 50%;
-  }
+/* Liquid Filled Text Effect */
+.text-liquid-fill {
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.4);
+  /* Clearly visible outline */
+  position: relative;
+  display: inline-block;
+  padding-bottom: 0.15em;
 }
 
-.text-gradient-liquid {
-  /* High-contrast "Liquid Gloss" effect */
-  background: linear-gradient(120deg,
-      #312e81 0%,
-      /* Dark Indigo */
-      #3b82f6 40%,
-      /* Blue-500 (Shine) */
-      #a855f7 60%,
-      /* Purple-500 */
-      #312e81 100%
-      /* Dark Indigo */
+.text-liquid-fill::before {
+  content: attr(data-text);
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 75%;
+  /* 75% Filled */
+  overflow: hidden;
+
+  /* Greyish/Black to Deep Blue Gradient */
+  background: linear-gradient(to top,
+      #111827 0%,
+      /* Gray-900 */
+      #1e1b4b 40%,
+      /* Indigo-950 */
+      #1d4ed8 100%
+      /* Blue-700 top edge */
     );
-  background-size: 200% auto;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
   -webkit-text-fill-color: transparent;
-  animation: liquid-wave 5s linear infinite;
 
-  /* Prevent clipping and ensure shine is visible */
-  padding-bottom: 0.15em;
-  margin-bottom: -0.15em;
-  display: inline-block;
-  /* Ensure transforms work well */
+  /* No outline on the liquid itself */
+  -webkit-text-stroke: 0;
+
+  /* Animation using CSS variable */
+  animation: liquid-rise var(--liquid-speed, 2s) ease-out forwards;
+}
+
+@keyframes liquid-rise {
+  0% {
+    height: 0%;
+    opacity: 0;
+  }
+
+  100% {
+    height: 75%;
+    opacity: 1;
+  }
 }
 
 /* ===============================
