@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { NavItem, ViewState } from '../types';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
+import { getOptimizedImageUrl } from '../utils/imageUtils';
 
 interface NavigationProps {
   currentView: ViewState;
@@ -13,6 +14,7 @@ interface NavigationProps {
 export const Navigation: React.FC<NavigationProps> = ({ currentView, onChangeView, profile, navItems }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const logoSrc = getOptimizedImageUrl(profile.logoImage);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -49,8 +51,8 @@ export const Navigation: React.FC<NavigationProps> = ({ currentView, onChangeVie
               onClick={() => handleNavClick('home')}
               className="flex items-center gap-3 text-sm font-semibold tracking-tight text-primaryText hover:text-accent transition-colors duration-300"
             >
-              {profile.logoImage ? (
-                <img src={profile.logoImage} alt="Logo" className="w-8 h-8 rounded-full object-cover border border-white/10" />
+              {logoSrc ? (
+                <img src={logoSrc} alt="Logo" className="w-8 h-8 rounded-full object-cover border border-white/10" />
               ) : null}
               <span>{profile.logoText || profile.name || 'Portfolio'}</span>
             </button>
