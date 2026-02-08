@@ -68,9 +68,8 @@ export const HomeSection: React.FC<HomeSectionProps> = ({
                             >
                                 {profile.role || 'Systems Engineer'}
                             </span>
-                            <span className="text-secondaryText/50 block mt-2 text-3xl md:text-4xl lg:text-5xl font-mono">
-                                {displayText}
-                                <span className="animate-pulse text-accent">|</span>
+                            <span className="text-secondaryText/50 block mt-2 text-3xl md:text-4xl lg:text-5xl">
+                                {profile.tagline || 'Open Source Contributor | Building performant systems'}
                             </span>
                         </motion.h1>
                     </Section>

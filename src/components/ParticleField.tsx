@@ -151,14 +151,34 @@ export const ParticleField: React.FC<ParticleFieldProps & { paused?: boolean }> 
 
         ctx.clearRect(0, 0, width, height);
 
-        // Draw Watermark (Background) - Subtle, Minimalist
+        // Draw Watermark (Background) - Subtle, Minimalist with Typewriter Effect
         if (text) {
             ctx.save();
             ctx.font = '900 25vw "Inter", sans-serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillStyle = 'rgba(255, 255, 255, 0.02)';
-            ctx.fillText(text, width / 2, height / 2);
+
+            // Typewriter Logic directly in render loop for smooth sync
+            // Speed: 200ms per char.
+            // Sequence: S -> ST -> STK -> STK. -> STK.. -> STK... (Stay)
+            const now = Date.now();
+            const speed = 300; // ms per char
+            const fullText = text + "..."; // "STK..."
+            const charIndex = Math.floor(now / speed) % (fullText.length + 10); // +10 for pause at end
+
+            // Clamp index to length to hold the final state
+            const visibleLength = Math.min(charIndex, fullText.length);
+            let displayText = fullText.substring(0, visibleLength);
+
+            // Blinking Cursor | (Blinks every 500ms)
+            const showCursor = Math.floor(now / 500) % 2 === 0;
+            if (showCursor && visibleLength < fullText.length + 5) { // Stop blinking after a while if desired, or keep blinking
+                displayText += "|";
+            }
+
+            // Draw
+            ctx.fillText(displayText, width / 2, height / 2);
             ctx.restore();
         }
 
