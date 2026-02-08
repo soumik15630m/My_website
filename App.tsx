@@ -841,7 +841,7 @@ function App() {
       </main>
 
       {/* Particle Field - Background Layer */}
-      <ParticleField mode={settings.particleMode} />
+      <ParticleField />
 
     </div>
   );
