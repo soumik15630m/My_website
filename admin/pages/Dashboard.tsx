@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 import { getContent, updateContent } from '../api';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Home, FolderOpen, Award, FileText, LogOut, Save, Plus, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Home, FolderOpen, Award, FileText, LogOut, Save, Plus, Trash2, ChevronLeft, ChevronRight, Upload, Download, Copy, FileUp } from 'lucide-react';
 
-type Tab = 'profile' | 'projects' | 'achievements' | 'notes';
+type Tab = 'profile' | 'projects' | 'achievements' | 'notes' | 'import';
 
 export function Dashboard() {
     const { user, token, logout } = useAuth();
@@ -76,7 +76,33 @@ export function Dashboard() {
         { id: 'projects' as Tab, label: 'Projects', icon: FolderOpen },
         { id: 'achievements' as Tab, label: 'Achievements', icon: Award },
         { id: 'notes' as Tab, label: 'Notes', icon: FileText },
+        { id: 'import' as Tab, label: 'Import/Export', icon: Upload },
     ];
+
+    // JSON Import/Export handlers
+    const handleImportJSON = (jsonData: any) => {
+        try {
+            if (jsonData.profile) setProfile(jsonData.profile);
+            if (jsonData.projects) setProjects(jsonData.projects);
+            if (jsonData.achievements) setAchievements(jsonData.achievements);
+            if (jsonData.notes) setNotes(jsonData.notes);
+            showMessage('success', 'Data imported successfully!');
+        } catch {
+            showMessage('error', 'Failed to import data');
+        }
+    };
+
+    const handleExportJSON = () => {
+        const data = { profile, projects, achievements, notes };
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `portfolio-data-${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        showMessage('success', 'Data exported!');
+    };
 
     return (
         <div className="min-h-screen bg-background flex">
@@ -185,6 +211,12 @@ export function Dashboard() {
                                     onChange={setNotes}
                                     onSave={() => saveContent('notes', notes)}
                                     saving={saving}
+                                />
+                            )}
+                            {activeTab === 'import' && (
+                                <ImportExportEditor
+                                    onImport={handleImportJSON}
+                                    onExport={handleExportJSON}
                                 />
                             )}
                         </>
@@ -487,3 +519,191 @@ function NotesEditor({ notes, onChange, onSave, saving }: any) {
         </div>
     );
 }
+
+// JSON Template for reference
+const JSON_TEMPLATE = `{
+  "profile": {
+    "name": "Your Name",
+    "title": "Your Title",
+    "bio": "About you...",
+    "location": "City, Country"
+  },
+  "projects": [
+    {
+      "id": "p1",
+      "title": "Project Title",
+      "description": "Project description",
+      "problemStatement": "What problem does it solve?",
+      "technicalDecisions": ["Decision 1", "Decision 2"],
+      "techStack": ["React", "TypeScript"],
+      "status": "active",
+      "year": "2024",
+      "githubUrl": "https://github.com/...",
+      "image": "https://...",
+      "architecture": "graph TD\\n    A[Client] --> B[Server]"
+    }
+  ],
+  "achievements": [
+    {
+      "id": "a1",
+      "title": "Achievement Title",
+      "issuer": "Organization",
+      "year": "2024",
+      "description": "Description",
+      "image": "https://..."
+    }
+  ],
+  "notes": [
+    {
+      "id": "n1",
+      "title": "Note Title",
+      "summary": "Brief summary",
+      "content": "Full content here...",
+      "date": "2024-01-15",
+      "readTime": "5 min",
+      "tags": ["tag1", "tag2"],
+      "imageUrl": "https://..."
+    }
+  ]
+}`;
+
+// Import/Export Editor Component
+function ImportExportEditor({ onImport, onExport }: { onImport: (data: any) => void; onExport: () => void }) {
+    const [jsonText, setJsonText] = React.useState('');
+    const [error, setError] = React.useState<string | null>(null);
+    const [showTemplate, setShowTemplate] = React.useState(true);
+    const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+    const handleTextChange = (value: string) => {
+        setJsonText(value);
+        setShowTemplate(false);
+        setError(null);
+    };
+
+    const handlePaste = (e: React.ClipboardEvent) => {
+        setShowTemplate(false);
+    };
+
+    const handleCopyTemplate = async () => {
+        try {
+            await navigator.clipboard.writeText(JSON_TEMPLATE);
+            setError(null);
+        } catch {
+            setError('Failed to copy template');
+        }
+    };
+
+    const handleImport = () => {
+        try {
+            const data = JSON.parse(jsonText);
+            onImport(data);
+            setError(null);
+        } catch {
+            setError('Invalid JSON format. Please check your input.');
+        }
+    };
+
+    const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            try {
+                const text = event.target?.result as string;
+                setJsonText(text);
+                setShowTemplate(false);
+                setError(null);
+            } catch {
+                setError('Failed to read file');
+            }
+        };
+        reader.readAsText(file);
+    };
+
+    const displayText = showTemplate && !jsonText ? JSON_TEMPLATE : jsonText;
+
+    return (
+        <div className="space-y-6">
+            <div className="bg-surface border border-border rounded-xl p-6 space-y-4">
+                <div className="flex justify-between items-center">
+                    <h3 className="text-lg font-medium text-primaryText">Import Data</h3>
+                    <div className="flex gap-2">
+                        <button
+                            onClick={handleCopyTemplate}
+                            className="flex items-center gap-2 px-3 py-1.5 border border-border text-secondaryText rounded-lg hover:bg-background hover:text-primaryText transition-colors text-sm"
+                        >
+                            <Copy size={14} />
+                            Copy Template
+                        </button>
+                        <button
+                            onClick={() => fileInputRef.current?.click()}
+                            className="flex items-center gap-2 px-3 py-1.5 border border-border text-secondaryText rounded-lg hover:bg-background hover:text-primaryText transition-colors text-sm"
+                        >
+                            <FileUp size={14} />
+                            Upload File
+                        </button>
+                        <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept=".json"
+                            onChange={handleFileUpload}
+                            className="hidden"
+                        />
+                    </div>
+                </div>
+
+                <p className="text-sm text-secondaryText">
+                    Paste your JSON data below or upload a file. The template shows the expected structure.
+                </p>
+
+                <div className="relative">
+                    <textarea
+                        value={displayText}
+                        onChange={(e) => handleTextChange(e.target.value)}
+                        onPaste={handlePaste}
+                        onFocus={() => {
+                            if (showTemplate) {
+                                setShowTemplate(false);
+                                setJsonText('');
+                            }
+                        }}
+                        placeholder="Paste your JSON here..."
+                        className={`w-full h-96 px-4 py-3 bg-background border border-border rounded-lg font-mono text-sm resize-none focus:outline-none focus:border-accent transition-colors ${showTemplate ? 'text-secondaryText/50' : 'text-primaryText'
+                            }`}
+                        spellCheck={false}
+                    />
+                </div>
+
+                {error && (
+                    <div className="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-lg text-sm">
+                        {error}
+                    </div>
+                )}
+
+                <div className="flex gap-4">
+                    <button
+                        onClick={handleImport}
+                        disabled={!jsonText.trim()}
+                        className="flex items-center gap-2 px-4 py-2 bg-accent text-background rounded-lg hover:bg-accent/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        <Upload size={18} />
+                        Import Data
+                    </button>
+                    <button
+                        onClick={onExport}
+                        className="flex items-center gap-2 px-4 py-2 border border-accent text-accent rounded-lg hover:bg-accent/10 transition-colors"
+                    >
+                        <Download size={18} />
+                        Export Current Data
+                    </button>
+                </div>
+            </div>
+
+            <div className="bg-amber-500/10 border border-amber-500/30 text-amber-400 px-4 py-3 rounded-lg text-sm">
+                <strong>Note:</strong> Importing data will replace your current form values. Make sure to save changes to update the database after importing.
+            </div>
+        </div>
+    );
+}
+
