@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 import { getContent, updateContent } from '../api';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Home, FolderOpen, Award, FileText, LogOut, Save, Plus, Trash2, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Upload, Download, Copy, FileUp, Settings } from 'lucide-react';
+import { Home, FolderOpen, Award, FileText, LogOut, Save, Plus, Trash2, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Upload, Download, Copy, FileUp, Settings, Search, X } from 'lucide-react';
 
 type Tab = 'profile' | 'projects' | 'achievements' | 'notes' | 'settings';
 
@@ -337,6 +337,20 @@ function ProjectsEditor({ projects, onChange, onSave, saving }: any) {
         container?.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
+    const [searchQuery, setSearchQuery] = React.useState('');
+
+    const filteredProjects = projects.filter((project: any) => {
+        if (!searchQuery.trim()) return true;
+        const query = searchQuery.toLowerCase();
+        return (
+            project.title?.toLowerCase().includes(query) ||
+            project.description?.toLowerCase().includes(query) ||
+            project.techStack?.some((tech: string) => tech.toLowerCase().includes(query))
+        );
+    });
+
+    const getOriginalIndex = (project: any) => projects.findIndex((p: any) => p.id === project.id || p === project);
+
     return (
         <div id="projects-container" className="space-y-6 max-h-[calc(100vh-200px)] overflow-y-auto pr-2">
             {/* Top Action Bar */}
@@ -373,70 +387,99 @@ function ProjectsEditor({ projects, onChange, onSave, saving }: any) {
                     template={PROJECT_TEMPLATE}
                     onImport={(items) => onChange([...projects, ...items])}
                 />
+
+                {/* Search */}
+                {projects.length > 0 && (
+                    <div className="relative">
+                        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-secondaryText" />
+                        <input
+                            type="text"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            placeholder="Search projects by title, description, or tech..."
+                            className="w-full pl-9 pr-8 py-2 bg-background border border-border rounded-lg text-primaryText text-sm placeholder:text-secondaryText/50 focus:outline-none focus:border-accent transition-colors"
+                        />
+                        {searchQuery && (
+                            <button
+                                onClick={() => setSearchQuery('')}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-secondaryText hover:text-primaryText"
+                            >
+                                <X size={14} />
+                            </button>
+                        )}
+                    </div>
+                )}
             </div>
 
-            {projects.map((project: any, index: number) => (
-                <div key={project.id || index} className="bg-surface border border-border rounded-xl p-6 space-y-4">
-                    <div className="flex justify-between items-start">
-                        <h3 className="text-lg font-medium text-primaryText">Project {index + 1}</h3>
-                        <button
-                            onClick={() => removeProject(index)}
-                            className="p-2 text-red-400 hover:bg-red-400/10 rounded-lg transition-colors"
-                        >
-                            <Trash2 size={18} />
-                        </button>
-                    </div>
+            {searchQuery && filteredProjects.length === 0 && (
+                <div className="text-center py-8 text-secondaryText">No projects match "{searchQuery}"</div>
+            )}
 
-                    <div className="grid grid-cols-2 gap-4">
-                        <Input label="Title" value={project.title} onChange={(v: string) => updateProject(index, { title: v })} />
-                        <Input label="Year" value={project.year} onChange={(v: string) => updateProject(index, { year: v })} />
-                    </div>
-                    <Input label="Description" value={project.description} onChange={(v: string) => updateProject(index, { description: v })} multiline />
-                    <Input label="Problem Statement" value={project.problemStatement} onChange={(v: string) => updateProject(index, { problemStatement: v })} multiline />
-                    <Input
-                        label="Tech Stack (comma-separated)"
-                        value={Array.isArray(project.techStack) ? project.techStack.join(', ') : project.techStack}
-                        onChange={(v: string) => updateProject(index, { techStack: v.split(',').map((s: string) => s.trim()).filter(Boolean) })}
-                    />
-                    <Input
-                        label="Technical Decisions (one per line)"
-                        value={Array.isArray(project.technicalDecisions) ? project.technicalDecisions.join('\n') : project.technicalDecisions}
-                        onChange={(v: string) => updateProject(index, { technicalDecisions: v.split('\n').filter(Boolean) })}
-                        multiline
-                    />
-                    <div className="grid grid-cols-2 gap-4">
-                        <Input label="GitHub URL" value={project.githubUrl} onChange={(v: string) => updateProject(index, { githubUrl: v })} />
-                        <Input label="Image URL (Google Drive)" value={project.imageUrl} onChange={(v: string) => updateProject(index, { imageUrl: v })} placeholder="https://drive.google.com/uc?export=view&id=..." />
-                    </div>
-                    <div className="space-y-1.5">
-                        <label className="text-sm text-secondaryText flex items-center gap-2">
-                            Architecture Diagram (Mermaid)
-                            <a href="https://mermaid.js.org/syntax/flowchart.html" target="_blank" rel="noopener noreferrer" className="text-xs text-accent hover:underline">
-                                Syntax Guide →
-                            </a>
-                        </label>
-                        <textarea
-                            value={project.architecture || ''}
-                            onChange={(e) => updateProject(index, { architecture: e.target.value })}
-                            placeholder={`graph TD\n    A[Client] --> B[API Gateway]\n    B --> C[Service]\n    C --> D[(Database)]`}
-                            className="w-full px-3 py-2 bg-background border border-border rounded-lg text-primaryText font-mono text-xs placeholder:text-secondaryText/30 focus:outline-none focus:border-accent transition-colors resize-none"
-                            rows={6}
+            {filteredProjects.map((project: any) => {
+                const index = getOriginalIndex(project);
+                return (
+                    <div key={project.id || index} className="bg-surface border border-border rounded-xl p-6 space-y-4">
+                        <div className="flex justify-between items-start">
+                            <h3 className="text-lg font-medium text-primaryText">Project {index + 1}</h3>
+                            <button
+                                onClick={() => removeProject(index)}
+                                className="p-2 text-red-400 hover:bg-red-400/10 rounded-lg transition-colors"
+                            >
+                                <Trash2 size={18} />
+                            </button>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <Input label="Title" value={project.title} onChange={(v: string) => updateProject(index, { title: v })} />
+                            <Input label="Year" value={project.year} onChange={(v: string) => updateProject(index, { year: v })} />
+                        </div>
+                        <Input label="Description" value={project.description} onChange={(v: string) => updateProject(index, { description: v })} multiline />
+                        <Input label="Problem Statement" value={project.problemStatement} onChange={(v: string) => updateProject(index, { problemStatement: v })} multiline />
+                        <Input
+                            label="Tech Stack (comma-separated)"
+                            value={Array.isArray(project.techStack) ? project.techStack.join(', ') : project.techStack}
+                            onChange={(v: string) => updateProject(index, { techStack: v.split(',').map((s: string) => s.trim()).filter(Boolean) })}
                         />
+                        <Input
+                            label="Technical Decisions (one per line)"
+                            value={Array.isArray(project.technicalDecisions) ? project.technicalDecisions.join('\n') : project.technicalDecisions}
+                            onChange={(v: string) => updateProject(index, { technicalDecisions: v.split('\n').filter(Boolean) })}
+                            multiline
+                        />
+                        <div className="grid grid-cols-2 gap-4">
+                            <Input label="GitHub URL" value={project.githubUrl} onChange={(v: string) => updateProject(index, { githubUrl: v })} />
+                            <Input label="Image URL (Google Drive)" value={project.imageUrl} onChange={(v: string) => updateProject(index, { imageUrl: v })} placeholder="https://drive.google.com/uc?export=view&id=..." />
+                        </div>
+                        <div className="space-y-1.5">
+                            <label className="text-sm text-secondaryText flex items-center gap-2">
+                                Architecture Diagram (Mermaid)
+                                <a href="https://mermaid.js.org/syntax/flowchart.html" target="_blank" rel="noopener noreferrer" className="text-xs text-accent hover:underline">
+                                    Syntax Guide →
+                                </a>
+                            </label>
+                            <textarea
+                                value={project.architecture || ''}
+                                onChange={(e) => updateProject(index, { architecture: e.target.value })}
+                                placeholder={`graph TD\n    A[Client] --> B[API Gateway]\n    B --> C[Service]\n    C --> D[(Database)]`}
+                                className="w-full px-3 py-2 bg-background border border-border rounded-lg text-primaryText font-mono text-xs placeholder:text-secondaryText/30 focus:outline-none focus:border-accent transition-colors resize-none"
+                                rows={6}
+                            />
+                        </div>
+                        <div>
+                            <label className="text-sm text-secondaryText">Status</label>
+                            <select
+                                value={project.status}
+                                onChange={(e) => updateProject(index, { status: e.target.value })}
+                                className="w-full mt-1.5 px-3 py-2 bg-background border border-border rounded-lg text-primaryText focus:outline-none focus:border-accent transition-colors"
+                            >
+                                <option value="active">Active</option>
+                                <option value="completed">Completed</option>
+                                <option value="archived">Archived</option>
+                            </select>
+                        </div>
                     </div>
-                    <div>
-                        <label className="text-sm text-secondaryText">Status</label>
-                        <select
-                            value={project.status}
-                            onChange={(e) => updateProject(index, { status: e.target.value })}
-                            className="w-full mt-1.5 px-3 py-2 bg-background border border-border rounded-lg text-primaryText focus:outline-none focus:border-accent transition-colors"
-                        >
-                            <option value="active">Active</option>
-                            <option value="completed">Completed</option>
-                            <option value="archived">Archived</option>
-                        </select>
-                    </div>
-                </div>
-            ))}
+                );
+            })}
 
             {/* Bottom Scroll Up */}
             {projects.length > 2 && (
@@ -483,6 +526,20 @@ function AchievementsEditor({ achievements, onChange, onSave, saving }: any) {
         container?.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
+    const [searchQuery, setSearchQuery] = React.useState('');
+
+    const filteredAchievements = achievements.filter((a: any) => {
+        if (!searchQuery.trim()) return true;
+        const query = searchQuery.toLowerCase();
+        return (
+            a.title?.toLowerCase().includes(query) ||
+            a.context?.toLowerCase().includes(query) ||
+            a.year?.toString().includes(query)
+        );
+    });
+
+    const getOriginalIndex = (item: any) => achievements.findIndex((a: any) => a.id === item.id || a === item);
+
     return (
         <div id="achievements-container" className="space-y-6 max-h-[calc(100vh-200px)] overflow-y-auto pr-2">
             {/* Top Action Bar */}
@@ -512,24 +569,53 @@ function AchievementsEditor({ achievements, onChange, onSave, saving }: any) {
                     template={ACHIEVEMENT_TEMPLATE}
                     onImport={(items) => onChange([...achievements, ...items])}
                 />
+
+                {/* Search */}
+                {achievements.length > 0 && (
+                    <div className="relative">
+                        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-secondaryText" />
+                        <input
+                            type="text"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            placeholder="Search by title, context, or year..."
+                            className="w-full pl-9 pr-8 py-2 bg-background border border-border rounded-lg text-primaryText text-sm placeholder:text-secondaryText/50 focus:outline-none focus:border-accent transition-colors"
+                        />
+                        {searchQuery && (
+                            <button
+                                onClick={() => setSearchQuery('')}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-secondaryText hover:text-primaryText"
+                            >
+                                <X size={14} />
+                            </button>
+                        )}
+                    </div>
+                )}
             </div>
 
-            {achievements.map((achievement: any, index: number) => (
-                <div key={achievement.id || index} className="bg-surface border border-border rounded-xl p-6 space-y-4">
-                    <div className="flex justify-between items-start">
-                        <h3 className="text-lg font-medium text-primaryText">Achievement {index + 1}</h3>
-                        <button onClick={() => removeAchievement(index)} className="p-2 text-red-400 hover:bg-red-400/10 rounded-lg transition-colors">
-                            <Trash2 size={18} />
-                        </button>
+            {searchQuery && filteredAchievements.length === 0 && (
+                <div className="text-center py-8 text-secondaryText">No achievements match "{searchQuery}"</div>
+            )}
+
+            {filteredAchievements.map((achievement: any) => {
+                const index = getOriginalIndex(achievement);
+                return (
+                    <div key={achievement.id || index} className="bg-surface border border-border rounded-xl p-6 space-y-4">
+                        <div className="flex justify-between items-start">
+                            <h3 className="text-lg font-medium text-primaryText">Achievement {index + 1}</h3>
+                            <button onClick={() => removeAchievement(index)} className="p-2 text-red-400 hover:bg-red-400/10 rounded-lg transition-colors">
+                                <Trash2 size={18} />
+                            </button>
+                        </div>
+                        <Input label="Title" value={achievement.title} onChange={(v: string) => updateAchievement(index, { title: v })} />
+                        <Input label="Context" value={achievement.context} onChange={(v: string) => updateAchievement(index, { context: v })} />
+                        <div className="grid grid-cols-2 gap-4">
+                            <Input label="Year" value={achievement.year} onChange={(v: string) => updateAchievement(index, { year: v })} />
+                            <Input label="Verification Link" value={achievement.verificationLink} onChange={(v: string) => updateAchievement(index, { verificationLink: v })} />
+                        </div>
                     </div>
-                    <Input label="Title" value={achievement.title} onChange={(v: string) => updateAchievement(index, { title: v })} />
-                    <Input label="Context" value={achievement.context} onChange={(v: string) => updateAchievement(index, { context: v })} />
-                    <div className="grid grid-cols-2 gap-4">
-                        <Input label="Year" value={achievement.year} onChange={(v: string) => updateAchievement(index, { year: v })} />
-                        <Input label="Verification Link" value={achievement.verificationLink} onChange={(v: string) => updateAchievement(index, { verificationLink: v })} />
-                    </div>
-                </div>
-            ))}
+                );
+            })}
 
             {/* Bottom Scroll Up */}
             {achievements.length > 3 && (
@@ -584,6 +670,20 @@ function NotesEditor({ notes, onChange, onSave, saving }: any) {
         container?.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
+    const [searchQuery, setSearchQuery] = React.useState('');
+
+    const filteredNotes = notes.filter((n: any) => {
+        if (!searchQuery.trim()) return true;
+        const query = searchQuery.toLowerCase();
+        return (
+            n.title?.toLowerCase().includes(query) ||
+            n.summary?.toLowerCase().includes(query) ||
+            n.tags?.some((tag: string) => tag.toLowerCase().includes(query))
+        );
+    });
+
+    const getOriginalIndex = (item: any) => notes.findIndex((n: any) => n.id === item.id || n === item);
+
     return (
         <div id="notes-container" className="space-y-6 max-h-[calc(100vh-200px)] overflow-y-auto pr-2">
             {/* Top Action Bar */}
@@ -613,40 +713,69 @@ function NotesEditor({ notes, onChange, onSave, saving }: any) {
                     template={NOTE_TEMPLATE}
                     onImport={(items) => onChange([...notes, ...items])}
                 />
+
+                {/* Search */}
+                {notes.length > 0 && (
+                    <div className="relative">
+                        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-secondaryText" />
+                        <input
+                            type="text"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            placeholder="Search by title, summary, or tags..."
+                            className="w-full pl-9 pr-8 py-2 bg-background border border-border rounded-lg text-primaryText text-sm placeholder:text-secondaryText/50 focus:outline-none focus:border-accent transition-colors"
+                        />
+                        {searchQuery && (
+                            <button
+                                onClick={() => setSearchQuery('')}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-secondaryText hover:text-primaryText"
+                            >
+                                <X size={14} />
+                            </button>
+                        )}
+                    </div>
+                )}
             </div>
 
-            {notes.map((note: any, index: number) => (
-                <div key={note.id || index} className="bg-surface border border-border rounded-xl p-6 space-y-4">
-                    <div className="flex justify-between items-start">
-                        <h3 className="text-lg font-medium text-primaryText">Note {index + 1}</h3>
-                        <button onClick={() => removeNote(index)} className="p-2 text-red-400 hover:bg-red-400/10 rounded-lg transition-colors">
-                            <Trash2 size={18} />
-                        </button>
+            {searchQuery && filteredNotes.length === 0 && (
+                <div className="text-center py-8 text-secondaryText">No notes match "{searchQuery}"</div>
+            )}
+
+            {filteredNotes.map((note: any) => {
+                const index = getOriginalIndex(note);
+                return (
+                    <div key={note.id || index} className="bg-surface border border-border rounded-xl p-6 space-y-4">
+                        <div className="flex justify-between items-start">
+                            <h3 className="text-lg font-medium text-primaryText">Note {index + 1}</h3>
+                            <button onClick={() => removeNote(index)} className="p-2 text-red-400 hover:bg-red-400/10 rounded-lg transition-colors">
+                                <Trash2 size={18} />
+                            </button>
+                        </div>
+                        <Input label="Title" value={note.title} onChange={(v: string) => updateNote(index, { title: v })} />
+                        <Input label="Summary" value={note.summary} onChange={(v: string) => updateNote(index, { summary: v })} multiline />
+                        <div className="grid grid-cols-3 gap-4">
+                            <Input label="Date" value={note.date} onChange={(v: string) => updateNote(index, { date: v })} placeholder="YYYY-MM-DD" />
+                            <Input label="Read Time" value={note.readTime} onChange={(v: string) => updateNote(index, { readTime: v })} placeholder="5 min" />
+                            <Input
+                                label="Tags (comma-separated)"
+                                value={Array.isArray(note.tags) ? note.tags.join(', ') : note.tags}
+                                onChange={(v: string) => updateNote(index, { tags: v.split(',').map((s: string) => s.trim()).filter(Boolean) })}
+                            />
+                        </div>
+                        <Input label="Featured Image URL" value={note.image} onChange={(v: string) => updateNote(index, { image: v })} placeholder="https://..." />
+                        <div className="space-y-1.5">
+                            <label className="text-sm text-secondaryText">Gallery Images (one URL per line)</label>
+                            <textarea
+                                value={Array.isArray(note.images) ? note.images.join('\n') : ''}
+                                onChange={(e) => updateNote(index, { images: e.target.value.split('\n').map((s: string) => s.trim()).filter(Boolean) })}
+                                placeholder="https://image1.jpg&#10;https://image2.jpg&#10;https://image3.jpg"
+                                className="w-full px-3 py-2 bg-background border border-border rounded-lg text-primaryText text-sm placeholder:text-secondaryText/30 focus:outline-none focus:border-accent transition-colors resize-none"
+                                rows={3}
+                            />
+                        </div>
                     </div>
-                    <Input label="Title" value={note.title} onChange={(v: string) => updateNote(index, { title: v })} />
-                    <Input label="Summary" value={note.summary} onChange={(v: string) => updateNote(index, { summary: v })} multiline />
-                    <div className="grid grid-cols-3 gap-4">
-                        <Input label="Date" value={note.date} onChange={(v: string) => updateNote(index, { date: v })} placeholder="YYYY-MM-DD" />
-                        <Input label="Read Time" value={note.readTime} onChange={(v: string) => updateNote(index, { readTime: v })} placeholder="5 min" />
-                        <Input
-                            label="Tags (comma-separated)"
-                            value={Array.isArray(note.tags) ? note.tags.join(', ') : note.tags}
-                            onChange={(v: string) => updateNote(index, { tags: v.split(',').map((s: string) => s.trim()).filter(Boolean) })}
-                        />
-                    </div>
-                    <Input label="Featured Image URL" value={note.image} onChange={(v: string) => updateNote(index, { image: v })} placeholder="https://..." />
-                    <div className="space-y-1.5">
-                        <label className="text-sm text-secondaryText">Gallery Images (one URL per line)</label>
-                        <textarea
-                            value={Array.isArray(note.images) ? note.images.join('\n') : ''}
-                            onChange={(e) => updateNote(index, { images: e.target.value.split('\n').map((s: string) => s.trim()).filter(Boolean) })}
-                            placeholder="https://image1.jpg&#10;https://image2.jpg&#10;https://image3.jpg"
-                            className="w-full px-3 py-2 bg-background border border-border rounded-lg text-primaryText text-sm placeholder:text-secondaryText/30 focus:outline-none focus:border-accent transition-colors resize-none"
-                            rows={3}
-                        />
-                    </div>
-                </div>
-            ))}
+                );
+            })}
 
             {/* Bottom Scroll Up */}
             {notes.length > 2 && (
