@@ -170,10 +170,7 @@ function App() {
     switch (currentView) {
       case 'home':
         // Get pinned projects for side panel (fallback to first 3 active if none pinned)
-        let pinnedProjects = projects.filter(p => p.pinned);
-        if (pinnedProjects.length === 0) {
-          pinnedProjects = projects.filter(p => p.status === 'active').slice(0, 3);
-        }
+        const pinnedProjects = projects.filter(p => p.pinned);
 
         return (
           <div className="max-w-7xl mx-auto min-h-[80vh]">
@@ -314,38 +311,7 @@ function App() {
                         ))}
                       </div>
                     </div>
-                  ) : opensource.length > 0 && (
-                    <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/5">
-                      <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-[10px] font-mono text-secondaryText/40 uppercase tracking-[0.2em]">Open Source</h3>
-                        <button
-                          onClick={() => handleViewChange('opensource')}
-                          className="text-[10px] font-mono text-accent hover:text-accent/80 transition-colors"
-                        >
-                          View all →
-                        </button>
-                      </div>
-                      <div className="space-y-2">
-                        {opensource.slice(0, 4).map((contrib) => (
-                          <a
-                            key={contrib.id}
-                            href={contrib.prUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="group flex items-start gap-3 p-3 rounded-xl hover:bg-white/[0.03] transition-colors"
-                          >
-                            <GitPullRequest size={14} className="text-green-500 mt-0.5 shrink-0" />
-                            <div className="flex-1 min-w-0">
-                              <p className="text-xs font-medium text-primaryText truncate group-hover:text-accent transition-colors">
-                                {contrib.title}
-                              </p>
-                              <p className="text-[10px] text-secondaryText/40 mt-0.5">{contrib.repo}</p>
-                            </div>
-                          </a>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                  ) : null}
                 </motion.div>
               </div>
             </div>
