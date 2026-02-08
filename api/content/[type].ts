@@ -25,7 +25,10 @@ const CONTENT_DEFAULTS: Record<string, any> = {
         { id: 'projects', label: '_projects' },
         { id: 'achievements', label: '_achievements' },
         { id: 'notes', label: '_log' },
-    ]
+    ],
+    settings: {
+        particleMode: 'default'
+    }
 };
 
 function verifyToken(token: string): { userId: number; email: string } | null {
