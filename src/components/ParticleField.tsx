@@ -154,21 +154,28 @@ export const ParticleField: React.FC<ParticleFieldProps> = ({ text = "STK" }) =>
         const hasTargets = isIdle && targets.length > 0;
 
         particlesRef.current.forEach((particle, index) => {
-            // IDLE BEHAVIOR: Strong Drift to Edge Targets
+            // IDLE BEHAVIOR: Smooth Drift to Edge Targets
             if (hasTargets) {
                 const target = targets[index % targets.length];
                 const dx = target.x - particle.x;
                 const dy = target.y - particle.y;
 
-                // Stronger attraction to overpower mouse (0.002 -> 0.05)
-                // This ensures "every particle will go there"
-                const spring = 0.05;
+                // Very gentle attraction (0.005) - Smooth drift, no snapping
+                const spring = 0.005;
                 particle.vx += dx * spring;
                 particle.vy += dy * spring;
 
-                // Heavy damping to snap and stay
-                particle.vx *= 0.85;
-                particle.vy *= 0.85;
+                // Strong damping to prevent sloshing (0.90)
+                particle.vx *= 0.90;
+                particle.vy *= 0.90;
+
+                // VELOCITY CAP: Prevent "teleporting" from far distances
+                const speed = Math.sqrt(particle.vx * particle.vx + particle.vy * particle.vy);
+                const maxSpeed = 5;
+                if (speed > maxSpeed) {
+                    particle.vx = (particle.vx / speed) * maxSpeed;
+                    particle.vy = (particle.vy / speed) * maxSpeed;
+                }
             }
 
             // ACTIVE BEHAVIOR: Mouse Interaction
