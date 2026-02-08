@@ -154,23 +154,28 @@ export const ParticleField: React.FC<ParticleFieldProps> = ({ text = "STK" }) =>
         const hasTargets = isIdle && targets.length > 0;
 
         particlesRef.current.forEach((particle, index) => {
-            // IDLE BEHAVIOR: Drift to Edge Targets
+            // IDLE BEHAVIOR: Strong Drift to Edge Targets
             if (hasTargets) {
                 const target = targets[index % targets.length];
-
                 const dx = target.x - particle.x;
                 const dy = target.y - particle.y;
 
-                // Gentle attraction to target
-                particle.vx += dx * 0.002;
-                particle.vy += dy * 0.002;
+                // Stronger attraction to overpower mouse (0.002 -> 0.05)
+                // This ensures "every particle will go there"
+                const spring = 0.05;
+                particle.vx += dx * spring;
+                particle.vy += dy * spring;
 
-                // Extra damping to settle
-                particle.vx *= 0.96;
-                particle.vy *= 0.96;
+                // Heavy damping to snap and stay
+                particle.vx *= 0.85;
+                particle.vy *= 0.85;
             }
 
-            // ACTIVE BEHAVIOR: Interaction (Preserved from original)
+            // ACTIVE BEHAVIOR: Mouse Interaction
+            // If idle, we dampen the mouse effect significantly so the watermark "wins"
+            // But we keep it slightly active so user feels it's not "frozen"
+            const interactionStrength = hasTargets ? 0.1 : 1.0;
+
             const dx = mouse.x - particle.x;
             const dy = mouse.y - particle.y;
             const distance = Math.sqrt(dx * dx + dy * dy);
@@ -181,15 +186,18 @@ export const ParticleField: React.FC<ParticleFieldProps> = ({ text = "STK" }) =>
                 const force = (maxDistance - distance) / maxDistance;
 
                 if (mouse.isClicking) {
-                    particle.vx -= Math.cos(angle) * force * 0.8;
-                    particle.vy -= Math.sin(angle) * force * 0.8;
+                    particle.vx -= Math.cos(angle) * force * 0.8 * interactionStrength;
+                    particle.vy -= Math.sin(angle) * force * 0.8 * interactionStrength;
                 } else {
                     // Attraction on hover
-                    particle.vx += Math.cos(angle) * force * 0.02;
-                    particle.vy += Math.sin(angle) * force * 0.02;
+                    particle.vx += Math.cos(angle) * force * 0.02 * interactionStrength;
+                    particle.vy += Math.sin(angle) * force * 0.02 * interactionStrength;
                 }
 
-                particle.alpha = Math.min(0.6, particle.baseAlpha + force * 0.2);
+                // Only brighten if Active OR if mouse is VERY close/strong interaction
+                if (!hasTargets) {
+                    particle.alpha = Math.min(0.6, particle.baseAlpha + force * 0.2);
+                }
             } else if (!hasTargets) {
                 particle.alpha += (particle.baseAlpha - particle.alpha) * 0.05;
             }
@@ -203,7 +211,7 @@ export const ParticleField: React.FC<ParticleFieldProps> = ({ text = "STK" }) =>
             particle.x += particle.vx;
             particle.y += particle.vy;
 
-            // Friction
+            // Friction (Only apply standard friction if NOT idle, as idle has its own damping)
             if (!hasTargets) {
                 particle.vx *= 0.995;
                 particle.vy *= 0.995;
@@ -222,7 +230,7 @@ export const ParticleField: React.FC<ParticleFieldProps> = ({ text = "STK" }) =>
             ctx.fill();
         });
 
-        // Draw connections
+        // Draw connections (Disable when idling)
         if (!hasTargets) {
             for (let i = 0; i < particlesRef.current.length; i++) {
                 const p1 = particlesRef.current[i];

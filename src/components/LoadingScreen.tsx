@@ -31,22 +31,22 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ profile }) => {
                         <defs>
                             <mask id="text-mask">
                                 <rect x="0" y="0" width="100%" height="100%" fill="black" />
-                                <text x="50%" y="54%" textAnchor="middle" dy=".35em" fill="white" className="text-8xl md:text-9xl font-['Orbitron'] font-black tracking-widest" style={{ fontWeight: 900 }}>
+                                <text x="50%" y="54%" textAnchor="middle" dy=".35em" fill="white" className="text-8xl md:text-9xl font-['Inter'] font-black tracking-tighter" style={{ fontWeight: 900 }}>
                                     STK
                                 </text>
                             </mask>
-                            {/* Wave Gradient */}
+                            {/* Context Aware Gradient - Data Stream / Cyberpunk */}
                             <linearGradient id="wave-gradient" x1="0" x2="0" y1="0" y2="1">
-                                <stop offset="0%" stopColor="#60a5fa" />
-                                <stop offset="50%" stopColor="#3b82f6" />
-                                <stop offset="100%" stopColor="#2563eb" />
+                                <stop offset="0%" stopColor="#22d3ee" /> {/* Cyan */}
+                                <stop offset="50%" stopColor="#0ea5e9" /> {/* Sky Blue */}
+                                <stop offset="100%" stopColor="#2563eb" /> {/* Blue */}
                             </linearGradient>
                         </defs>
 
                         {/* Background Text (Outline/Dim) */}
                         <text x="50%" y="54%" textAnchor="middle" dy=".35em"
-                            fill="none" stroke="#333" strokeWidth="1"
-                            className="text-8xl md:text-9xl font-['Orbitron'] font-black tracking-widest"
+                            fill="none" stroke="#222" strokeWidth="1"
+                            className="text-8xl md:text-9xl font-['Inter'] font-black tracking-tighter"
                             style={{ fontWeight: 900 }}
                         >
                             STK
