@@ -109,6 +109,17 @@ export const OpenSourceDetail: React.FC<OpenSourceDetailProps> = ({ contribution
                     {/* Divider */}
                     <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
+                    {/* Image if present */}
+                    {contribution.image && (
+                        <div className="rounded-2xl overflow-hidden border border-white/10 bg-black/20">
+                            <img
+                                src={contribution.image}
+                                alt={contribution.title}
+                                className="w-full h-auto object-cover"
+                            />
+                        </div>
+                    )}
+
                     {/* Problem Statement */}
                     <div className="space-y-4">
                         <h3 className="text-xs font-mono text-secondaryText/50 uppercase tracking-widest">The Problem</h3>

@@ -92,6 +92,35 @@ export const NoteDetail: React.FC<NoteDetailProps> = ({ note, onClose }) => {
                     {/* Divider */}
                     <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
+                    {/* Image Gallery (multiple images) */}
+                    {note.images && note.images.length > 0 && (
+                        <div className="space-y-3">
+                            <h3 className="text-xs font-mono text-secondaryText/50 uppercase tracking-widest">Gallery</h3>
+                            <div className={`grid gap-3 ${note.images.length === 1 ? 'grid-cols-1' : note.images.length === 2 ? 'grid-cols-2' : 'grid-cols-2 md:grid-cols-3'}`}>
+                                {note.images.map((img, idx) => (
+                                    <div key={idx} className="rounded-xl overflow-hidden border border-white/10 bg-black/20 aspect-video">
+                                        <img
+                                            src={img}
+                                            alt={`${note.title} - Image ${idx + 1}`}
+                                            className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Single featured image (fallback if no gallery) */}
+                    {note.image && (!note.images || note.images.length === 0) && (
+                        <div className="rounded-2xl overflow-hidden border border-white/10 bg-black/20">
+                            <img
+                                src={note.image}
+                                alt={note.title}
+                                className="w-full h-auto object-cover"
+                            />
+                        </div>
+                    )}
+
                     {/* Summary / Content */}
                     <div className="space-y-4">
                         <h3 className="text-xs font-mono text-secondaryText/50 uppercase tracking-widest">Summary</h3>

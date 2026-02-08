@@ -502,7 +502,17 @@ function NotesEditor({ notes, onChange, onSave, saving }: any) {
                             onChange={(v: string) => updateNote(index, { tags: v.split(',').map((s: string) => s.trim()).filter(Boolean) })}
                         />
                     </div>
-                    <Input label="Image URL (Google Drive)" value={note.imageUrl} onChange={(v: string) => updateNote(index, { imageUrl: v })} placeholder="https://drive.google.com/uc?export=view&id=..." />
+                    <Input label="Featured Image URL" value={note.image} onChange={(v: string) => updateNote(index, { image: v })} placeholder="https://..." />
+                    <div className="space-y-1.5">
+                        <label className="text-sm text-secondaryText">Gallery Images (one URL per line)</label>
+                        <textarea
+                            value={Array.isArray(note.images) ? note.images.join('\n') : ''}
+                            onChange={(e) => updateNote(index, { images: e.target.value.split('\n').map((s: string) => s.trim()).filter(Boolean) })}
+                            placeholder="https://image1.jpg&#10;https://image2.jpg&#10;https://image3.jpg"
+                            className="w-full px-3 py-2 bg-background border border-border rounded-lg text-primaryText text-sm placeholder:text-secondaryText/30 focus:outline-none focus:border-accent transition-colors resize-none"
+                            rows={3}
+                        />
+                    </div>
                 </div>
             ))}
 
@@ -562,7 +572,8 @@ const JSON_TEMPLATE = `{
       "date": "2024-01-15",
       "readTime": "5 min",
       "tags": ["tag1", "tag2"],
-      "imageUrl": "https://..."
+      "image": "https://featured-image.jpg",
+      "images": ["https://gallery1.jpg", "https://gallery2.jpg"]
     }
   ]
 }`;

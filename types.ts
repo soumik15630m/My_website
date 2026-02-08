@@ -30,6 +30,7 @@ export interface Note {
   readTime: string;
   content?: string;
   image?: string;
+  images?: string[]; // Multiple images for gallery
 }
 
 export interface OpenSourceContribution {
@@ -43,6 +44,7 @@ export interface OpenSourceContribution {
   labels: string[];
   date: string;
   description?: string;
+  image?: string; // Screenshot or diagram
 }
 
 export type ViewState = 'home' | 'projects' | 'achievements' | 'notes' | 'opensource';
