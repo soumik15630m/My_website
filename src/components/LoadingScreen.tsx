@@ -73,9 +73,47 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ profile }) => {
                                 STK
                             </text>
 
-                            {/* Layer 2: The Gradient Fill (Masked to Text Shape) */}
+                            {/* Layer 2: The Gradient Fill (Masked to Text Shape) - With Water Flow */}
                             <g mask="url(#text-shape-mask)">
-                                <rect x="0" y="0" width="400" height="200" fill="url(#reveal-gradient)" />
+                                {/* Background for deep depth */}
+                                <rect x="0" y="0" width="400" height="200" fill="#000" />
+
+                                {/* Flowing Wave 1 */}
+                                <motion.path
+                                    d="M0,100 Q50,120 100,100 T200,100 T300,100 T400,100 V200 H0 Z"
+                                    fill="url(#reveal-gradient)"
+                                    animate={{
+                                        d: [
+                                            "M0,100 Q50,120 100,100 T200,100 T300,100 T400,100 V200 H0 Z",
+                                            "M0,100 Q50,80 100,100 T200,100 T300,100 T400,100 V200 H0 Z",
+                                            "M0,100 Q50,120 100,100 T200,100 T300,100 T400,100 V200 H0 Z"
+                                        ],
+                                        x: [-50, 0]
+                                    }}
+                                    transition={{
+                                        d: { duration: 4, repeat: Infinity, ease: "easeInOut" },
+                                        x: { duration: 5, repeat: Infinity, ease: "linear" }
+                                    }}
+                                />
+
+                                {/* Flowing Wave 2 (Offset) */}
+                                <motion.path
+                                    d="M0,90 Q50,70 100,90 T200,90 T300,90 T400,90 V200 H0 Z"
+                                    fill="url(#reveal-gradient)"
+                                    fillOpacity="0.7"
+                                    animate={{
+                                        d: [
+                                            "M0,90 Q50,70 100,90 T200,90 T300,90 T400,90 V200 H0 Z",
+                                            "M0,90 Q50,110 100,90 T200,90 T300,90 T400,90 V200 H0 Z",
+                                            "M0,90 Q50,70 100,90 T200,90 T300,90 T400,90 V200 H0 Z"
+                                        ],
+                                        x: [-30, 0]
+                                    }}
+                                    transition={{
+                                        d: { duration: 3, repeat: Infinity, ease: "easeInOut" },
+                                        x: { duration: 4, repeat: Infinity, ease: "linear" }
+                                    }}
+                                />
                             </g>
                         </g>
 
@@ -89,21 +127,31 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ profile }) => {
                             initial={{ x: 0, opacity: 1 }}
                             animate={{ x: 400, opacity: [1, 1, 0] }}
                             transition={{
-                                duration: 2.5,
+                                duration: 3.5,
                                 ease: [0.22, 1, 0.36, 1]
                             }}
                         />
                     </svg>
                 </div>
 
-                <motion.p
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.5 }}
-                    className="text-center mt-4 text-blue-400/60 font-mono text-xs tracking-[0.5em] uppercase"
-                >
-                    Systems Engineer
-                </motion.p>
+                <div className="flex flex-col items-center mt-6 space-y-2">
+                    <motion.p
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 1.0 }} // Delayed appearance
+                        className="text-blue-400/80 font-mono text-sm tracking-[0.3em] uppercase"
+                    >
+                        Systems Engineer
+                    </motion.p>
+                    <motion.p
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 1.5, duration: 1 }}
+                        className="text-white/40 text-[10px] tracking-widest font-light uppercase"
+                    >
+                        Architecting Digital Excellence
+                    </motion.p>
+                </div>
             </div>
         </motion.div>
     );
