@@ -6,13 +6,14 @@ export type ParticleMode = 'default' | 'aurora' | 'antigravity';
 interface Particle {
     x: number;
     y: number;
+    homeX: number;  // Home position for return behavior
+    homeY: number;
     vx: number;
     vy: number;
     size: number;
     alpha: number;
     baseAlpha: number;
-    layer: number; // 0 = far, 1 = mid, 2 = near (for depth)
-    color?: string;
+    layer: number;
 }
 
 interface AuroraBlob {
@@ -29,7 +30,7 @@ interface ParticleFieldProps {
     mode?: ParticleMode;
 }
 
-const PARTICLE_COUNT = 150;
+const PARTICLE_COUNT = 120;
 const AURORA_BLOB_COUNT = 5;
 
 export const ParticleField: React.FC<ParticleFieldProps> = ({ mode = 'default' }) => {
@@ -44,9 +45,9 @@ export const ParticleField: React.FC<ParticleFieldProps> = ({ mode = 'default' }
 
     // Layer configurations for depth effect
     const layerConfigs = [
-        { speed: 0.3, sizeMultiplier: 0.5, alphaMultiplier: 0.4 }, // Far
-        { speed: 0.6, sizeMultiplier: 0.8, alphaMultiplier: 0.7 }, // Mid
-        { speed: 1.0, sizeMultiplier: 1.2, alphaMultiplier: 1.0 }, // Near
+        { speed: 0.3, sizeMultiplier: 0.5, alphaMultiplier: 0.4 },
+        { speed: 0.6, sizeMultiplier: 0.8, alphaMultiplier: 0.7 },
+        { speed: 1.0, sizeMultiplier: 1.2, alphaMultiplier: 1.0 },
     ];
 
     // Initialize particles based on mode
@@ -54,18 +55,31 @@ export const ParticleField: React.FC<ParticleFieldProps> = ({ mode = 'default' }
         particlesRef.current = [];
         auroraBlobsRef.current = [];
 
-        // Regular particles with depth layers
-        for (let i = 0; i < PARTICLE_COUNT; i++) {
-            const layer = Math.floor(Math.random() * 3);
+        const count = mode === 'antigravity' ? 100 : PARTICLE_COUNT;
+
+        for (let i = 0; i < count; i++) {
+            const layer = mode === 'antigravity' ? 1 : Math.floor(Math.random() * 3);
             const config = layerConfigs[layer];
-            const size = (Math.random() * 1.8 + 0.4) * config.sizeMultiplier;
-            const baseAlpha = (Math.random() * 0.3 + 0.1) * config.alphaMultiplier;
+
+            // For antigravity: uniform distribution, larger '+' marks
+            const size = mode === 'antigravity'
+                ? Math.random() * 2 + 1.5
+                : (Math.random() * 1.8 + 0.4) * config.sizeMultiplier;
+
+            const baseAlpha = mode === 'antigravity'
+                ? Math.random() * 0.4 + 0.3
+                : (Math.random() * 0.3 + 0.1) * config.alphaMultiplier;
+
+            const x = Math.random() * width;
+            const y = Math.random() * height;
 
             particlesRef.current.push({
-                x: Math.random() * width,
-                y: Math.random() * height,
-                vx: (Math.random() - 0.5) * 0.15 * config.speed,
-                vy: (Math.random() - 0.5) * 0.15 * config.speed,
+                x,
+                y,
+                homeX: x,  // Store home position
+                homeY: y,
+                vx: 0,
+                vy: 0,
                 size,
                 alpha: baseAlpha,
                 baseAlpha,
@@ -73,7 +87,7 @@ export const ParticleField: React.FC<ParticleFieldProps> = ({ mode = 'default' }
             });
         }
 
-        // Aurora blobs for aurora mode
+        // Aurora blobs
         if (mode === 'aurora') {
             for (let i = 0; i < AURORA_BLOB_COUNT; i++) {
                 auroraBlobsRef.current.push({
@@ -82,42 +96,31 @@ export const ParticleField: React.FC<ParticleFieldProps> = ({ mode = 'default' }
                     vx: (Math.random() - 0.5) * 0.3,
                     vy: (Math.random() - 0.5) * 0.3,
                     radius: Math.random() * 200 + 150,
-                    hue: Math.random() * 60 + 180, // Cyan to purple range
+                    hue: Math.random() * 60 + 180,
                     phase: Math.random() * Math.PI * 2,
                 });
             }
         }
     }, [mode]);
 
-    // Draw '+' shape for antigravity mode
-    const drawCross = (ctx: CanvasRenderingContext2D, x: number, y: number, size: number, alpha: number) => {
-        ctx.beginPath();
-        ctx.strokeStyle = `rgba(180, 200, 255, ${alpha})`;
-        ctx.lineWidth = size * 0.3;
-        ctx.lineCap = 'round';
-        // Horizontal line
-        ctx.moveTo(x - size, y);
-        ctx.lineTo(x + size, y);
-        // Vertical line
-        ctx.moveTo(x, y - size);
-        ctx.lineTo(x, y + size);
-        ctx.stroke();
-    };
-
-    // Spawn burst particles
-    const spawnBurst = useCallback((x: number, y: number, count: number = 20) => {
+    // Spawn burst particles (for click effect)
+    const spawnBurst = useCallback((x: number, y: number, count: number = 15) => {
         for (let i = 0; i < count; i++) {
             const angle = (Math.PI * 2 * i) / count + Math.random() * 0.3;
-            const speed = Math.random() * 4 + 2;
+            const speed = Math.random() * 6 + 3;
+            const homeX = x + Math.cos(angle) * 200;
+            const homeY = y + Math.sin(angle) * 200;
 
             particlesRef.current.push({
                 x,
                 y,
+                homeX,
+                homeY,
                 vx: Math.cos(angle) * speed,
                 vy: Math.sin(angle) * speed,
-                size: Math.random() * 1.5 + 0.5,
-                alpha: 0.5,
-                baseAlpha: 0.5,
+                size: Math.random() * 2 + 1,
+                alpha: 0.7,
+                baseAlpha: 0.4,
                 layer: 2,
             });
         }
@@ -139,21 +142,18 @@ export const ParticleField: React.FC<ParticleFieldProps> = ({ mode = 'default' }
         // Clear canvas
         ctx.clearRect(0, 0, width, height);
 
-        // Draw aurora blobs (background layer)
+        // Aurora blobs (background)
         if (mode === 'aurora') {
             auroraBlobsRef.current.forEach((blob) => {
-                // Update blob position
                 blob.x += blob.vx;
                 blob.y += blob.vy;
                 blob.phase += 0.01;
 
-                // Wrap around
                 if (blob.x < -blob.radius) blob.x = width + blob.radius;
                 if (blob.x > width + blob.radius) blob.x = -blob.radius;
                 if (blob.y < -blob.radius) blob.y = height + blob.radius;
                 if (blob.y > height + blob.radius) blob.y = -blob.radius;
 
-                // Draw gradient blob
                 const pulsing = Math.sin(blob.phase) * 0.2 + 0.8;
                 const gradient = ctx.createRadialGradient(
                     blob.x, blob.y, 0,
@@ -168,111 +168,166 @@ export const ParticleField: React.FC<ParticleFieldProps> = ({ mode = 'default' }
             });
         }
 
-        // Keep only reasonable number of particles
-        if (particlesRef.current.length > PARTICLE_COUNT + 100) {
-            particlesRef.current = particlesRef.current.slice(-PARTICLE_COUNT);
+        // Keep particle count manageable
+        const maxParticles = mode === 'antigravity' ? 150 : PARTICLE_COUNT + 50;
+        if (particlesRef.current.length > maxParticles) {
+            particlesRef.current = particlesRef.current.slice(-maxParticles);
         }
 
-        // Sort particles by layer for proper depth rendering
-        const sortedParticles = [...particlesRef.current].sort((a, b) => a.layer - b.layer);
+        // Setup glow for antigravity mode
+        if (mode === 'antigravity') {
+            ctx.shadowBlur = 8;
+            ctx.shadowColor = 'rgba(200, 220, 255, 0.5)';
+        }
 
         // Update and draw particles
-        sortedParticles.forEach((particle) => {
+        particlesRef.current.forEach((particle) => {
             const config = layerConfigs[particle.layer] || layerConfigs[1];
 
-            // Mouse interaction (stronger for closer particles)
+            // Mouse interaction
             const dx = mouse.x - particle.x;
             const dy = mouse.y - particle.y;
             const distance = Math.sqrt(dx * dx + dy * dy);
-            const maxDistance = 150;
 
-            if (distance < maxDistance && distance > 0) {
-                const angle = Math.atan2(dy, dx);
-                const force = (maxDistance - distance) / maxDistance;
-                const layerForce = force * config.speed;
+            if (mode === 'antigravity') {
+                // ANTIGRAVITY: Strong inverse-square repulsion
+                const repulsionRadius = 200;
 
-                if (mode === 'antigravity') {
-                    // Antigravity: particles repel from mouse
-                    particle.vx -= Math.cos(angle) * layerForce * 0.15;
-                    particle.vy -= Math.sin(angle) * layerForce * 0.15;
-                } else if (mouse.isClicking) {
-                    particle.vx -= Math.cos(angle) * layerForce * 0.8;
-                    particle.vy -= Math.sin(angle) * layerForce * 0.8;
-                } else {
-                    particle.vx += Math.cos(angle) * layerForce * 0.02;
-                    particle.vy += Math.sin(angle) * layerForce * 0.02;
+                if (distance < repulsionRadius && distance > 0) {
+                    const angle = Math.atan2(dy, dx);
+                    // Inverse-square force: stronger when closer
+                    const force = Math.pow((repulsionRadius - distance) / repulsionRadius, 2) * 3;
+
+                    particle.vx -= Math.cos(angle) * force;
+                    particle.vy -= Math.sin(angle) * force;
+                    particle.alpha = Math.min(0.9, particle.baseAlpha + force * 0.3);
                 }
 
-                particle.alpha = Math.min(0.6, particle.baseAlpha + force * 0.2);
+                // Return-to-home force (spring behavior)
+                const homeDistX = particle.homeX - particle.x;
+                const homeDistY = particle.homeY - particle.y;
+                particle.vx += homeDistX * 0.02;
+                particle.vy += homeDistY * 0.02;
+
+                // Click burst effect
+                if (mouse.isClicking && distance < 300 && distance > 0) {
+                    const angle = Math.atan2(dy, dx);
+                    const force = (300 - distance) / 300 * 8;
+                    particle.vx -= Math.cos(angle) * force;
+                    particle.vy -= Math.sin(angle) * force;
+                }
+
             } else {
-                particle.alpha += (particle.baseAlpha - particle.alpha) * 0.05;
+                // Default/Aurora: gentle attraction/repulsion
+                const maxDistance = 150;
+                if (distance < maxDistance && distance > 0) {
+                    const angle = Math.atan2(dy, dx);
+                    const force = (maxDistance - distance) / maxDistance * config.speed;
+
+                    if (mouse.isClicking) {
+                        particle.vx -= Math.cos(angle) * force * 0.8;
+                        particle.vy -= Math.sin(angle) * force * 0.8;
+                    } else {
+                        particle.vx += Math.cos(angle) * force * 0.02;
+                        particle.vy += Math.sin(angle) * force * 0.02;
+                    }
+                    particle.alpha = Math.min(0.6, particle.baseAlpha + force * 0.2);
+                }
             }
 
-            // Scroll effect - scaled by layer
+            // Alpha decay
+            particle.alpha += (particle.baseAlpha - particle.alpha) * 0.05;
+
+            // Scroll effect
             if (Math.abs(scrollVelocity) > 0.5) {
-                particle.vy += scrollVelocity * 0.002 * config.speed;
+                const scrollFactor = mode === 'antigravity' ? 0.001 : 0.002 * config.speed;
+                particle.vy += scrollVelocity * scrollFactor;
             }
 
             // Apply velocity
             particle.x += particle.vx;
             particle.y += particle.vy;
 
-            // Friction
-            particle.vx *= 0.995;
-            particle.vy *= 0.995;
+            // Friction (stronger for antigravity for smoother movement)
+            const friction = mode === 'antigravity' ? 0.92 : 0.995;
+            particle.vx *= friction;
+            particle.vy *= friction;
 
             // Wrap around edges
-            if (particle.x < -10) particle.x = width + 10;
-            if (particle.x > width + 10) particle.x = -10;
-            if (particle.y < -10) particle.y = height + 10;
-            if (particle.y > height + 10) particle.y = -10;
+            if (particle.x < -20) { particle.x = width + 20; particle.homeX = particle.x; }
+            if (particle.x > width + 20) { particle.x = -20; particle.homeX = particle.x; }
+            if (particle.y < -20) { particle.y = height + 20; particle.homeY = particle.y; }
+            if (particle.y > height + 20) { particle.y = -20; particle.homeY = particle.y; }
 
-            // Draw particle based on mode
+            // Draw particle
             if (mode === 'antigravity') {
-                drawCross(ctx, particle.x, particle.y, particle.size * 3, particle.alpha);
+                // Draw '+' sign with glow
+                const s = particle.size * 4;
+                ctx.beginPath();
+                ctx.strokeStyle = `rgba(220, 230, 255, ${particle.alpha})`;
+                ctx.lineWidth = particle.size * 0.4;
+                ctx.lineCap = 'round';
+                ctx.moveTo(particle.x - s, particle.y);
+                ctx.lineTo(particle.x + s, particle.y);
+                ctx.moveTo(particle.x, particle.y - s);
+                ctx.lineTo(particle.x, particle.y + s);
+                ctx.stroke();
             } else {
+                // Draw circle
                 ctx.beginPath();
                 ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-                const hue = mode === 'aurora' ? 200 + particle.layer * 20 : 0;
-                const sat = mode === 'aurora' ? '30%' : '0%';
-                const light = mode === 'aurora' ? '70%' : '72%';
-                ctx.fillStyle = mode === 'aurora'
-                    ? `hsla(${hue}, ${sat}, ${light}, ${particle.alpha})`
-                    : `rgba(180, 180, 190, ${particle.alpha})`;
+                if (mode === 'aurora') {
+                    const hue = 200 + particle.layer * 20;
+                    ctx.fillStyle = `hsla(${hue}, 30%, 70%, ${particle.alpha})`;
+                } else {
+                    ctx.fillStyle = `rgba(180, 180, 190, ${particle.alpha})`;
+                }
                 ctx.fill();
             }
         });
 
-        // Draw connections (mesh effect) - only for nearby layers
-        const connectionDistance = mode === 'antigravity' ? 100 : 80;
-        const connectionAlphaBase = mode === 'antigravity' ? 0.15 : 0.12;
+        // Reset shadow for connection lines
+        ctx.shadowBlur = 0;
+
+        // Draw constellation mesh
+        const connectionDistance = mode === 'antigravity' ? 120 : 80;
+        const connectionAlpha = mode === 'antigravity' ? 0.2 : 0.12;
 
         for (let i = 0; i < particlesRef.current.length; i++) {
             const p1 = particlesRef.current[i];
-            for (let j = i + 1; j < particlesRef.current.length; j++) {
+
+            // Limit connections per particle for performance
+            let connections = 0;
+            const maxConnections = mode === 'antigravity' ? 5 : 3;
+
+            for (let j = i + 1; j < particlesRef.current.length && connections < maxConnections; j++) {
                 const p2 = particlesRef.current[j];
 
-                // Only connect particles in same or adjacent layers
+                // Only connect nearby layers
                 if (Math.abs(p1.layer - p2.layer) > 1) continue;
 
-                const dx = p1.x - p2.x;
-                const dy = p1.y - p2.y;
-                const distance = Math.sqrt(dx * dx + dy * dy);
+                const cdx = p1.x - p2.x;
+                const cdy = p1.y - p2.y;
+                const dist = Math.sqrt(cdx * cdx + cdy * cdy);
 
-                if (distance < connectionDistance) {
-                    const alpha = connectionAlphaBase * (1 - distance / connectionDistance);
+                if (dist < connectionDistance) {
+                    connections++;
+                    const alpha = connectionAlpha * (1 - dist / connectionDistance);
+
                     ctx.beginPath();
                     ctx.moveTo(p1.x, p1.y);
                     ctx.lineTo(p2.x, p2.y);
 
-                    if (mode === 'aurora') {
+                    if (mode === 'antigravity') {
+                        ctx.strokeStyle = `rgba(180, 200, 255, ${alpha})`;
+                        ctx.lineWidth = 0.8;
+                    } else if (mode === 'aurora') {
                         ctx.strokeStyle = `hsla(210, 40%, 70%, ${alpha})`;
-                    } else if (mode === 'antigravity') {
-                        ctx.strokeStyle = `rgba(150, 180, 255, ${alpha})`;
+                        ctx.lineWidth = 0.5;
                     } else {
                         ctx.strokeStyle = `rgba(180, 180, 190, ${alpha})`;
+                        ctx.lineWidth = 0.5;
                     }
-                    ctx.lineWidth = 0.5;
                     ctx.stroke();
                 }
             }
@@ -292,8 +347,12 @@ export const ParticleField: React.FC<ParticleFieldProps> = ({ mode = 'default' }
 
     const handleMouseDown = useCallback((e: MouseEvent) => {
         mouseRef.current.isClicking = true;
-        spawnBurst(e.clientX, e.clientY, 25);
-    }, [spawnBurst]);
+        if (mode === 'antigravity') {
+            spawnBurst(e.clientX, e.clientY, 12);
+        } else {
+            spawnBurst(e.clientX, e.clientY, 20);
+        }
+    }, [spawnBurst, mode]);
 
     const handleMouseUp = useCallback(() => {
         mouseRef.current.isClicking = false;
