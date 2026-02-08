@@ -41,7 +41,7 @@ function App() {
     const timer = setTimeout(() => {
       // Only set to false if content is also ready (handled by derived state below)
       setIsMinLoadComplete(true);
-    }, 3500);
+    }, 6000);
 
     return () => clearTimeout(timer);
   }, []);
