@@ -212,7 +212,7 @@ export const ParticleField: React.FC = () => {
             className="fixed inset-0 z-0 pointer-events-none"
             style={{
                 background: 'transparent',
-                filter: 'blur(0.5px)',  // Subtle DOF blur effect
+                willChange: 'transform',  // GPU acceleration
             }}
         />
     );
