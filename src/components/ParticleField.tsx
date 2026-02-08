@@ -149,20 +149,13 @@ export const ParticleField: React.FC<ParticleFieldProps> = ({ text = "STK" }) =>
                 if (particle.y > height + 10) particle.y = -10;
             }
 
-            // Mouse Repulsion (Always active)
+            // Mouse interaction (Removed repulsion)
+            /* 
+            // Optional: Add attraction or other interaction here if desired later
             const dx = mouse.x - particle.x;
             const dy = mouse.y - particle.y;
             const distance = Math.sqrt(dx * dx + dy * dy);
-            const maxDistance = 150;
-
-            if (distance < maxDistance && distance > 0) {
-                const angle = Math.atan2(dy, dx);
-                const force = (maxDistance - distance) / maxDistance;
-                // Push away
-                particle.vx -= Math.cos(angle) * force * 0.5;
-                particle.vy -= Math.sin(angle) * force * 0.5;
-                particle.alpha = Math.min(0.8, particle.baseAlpha + force * 0.4);
-            }
+            */
 
             // Move
             particle.x += particle.vx;
