@@ -40,11 +40,10 @@ export const HomeSection: React.FC<HomeSectionProps> = ({
                             className="text-4xl md:text-6xl lg:text-7xl font-semibold tracking-tight leading-[1.05]"
                         >
                             <motion.span
-                                className="text-primaryText block cursor-default"
+                                className="text-gradient-liquid block cursor-default w-fit"
                                 whileHover={{
                                     x: 10,
-                                    textShadow: "0 0 20px rgba(56,189,248,0.5)",
-                                    color: "#ffffff"
+                                    filter: "drop-shadow(0 0 10px rgba(138, 180, 248, 0.5))"
                                 }}
                                 transition={{ type: "spring", stiffness: 300, damping: 10 }}
                             >

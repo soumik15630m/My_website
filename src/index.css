@@ -224,6 +224,36 @@ body {
   animation: shimmer 3s ease-in-out infinite;
 }
 
+/* Liquid Gradient Text Animation */
+@keyframes liquid-flow {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.text-gradient-liquid {
+  background: linear-gradient(-45deg,
+      #8AB4F8,
+      #c084fc,
+      #22c55e,
+      #8AB4F8);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  /* Fallback */
+  -webkit-text-fill-color: transparent;
+  animation: liquid-flow 6s ease-in-out infinite;
+}
+
 /* ===============================
    MERMAID DIAGRAM STYLES
    =============================== */
