@@ -165,6 +165,8 @@ export const HomeSection: React.FC<HomeSectionProps> = ({
                                             repoUrl={contrib.repoUrl}
                                             prNumber={contrib.prNumber}
                                             initialTitle={contrib.title}
+                                            initialStatus={contrib.status}
+                                            initialImage={contrib.image}
                                         />
                                     ))}
                                 </div>

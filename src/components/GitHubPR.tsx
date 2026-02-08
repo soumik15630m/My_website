@@ -6,6 +6,8 @@ interface GitHubPRProps {
     repoUrl: string; // e.g., "https://github.com/owner/repo"
     prNumber: number;
     initialTitle?: string;
+    initialStatus?: 'merged' | 'open' | 'closed';
+    initialImage?: string;
 }
 
 interface PRData {
