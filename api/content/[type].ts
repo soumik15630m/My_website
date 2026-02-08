@@ -17,93 +17,10 @@ const CONTENT_DEFAULTS: Record<string, any> = {
         github: "https://github.com/example",
         about: "I specialize in low-level systems programming..."
     },
-    projects: [
-        {
-            id: 'p1',
-            title: 'Neural Code Search',
-            description: 'Semantic code search using transformers.',
-            problemStatement: 'Search code by meaning, not just keywords.',
-            technicalDecisions: ['Used BERT model', 'Optimized for latency'],
-            techStack: ['Python', 'PyTorch', 'Transformers'],
-            status: 'completed',
-            year: '2024',
-            pinned: true
-        },
-        {
-            id: 'p2',
-            title: 'WASM Runtime',
-            description: 'Lightweight WebAssembly runtime for edge.',
-            problemStatement: 'Execute WASM in resource-constrained environments.',
-            technicalDecisions: ['Written in Rust for safety', 'JIT compilation'],
-            techStack: ['Rust', 'WebAssembly'],
-            status: 'active',
-            year: '2024',
-            pinned: true
-        },
-        {
-            id: 'p3',
-            title: 'Incremental Compiler',
-            description: 'Fast recompilation by caching intermediate.',
-            problemStatement: 'Reduce build times for large projects.',
-            technicalDecisions: ['Dependency graph caching', 'Parallel compilation'],
-            techStack: ['C++', 'LLVM'],
-            status: 'active',
-            year: '2024',
-            pinned: true
-        }
-    ],
+    projects: [],
     achievements: [],
     notes: [],
-    opensource: [
-        {
-            id: 'pr1',
-            repo: 'llvm/llvm-project',
-            repoUrl: 'https://github.com/llvm/llvm-project',
-            title: '[SLP] Fix crash on extractelement with out-of-bounds index',
-            prNumber: 76543,
-            prUrl: '#',
-            status: 'merged',
-            labels: ['bug', 'backend'],
-            date: '2024-02-15',
-            pinned: true
-        },
-        {
-            id: 'pr2',
-            repo: 'fmtlib/fmt',
-            repoUrl: 'https://github.com/fmtlib/fmt',
-            title: 'Fix range suppressor formatter',
-            prNumber: 3842,
-            prUrl: '#',
-            status: 'merged',
-            labels: ['bug', 'core'],
-            date: '2024-01-20',
-            pinned: true
-        },
-        {
-            id: 'pr3',
-            repo: 'fmtlib/fmt',
-            repoUrl: 'https://github.com/fmtlib/fmt',
-            title: 'Update Android Gradle Plugin to 9.x',
-            prNumber: 3845,
-            prUrl: '#',
-            status: 'merged',
-            labels: ['build'],
-            date: '2024-01-22',
-            pinned: true
-        },
-        {
-            id: 'pr4',
-            repo: 'rust-lang/rust',
-            repoUrl: 'https://github.com/rust-lang/rust',
-            title: 'Improve error message for mismatched types',
-            prNumber: 120500,
-            prUrl: '#',
-            status: 'merged',
-            labels: ['diagnostics', 'compiler'],
-            date: '2024-03-01',
-            pinned: true
-        }
-    ],
+    opensource: [],
     nav_items: [
         { id: 'home', label: '_home' },
         { id: 'projects', label: '_projects' },
