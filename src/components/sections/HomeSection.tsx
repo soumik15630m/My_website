@@ -57,7 +57,7 @@ export const HomeSection: React.FC<HomeSectionProps> = ({
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
                             {/* About */}
                             <div className="md:col-span-2">
-                                <h3 className="text-[10px] font-mono text-secondaryText/40 uppercase tracking-[0.2em] mb-4">About</h3>
+                                <h2 className="text-[10px] font-mono text-secondaryText/40 uppercase tracking-[0.2em] mb-4">About</h2>
                                 <p className="text-sm md:text-base text-primaryText/80 leading-relaxed font-light">
                                     {profile.about}
                                 </p>
@@ -66,11 +66,11 @@ export const HomeSection: React.FC<HomeSectionProps> = ({
                             {/* Location + Status */}
                             <div className="space-y-6">
                                 <div>
-                                    <h3 className="text-[10px] font-mono text-secondaryText/40 uppercase tracking-[0.2em] mb-2">Location</h3>
+                                    <h2 className="text-[10px] font-mono text-secondaryText/40 uppercase tracking-[0.2em] mb-2">Location</h2>
                                     <p className="text-primaryText font-medium text-sm">{profile.location}</p>
                                 </div>
                                 <div>
-                                    <h3 className="text-[10px] font-mono text-secondaryText/40 uppercase tracking-[0.2em] mb-2">Status</h3>
+                                    <h2 className="text-[10px] font-mono text-secondaryText/40 uppercase tracking-[0.2em] mb-2">Status</h2>
                                     <div className="flex items-center gap-2">
                                         <span className="relative flex h-2 w-2">
                                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
@@ -96,7 +96,7 @@ export const HomeSection: React.FC<HomeSectionProps> = ({
                         {pinnedProjects.length > 0 && (
                             <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/5">
                                 <div className="flex items-center justify-between mb-4">
-                                    <h3 className="text-[10px] font-mono text-secondaryText/40 uppercase tracking-[0.2em]">Pinned Projects</h3>
+                                    <h2 className="text-[10px] font-mono text-secondaryText/40 uppercase tracking-[0.2em]">Pinned Projects</h2>
                                     <button
                                         onClick={() => handleViewChange('projects')}
                                         className="text-[10px] font-mono text-accent hover:text-accent/80 transition-colors"
@@ -134,7 +134,7 @@ export const HomeSection: React.FC<HomeSectionProps> = ({
                         {opensource.some(c => c.pinned) ? (
                             <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/5">
                                 <div className="flex items-center justify-between mb-4">
-                                    <h3 className="text-[10px] font-mono text-secondaryText/40 uppercase tracking-[0.2em]">Open Source</h3>
+                                    <h2 className="text-[10px] font-mono text-secondaryText/40 uppercase tracking-[0.2em]">Open Source</h2>
                                     <button
                                         onClick={() => handleViewChange('opensource')}
                                         className="text-[10px] font-mono text-accent hover:text-accent/80 transition-colors"

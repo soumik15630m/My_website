@@ -84,6 +84,7 @@ export const ScrollTrigger: React.FC<ScrollTriggerProps> = ({ nextSection, onCli
                     {/* Draggable Button */}
                     <motion.button
                         type="button"
+                        aria-label="Scroll to continue"
                         style={{ y, scale: buttonScale }}
                         drag="y"
                         dragConstraints={{ top: 0, bottom: 100 }}
