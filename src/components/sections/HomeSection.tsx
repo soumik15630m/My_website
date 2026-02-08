@@ -37,7 +37,7 @@ export const HomeSection: React.FC<HomeSectionProps> = ({
                             initial={{ opacity: 0, y: 30 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.7, ease: [0.2, 0.8, 0.2, 1] }}
-                            className="text-4xl md:text-6xl lg:text-7xl font-semibold tracking-tight leading-[1.05]"
+                            className="text-4xl md:text-6xl lg:text-7xl font-semibold tracking-tight leading-tight"
                         >
                             <motion.span
                                 className="text-gradient-liquid block cursor-default w-fit"
