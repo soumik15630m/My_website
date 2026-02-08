@@ -230,11 +230,12 @@ body {
 /* Liquid Filled Text Effect */
 .text-liquid-fill {
   color: transparent;
-  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.4);
-  /* Clearly visible outline */
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.5);
+  /* Crisp visible outline */
   position: relative;
   display: inline-block;
   padding-bottom: 0.15em;
+  z-index: 10;
 }
 
 .text-liquid-fill::before {
@@ -246,23 +247,22 @@ body {
   height: 75%;
   /* 75% Filled */
   overflow: hidden;
+  z-index: -1;
+  /* Behind the outline */
 
-  /* Greyish/Black to Deep Blue Gradient */
+  /* Greyish/Black bottom -> Deep Blue top */
   background: linear-gradient(to top,
-      #111827 0%,
-      /* Gray-900 */
-      #1e1b4b 40%,
-      /* Indigo-950 */
-      #1d4ed8 100%
-      /* Blue-700 top edge */
+      #020617 0%,
+      /* Slate-950 */
+      #172554 50%,
+      /* Blue-950 (Deep Blue) */
+      #3b82f6 100%
+      /* Blue-500 (Liquid Surface) */
     );
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
   -webkit-text-fill-color: transparent;
-
-  /* No outline on the liquid itself */
-  -webkit-text-stroke: 0;
 
   /* Animation using CSS variable */
   animation: liquid-rise var(--liquid-speed, 2s) ease-out forwards;
