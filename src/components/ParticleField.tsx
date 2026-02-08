@@ -142,7 +142,7 @@ export const ParticleField: React.FC<ParticleFieldProps & { paused?: boolean }> 
         const canvas = canvasRef.current;
         if (!canvas) return;
 
-        const ctx = canvas.getContext('2d', { desynchronized: true });
+        const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
         const { width, height } = canvas;

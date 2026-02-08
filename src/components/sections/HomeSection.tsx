@@ -4,6 +4,7 @@ import { GitPullRequest } from 'lucide-react';
 import { Section } from '../Section';
 import { ScrollTrigger } from '../ScrollTrigger';
 import { Profile, Project, OpenSourceContribution } from '../../types';
+import { GitHubPR } from '../GitHubPR';
 
 interface HomeSectionProps {
     profile: Profile;
@@ -38,9 +39,17 @@ export const HomeSection: React.FC<HomeSectionProps> = ({
                             transition={{ duration: 0.7, ease: [0.2, 0.8, 0.2, 1] }}
                             className="text-4xl md:text-6xl lg:text-7xl font-semibold tracking-tight leading-[1.05]"
                         >
-                            <span className="text-primaryText block">
+                            <motion.span
+                                className="text-primaryText block cursor-default"
+                                whileHover={{
+                                    x: 10,
+                                    textShadow: "0 0 20px rgba(56,189,248,0.5)",
+                                    color: "#ffffff"
+                                }}
+                                transition={{ type: "spring", stiffness: 300, damping: 10 }}
+                            >
                                 {profile.role || 'Systems Engineer'}
-                            </span>
+                            </motion.span>
                             <span className="text-secondaryText/50 block mt-2 text-3xl md:text-4xl lg:text-5xl">
                                 {profile.tagline || 'Open Source Contributor | Building performant systems'}
                             </span>
@@ -94,7 +103,7 @@ export const HomeSection: React.FC<HomeSectionProps> = ({
                     >
                         {/* Pinned Projects Panel */}
                         {pinnedProjects.length > 0 && (
-                            <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/5">
+                            <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/5 backdrop-blur-sm">
                                 <div className="flex items-center justify-between mb-4">
                                     <h2 className="text-[10px] font-mono text-secondaryText/40 uppercase tracking-[0.2em]">Pinned Projects</h2>
                                     <button
@@ -106,12 +115,19 @@ export const HomeSection: React.FC<HomeSectionProps> = ({
                                 </div>
                                 <div className="space-y-3">
                                     {pinnedProjects.map((project) => (
-                                        <button
+                                        <motion.button
                                             key={project.id}
                                             onClick={() => setSelectedProject(project)}
-                                            className="group w-full text-left p-3 rounded-xl bg-white/[0.02] border border-white/5 hover:border-accent/30 hover:bg-white/[0.04] transition-all"
+                                            whileHover={{
+                                                scale: 1.02,
+                                                backgroundColor: "rgba(255, 255, 255, 0.05)",
+                                                borderColor: "rgba(56, 189, 248, 0.3)" // accent color low opacity
+                                            }}
+                                            whileTap={{ scale: 0.98 }}
+                                            transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                                            className="group w-full text-left p-3 rounded-xl bg-white/[0.02] border border-white/5 transition-colors relative overflow-hidden"
                                         >
-                                            <div className="flex items-start gap-3">
+                                            <div className="flex items-start gap-3 relative z-10">
                                                 {project.image && (
                                                     <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 bg-surface">
                                                         <img src={project.image} alt="" className="w-full h-full object-cover" loading="lazy" />
@@ -121,10 +137,10 @@ export const HomeSection: React.FC<HomeSectionProps> = ({
                                                     <p className="text-sm font-medium text-primaryText truncate group-hover:text-accent transition-colors">
                                                         {project.title}
                                                     </p>
-                                                    <p className="text-xs text-secondaryText/50 mt-0.5 line-clamp-1">{project.description}</p>
+                                                    <p className="text-xs text-secondaryText/50 mt-0.5 line-clamp-1 group-hover:text-secondaryText/80 transition-colors">{project.description}</p>
                                                 </div>
                                             </div>
-                                        </button>
+                                        </motion.button>
                                     ))}
                                 </div>
                             </div>
@@ -132,7 +148,7 @@ export const HomeSection: React.FC<HomeSectionProps> = ({
 
                         {/* Open Source Panel */}
                         {opensource.some(c => c.pinned) ? (
-                            <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/5">
+                            <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/5 backdrop-blur-sm">
                                 <div className="flex items-center justify-between mb-4">
                                     <h2 className="text-[10px] font-mono text-secondaryText/40 uppercase tracking-[0.2em]">Open Source</h2>
                                     <button
@@ -142,23 +158,14 @@ export const HomeSection: React.FC<HomeSectionProps> = ({
                                         View all →
                                     </button>
                                 </div>
-                                <div className="space-y-2">
+                                <div className="space-y-3">
                                     {opensource.filter(c => c.pinned).map((contrib) => (
-                                        <a
+                                        <GitHubPR
                                             key={contrib.id}
-                                            href={contrib.prUrl}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="group flex items-start gap-3 p-3 rounded-xl hover:bg-white/[0.03] transition-colors"
-                                        >
-                                            <GitPullRequest size={14} className="text-green-500 mt-0.5 shrink-0" />
-                                            <div className="flex-1 min-w-0">
-                                                <p className="text-xs font-medium text-primaryText truncate group-hover:text-accent transition-colors">
-                                                    {contrib.title}
-                                                </p>
-                                                <p className="text-[10px] text-secondaryText/40 mt-0.5">{contrib.repo}</p>
-                                            </div>
-                                        </a>
+                                            repoUrl={contrib.repoUrl}
+                                            prNumber={contrib.prNumber}
+                                            initialTitle={contrib.title}
+                                        />
                                     ))}
                                 </div>
                             </div>
