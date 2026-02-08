@@ -103,9 +103,9 @@ export const ParticleField: React.FC = () => {
                 particle.alpha += (particle.baseAlpha - particle.alpha) * 0.05;
             }
 
-            // Scroll effect
+            // Scroll effect - reduced velocity for smoother experience
             if (Math.abs(scrollVelocity) > 0.5) {
-                particle.vy += scrollVelocity * 0.008;
+                particle.vy += scrollVelocity * 0.002;
             }
 
             // Apply velocity
@@ -150,8 +150,8 @@ export const ParticleField: React.FC = () => {
             }
         }
 
-        // Decay scroll velocity
-        scrollVelocityRef.current *= 0.95;
+        // Decay scroll velocity - faster decay for less jarring effect
+        scrollVelocityRef.current *= 0.85;
 
         animationRef.current = requestAnimationFrame(animate);
     }, []);
@@ -210,7 +210,10 @@ export const ParticleField: React.FC = () => {
         <canvas
             ref={canvasRef}
             className="fixed inset-0 z-0 pointer-events-none"
-            style={{ background: 'transparent' }}
+            style={{
+                background: 'transparent',
+                filter: 'blur(0.5px)',  // Subtle DOF blur effect
+            }}
         />
     );
 };
