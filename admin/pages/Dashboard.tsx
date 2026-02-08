@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 import { getContent, updateContent } from '../api';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Home, FolderOpen, Award, FileText, LogOut, Save, Plus, Trash2, ChevronLeft, ChevronRight, Upload, Download, Copy, FileUp, Settings } from 'lucide-react';
+import { Home, FolderOpen, Award, FileText, LogOut, Save, Plus, Trash2, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Upload, Download, Copy, FileUp, Settings } from 'lucide-react';
 
 type Tab = 'profile' | 'projects' | 'achievements' | 'notes' | 'settings';
 
@@ -327,8 +327,54 @@ function ProjectsEditor({ projects, onChange, onSave, saving }: any) {
         onChange(projects.filter((_: any, i: number) => i !== index));
     };
 
+    const scrollToBottom = () => {
+        const container = document.getElementById('projects-container');
+        container?.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+    };
+
+    const scrollToTop = () => {
+        const container = document.getElementById('projects-container');
+        container?.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
     return (
-        <div className="space-y-6">
+        <div id="projects-container" className="space-y-6 max-h-[calc(100vh-200px)] overflow-y-auto pr-2">
+            {/* Top Action Bar */}
+            <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm pb-4 border-b border-border space-y-4">
+                <div className="flex gap-4 flex-wrap">
+                    <button
+                        onClick={addProject}
+                        className="flex items-center gap-2 px-4 py-2 border border-border text-secondaryText rounded-lg hover:bg-surface hover:text-primaryText transition-colors"
+                    >
+                        <Plus size={18} />
+                        Add Project
+                    </button>
+                    <button
+                        onClick={onSave}
+                        disabled={saving}
+                        className="flex items-center gap-2 px-4 py-2 bg-accent text-background rounded-lg hover:bg-accent/90 transition-colors disabled:opacity-50"
+                    >
+                        <Save size={18} />
+                        {saving ? 'Saving...' : 'Save All'}
+                    </button>
+                    {projects.length > 2 && (
+                        <button
+                            onClick={scrollToBottom}
+                            className="flex items-center gap-1 px-3 py-2 text-secondaryText hover:text-primaryText transition-colors ml-auto"
+                        >
+                            <ChevronDown size={18} />
+                            Scroll Down
+                        </button>
+                    )}
+                </div>
+
+                <JsonImportSection
+                    itemName="Projects"
+                    template={PROJECT_TEMPLATE}
+                    onImport={(items) => onChange([...projects, ...items])}
+                />
+            </div>
+
             {projects.map((project: any, index: number) => (
                 <div key={project.id || index} className="bg-surface border border-border rounded-xl p-6 space-y-4">
                     <div className="flex justify-between items-start">
@@ -392,29 +438,18 @@ function ProjectsEditor({ projects, onChange, onSave, saving }: any) {
                 </div>
             ))}
 
-            <div className="flex gap-4">
-                <button
-                    onClick={addProject}
-                    className="flex items-center gap-2 px-4 py-2 border border-border text-secondaryText rounded-lg hover:bg-surface hover:text-primaryText transition-colors"
-                >
-                    <Plus size={18} />
-                    Add Project
-                </button>
-                <button
-                    onClick={onSave}
-                    disabled={saving}
-                    className="flex items-center gap-2 px-4 py-2 bg-accent text-background rounded-lg hover:bg-accent/90 transition-colors disabled:opacity-50"
-                >
-                    <Save size={18} />
-                    {saving ? 'Saving...' : 'Save All Projects'}
-                </button>
-            </div>
-
-            <JsonImportSection
-                itemName="Projects"
-                template={PROJECT_TEMPLATE}
-                onImport={(items) => onChange([...projects, ...items])}
-            />
+            {/* Bottom Scroll Up */}
+            {projects.length > 2 && (
+                <div className="flex justify-center pt-4">
+                    <button
+                        onClick={scrollToTop}
+                        className="flex items-center gap-1 px-4 py-2 text-secondaryText hover:text-primaryText border border-border rounded-lg transition-colors"
+                    >
+                        <ChevronUp size={18} />
+                        Scroll to Top
+                    </button>
+                </div>
+            )}
         </div>
     );
 }
@@ -438,8 +473,47 @@ function AchievementsEditor({ achievements, onChange, onSave, saving }: any) {
         onChange(achievements.filter((_: any, i: number) => i !== index));
     };
 
+    const scrollToBottom = () => {
+        const container = document.getElementById('achievements-container');
+        container?.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+    };
+
+    const scrollToTop = () => {
+        const container = document.getElementById('achievements-container');
+        container?.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
     return (
-        <div className="space-y-6">
+        <div id="achievements-container" className="space-y-6 max-h-[calc(100vh-200px)] overflow-y-auto pr-2">
+            {/* Top Action Bar */}
+            <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm pb-4 border-b border-border space-y-4">
+                <div className="flex gap-4 flex-wrap">
+                    <button onClick={addAchievement} className="flex items-center gap-2 px-4 py-2 border border-border text-secondaryText rounded-lg hover:bg-surface hover:text-primaryText transition-colors">
+                        <Plus size={18} />
+                        Add Achievement
+                    </button>
+                    <button onClick={onSave} disabled={saving} className="flex items-center gap-2 px-4 py-2 bg-accent text-background rounded-lg hover:bg-accent/90 transition-colors disabled:opacity-50">
+                        <Save size={18} />
+                        {saving ? 'Saving...' : 'Save All'}
+                    </button>
+                    {achievements.length > 3 && (
+                        <button
+                            onClick={scrollToBottom}
+                            className="flex items-center gap-1 px-3 py-2 text-secondaryText hover:text-primaryText transition-colors ml-auto"
+                        >
+                            <ChevronDown size={18} />
+                            Scroll Down
+                        </button>
+                    )}
+                </div>
+
+                <JsonImportSection
+                    itemName="Achievements"
+                    template={ACHIEVEMENT_TEMPLATE}
+                    onImport={(items) => onChange([...achievements, ...items])}
+                />
+            </div>
+
             {achievements.map((achievement: any, index: number) => (
                 <div key={achievement.id || index} className="bg-surface border border-border rounded-xl p-6 space-y-4">
                     <div className="flex justify-between items-start">
@@ -457,22 +531,18 @@ function AchievementsEditor({ achievements, onChange, onSave, saving }: any) {
                 </div>
             ))}
 
-            <div className="flex gap-4">
-                <button onClick={addAchievement} className="flex items-center gap-2 px-4 py-2 border border-border text-secondaryText rounded-lg hover:bg-surface hover:text-primaryText transition-colors">
-                    <Plus size={18} />
-                    Add Achievement
-                </button>
-                <button onClick={onSave} disabled={saving} className="flex items-center gap-2 px-4 py-2 bg-accent text-background rounded-lg hover:bg-accent/90 transition-colors disabled:opacity-50">
-                    <Save size={18} />
-                    {saving ? 'Saving...' : 'Save All'}
-                </button>
-            </div>
-
-            <JsonImportSection
-                itemName="Achievements"
-                template={ACHIEVEMENT_TEMPLATE}
-                onImport={(items) => onChange([...achievements, ...items])}
-            />
+            {/* Bottom Scroll Up */}
+            {achievements.length > 3 && (
+                <div className="flex justify-center pt-4">
+                    <button
+                        onClick={scrollToTop}
+                        className="flex items-center gap-1 px-4 py-2 text-secondaryText hover:text-primaryText border border-border rounded-lg transition-colors"
+                    >
+                        <ChevronUp size={18} />
+                        Scroll to Top
+                    </button>
+                </div>
+            )}
         </div>
     );
 }
@@ -504,8 +574,47 @@ function NotesEditor({ notes, onChange, onSave, saving }: any) {
         onChange(notes.filter((_: any, i: number) => i !== index));
     };
 
+    const scrollToBottom = () => {
+        const container = document.getElementById('notes-container');
+        container?.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+    };
+
+    const scrollToTop = () => {
+        const container = document.getElementById('notes-container');
+        container?.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
     return (
-        <div className="space-y-6">
+        <div id="notes-container" className="space-y-6 max-h-[calc(100vh-200px)] overflow-y-auto pr-2">
+            {/* Top Action Bar */}
+            <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm pb-4 border-b border-border space-y-4">
+                <div className="flex gap-4 flex-wrap">
+                    <button onClick={addNote} className="flex items-center gap-2 px-4 py-2 border border-border text-secondaryText rounded-lg hover:bg-surface hover:text-primaryText transition-colors">
+                        <Plus size={18} />
+                        Add Note
+                    </button>
+                    <button onClick={onSave} disabled={saving} className="flex items-center gap-2 px-4 py-2 bg-accent text-background rounded-lg hover:bg-accent/90 transition-colors disabled:opacity-50">
+                        <Save size={18} />
+                        {saving ? 'Saving...' : 'Save All'}
+                    </button>
+                    {notes.length > 2 && (
+                        <button
+                            onClick={scrollToBottom}
+                            className="flex items-center gap-1 px-3 py-2 text-secondaryText hover:text-primaryText transition-colors ml-auto"
+                        >
+                            <ChevronDown size={18} />
+                            Scroll Down
+                        </button>
+                    )}
+                </div>
+
+                <JsonImportSection
+                    itemName="Notes"
+                    template={NOTE_TEMPLATE}
+                    onImport={(items) => onChange([...notes, ...items])}
+                />
+            </div>
+
             {notes.map((note: any, index: number) => (
                 <div key={note.id || index} className="bg-surface border border-border rounded-xl p-6 space-y-4">
                     <div className="flex justify-between items-start">
@@ -539,22 +648,18 @@ function NotesEditor({ notes, onChange, onSave, saving }: any) {
                 </div>
             ))}
 
-            <div className="flex gap-4">
-                <button onClick={addNote} className="flex items-center gap-2 px-4 py-2 border border-border text-secondaryText rounded-lg hover:bg-surface hover:text-primaryText transition-colors">
-                    <Plus size={18} />
-                    Add Note
-                </button>
-                <button onClick={onSave} disabled={saving} className="flex items-center gap-2 px-4 py-2 bg-accent text-background rounded-lg hover:bg-accent/90 transition-colors disabled:opacity-50">
-                    <Save size={18} />
-                    {saving ? 'Saving...' : 'Save All'}
-                </button>
-            </div>
-
-            <JsonImportSection
-                itemName="Notes"
-                template={NOTE_TEMPLATE}
-                onImport={(items) => onChange([...notes, ...items])}
-            />
+            {/* Bottom Scroll Up */}
+            {notes.length > 2 && (
+                <div className="flex justify-center pt-4">
+                    <button
+                        onClick={scrollToTop}
+                        className="flex items-center gap-1 px-4 py-2 text-secondaryText hover:text-primaryText border border-border rounded-lg transition-colors"
+                    >
+                        <ChevronUp size={18} />
+                        Scroll to Top
+                    </button>
+                </div>
+            )}
         </div>
     );
 }
