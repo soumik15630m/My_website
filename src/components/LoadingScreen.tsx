@@ -145,7 +145,7 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ profile }) => {
                     </motion.p>
 
                     {/* Premium Tagline: Staggered Letter Reveal */}
-                    <div className="flex overflow-hidden">
+                    <div className="flex flex-wrap justify-center max-w-[80%] mx-auto text-center gap-y-1">
                         {(profile?.tagline || "Architecting Digital Excellence").split("").map((char, index) => (
                             <motion.span
                                 key={index}
@@ -153,7 +153,7 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ profile }) => {
                                 animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
                                 transition={{
                                     duration: 1.5, // Slower fade-in
-                                    delay: 1.0 + (index * 0.1), // Start earlier (1.0s) so it's visible before load finishes
+                                    delay: 1.0 + (index * 0.05), // Adjusted stagger for longer text (0.05s)
                                     ease: "easeOut"
                                 }}
                                 className="text-white/40 text-xs tracking-widest font-light uppercase inline-block"
