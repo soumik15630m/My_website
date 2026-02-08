@@ -1,25 +1,92 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { getOptimizedImageUrl } from '../utils/imageUtils';
 
 interface LoadingScreenProps {
     profile?: {
         logoText?: string;
         logoImage?: string;
         role?: string;
+        tagline?: string;
+        loadingSettings?: {
+            style: 'curtain' | 'minimal';
+            revealDuration: number;
+            taglineDelay: number;
+            taglineStagger: number;
+        };
     };
 }
 
 export const LoadingScreen: React.FC<LoadingScreenProps> = ({ profile }) => {
-    // "STK" fluid animation
-    // Using SVG clipPath/mask for best text cut-out effect
+    const settings = profile?.loadingSettings || {
+        style: 'curtain',
+        revealDuration: 3.5,
+        taglineDelay: 1.5,
+        taglineStagger: 0.1
+    };
 
+    const logoText = profile?.logoText || "STK";
+    const role = profile?.role || 'Systems Engineer';
+    const tagline = profile?.tagline || "Architecting Digital Excellence";
+
+    // Minimal Style: clean fade in/out
+    if (settings.style === 'minimal') {
+        return (
+            <motion.div
+                initial={{ opacity: 1 }}
+                exit={{ opacity: 0, transition: { duration: 0.8 } }}
+                className="fixed inset-0 z-50 flex items-center justify-center bg-black"
+            >
+                <div className="flex flex-col items-center gap-6">
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 1.0 }}
+                        className="text-6xl md:text-8xl font-['Inter'] font-black tracking-tighter text-white"
+                    >
+                        {logoText}
+                    </motion.div>
+
+                    <div className="flex flex-col items-center space-y-2">
+                        <motion.p
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.5, duration: 0.8 }}
+                            className="text-blue-400/80 font-mono text-sm tracking-[0.3em] uppercase"
+                        >
+                            {role}
+                        </motion.p>
+
+                        <div className="flex flex-wrap justify-center max-w-[80%] mx-auto text-center gap-y-1">
+                            {tagline.split("").map((char, index) => (
+                                <motion.span
+                                    key={index}
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{
+                                        duration: 0.5,
+                                        delay: 1.0 + (index * 0.03),
+                                        ease: "easeOut"
+                                    }}
+                                    className="text-white/40 text-xs tracking-widest font-light uppercase inline-block"
+                                    style={{ marginRight: char === " " ? "0.5em" : "0" }}
+                                >
+                                    {char === " " ? "\u00A0" : char}
+                                </motion.span>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </motion.div>
+        );
+    }
+
+    // Default: Curtain Style
     return (
         <motion.div
             initial={{ opacity: 1 }}
             exit={{
                 opacity: 0,
-                transition: { duration: 0.8 }
+                transition: { duration: 0.8 } // Fade out duration
             }}
             className="fixed inset-0 z-50 flex items-center justify-center bg-black"
         >
@@ -27,15 +94,15 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ profile }) => {
                 <div className="relative w-[300px] h-[150px] md:w-[400px] md:h-[200px]">
                     <svg viewBox="0 0 400 200" className="w-full h-full font-bold">
                         <defs>
-                            {/* Mask 1: The Text Shape (For the Gradient Fill) */}
+                            {/* Mask 1: The Text Shape */}
                             <mask id="text-shape-mask">
                                 <rect x="0" y="0" width="100%" height="100%" fill="black" />
                                 <text x="50%" y="54%" textAnchor="middle" dy=".35em" fill="white" className="text-8xl md:text-9xl font-['Inter'] font-black tracking-tighter" style={{ fontWeight: 900 }}>
-                                    STK
+                                    {logoText}
                                 </text>
                             </mask>
 
-                            {/* Mask 2: The Curtain Reveal (For Everything) */}
+                            {/* Mask 2: The Curtain Reveal */}
                             <mask id="curtain-reveal-mask">
                                 <rect x="0" y="0" width="100%" height="100%" fill="black" />
                                 <motion.rect
@@ -47,7 +114,7 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ profile }) => {
                                     initial={{ width: 0 }}
                                     animate={{ width: 400 }}
                                     transition={{
-                                        duration: 3.5, // Slower reveal
+                                        duration: settings.revealDuration, // Configurable duration
                                         ease: [0.22, 1, 0.36, 1],
                                     }}
                                 />
@@ -64,21 +131,18 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ profile }) => {
                         {/* Master Group: Everything is revealed by the curtain */}
                         <g mask="url(#curtain-reveal-mask)">
 
-                            {/* Layer 1: The Dim Outline (Now revealed by curtain) */}
+                            {/* Layer 1: The Dim Outline */}
                             <text x="50%" y="54%" textAnchor="middle" dy=".35em"
                                 fill="none" stroke="#333" strokeWidth="1"
                                 className="text-8xl md:text-9xl font-['Inter'] font-black tracking-tighter"
                                 style={{ fontWeight: 900 }}
                             >
-                                STK
+                                {logoText}
                             </text>
 
                             {/* Layer 2: The Gradient Fill (Masked to Text Shape) - With Water Flow */}
                             <g mask="url(#text-shape-mask)">
-                                {/* Background for deep depth */}
                                 <rect x="0" y="0" width="400" height="200" fill="#000" />
-
-                                {/* Flowing Wave 1 */}
                                 <motion.path
                                     d="M0,100 Q50,120 100,100 T200,100 T300,100 T400,100 V200 H0 Z"
                                     fill="url(#reveal-gradient)"
@@ -95,8 +159,6 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ profile }) => {
                                         x: { duration: 5, repeat: Infinity, ease: "linear" }
                                     }}
                                 />
-
-                                {/* Flowing Wave 2 (Offset) */}
                                 <motion.path
                                     d="M0,90 Q50,70 100,90 T200,90 T300,90 T400,90 V200 H0 Z"
                                     fill="url(#reveal-gradient)"
@@ -117,7 +179,7 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ profile }) => {
                             </g>
                         </g>
 
-                        {/* Scanning Line (The "Leading Edge" of the curtain) - Draws on top */}
+                        {/* Scanning Line */}
                         <motion.rect
                             x="0"
                             y="0"
@@ -127,7 +189,7 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ profile }) => {
                             initial={{ x: 0, opacity: 1 }}
                             animate={{ x: 400, opacity: [1, 1, 0] }}
                             transition={{
-                                duration: 3.5,
+                                duration: settings.revealDuration, // Configurable
                                 ease: [0.22, 1, 0.36, 1]
                             }}
                         />
@@ -138,22 +200,21 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ profile }) => {
                     <motion.p
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 1.0 }} // Delayed appearance
+                        transition={{ delay: 1.0 }}
                         className="text-blue-400/80 font-mono text-sm tracking-[0.3em] uppercase"
                     >
-                        {profile?.role || 'Systems Engineer'}
+                        {role}
                     </motion.p>
 
-                    {/* Premium Tagline: Staggered Letter Reveal */}
                     <div className="flex flex-wrap justify-center max-w-[80%] mx-auto text-center gap-y-1">
-                        {(profile?.tagline || "Architecting Digital Excellence").split("").map((char, index) => (
+                        {tagline.split("").map((char, index) => (
                             <motion.span
                                 key={index}
                                 initial={{ opacity: 0, filter: "blur(10px)", y: 5 }}
                                 animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
                                 transition={{
-                                    duration: 1.5, // Slower fade-in
-                                    delay: 1.0 + (index * 0.05), // Adjusted stagger for longer text (0.05s)
+                                    duration: 1.5,
+                                    delay: settings.taglineDelay + (index * settings.taglineStagger), // Configurable Delay & Stagger
                                     ease: "easeOut"
                                 }}
                                 className="text-white/40 text-xs tracking-widest font-light uppercase inline-block"

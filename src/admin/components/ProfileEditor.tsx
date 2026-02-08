@@ -1,6 +1,7 @@
 import React from 'react';
-import { Save, Award, X, ChevronDown } from 'lucide-react';
+import { Save, Award, X, ChevronDown, Play } from 'lucide-react';
 import { Input } from './ui/Input';
+import { LoadingScreen } from '../../components/LoadingScreen';
 
 interface ProfileEditorProps {
     profile: any;
@@ -14,6 +15,7 @@ interface ProfileEditorProps {
 }
 
 export const ProfileEditor: React.FC<ProfileEditorProps> = ({
+    // ... (keep props)
     profile,
     onChange,
     onSave,
@@ -23,7 +25,19 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({
     onUpdateProjects,
     onUpdateOpensource
 }) => {
+    const [showPreview, setShowPreview] = React.useState(false);
+
     const update = (key: string, value: any) => onChange({ ...profile, [key]: value });
+
+    const updateSettings = (key: string, value: any) => {
+        onChange({
+            ...profile,
+            loadingSettings: {
+                ...profile.loadingSettings,
+                [key]: value
+            }
+        });
+    };
 
     const toggleProjectPin = (index: number) => {
         const newProjects = [...projects];
@@ -39,12 +53,84 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({
 
     return (
         <div className="space-y-8">
+            {showPreview && (
+                <div
+                    className="fixed inset-0 z-[100] cursor-pointer"
+                    onClick={() => setShowPreview(false)}
+                    title="Click to close preview"
+                >
+                    <LoadingScreen profile={profile} />
+                </div>
+            )}
+
             <div className="max-w-2xl space-y-6">
+                {/* Branding Section */}
                 <div className="p-4 bg-surface/30 rounded-xl border border-border mb-6">
-                    <h3 className="text-sm font-medium text-secondaryText mb-4 uppercase tracking-wider">Branding</h3>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-sm font-medium text-secondaryText uppercase tracking-wider">Branding</h3>
+                        <button
+                            onClick={() => setShowPreview(true)}
+                            className="flex items-center gap-2 text-xs text-accent hover:text-accent/80 transition-colors"
+                        >
+                            <Play size={14} /> Preview Animation
+                        </button>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4 mb-4">
                         <Input label="Logo Text" value={profile.logoText} onChange={(v: string) => update('logoText', v)} placeholder="0x1A" />
                         <Input label="Logo Image URL" value={profile.logoImage} onChange={(v: string) => update('logoImage', v)} placeholder="https://..." />
+                    </div>
+
+                    {/* Loading Animation Config */}
+                    <div className="space-y-3 pt-3 border-t border-border/50">
+                        <h4 className="text-xs font-medium text-secondaryText uppercase tracking-wider mb-2">Loading Screen Config</h4>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-xs text-secondaryText mb-1">Animation Style</label>
+                                <div className="relative">
+                                    <select
+                                        value={profile.loadingSettings?.style || 'curtain'}
+                                        onChange={(e) => updateSettings('style', e.target.value)}
+                                        className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm text-primaryText focus:border-accent focus:outline-none appearance-none"
+                                    >
+                                        <option value="curtain">Curtain Reveal (Premium)</option>
+                                        <option value="minimal">Minimal Fade</option>
+                                    </select>
+                                    <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-secondaryText pointer-events-none" />
+                                </div>
+                            </div>
+                            <Input
+                                label="Min Load Time (ms)"
+                                type="number"
+                                value={profile.loadingSettings?.minLoadTime || 6000}
+                                onChange={(v: string) => updateSettings('minLoadTime', parseInt(v))}
+                            />
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-4">
+                            <Input
+                                label="Reveal Duration (s)"
+                                type="number"
+                                step="0.1"
+                                value={profile.loadingSettings?.revealDuration || 3.5}
+                                onChange={(v: string) => updateSettings('revealDuration', parseFloat(v))}
+                            />
+                            <Input
+                                label="Tagline Delay (s)"
+                                type="number"
+                                step="0.1"
+                                value={profile.loadingSettings?.taglineDelay || 1.5}
+                                onChange={(v: string) => updateSettings('taglineDelay', parseFloat(v))}
+                            />
+                            <Input
+                                label="Letter Stagger (s)"
+                                type="number"
+                                step="0.01"
+                                value={profile.loadingSettings?.taglineStagger || 0.1}
+                                onChange={(v: string) => updateSettings('taglineStagger', parseFloat(v))}
+                            />
+                        </div>
                     </div>
                 </div>
 

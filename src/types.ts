@@ -56,6 +56,14 @@ export interface NavItem {
   label: string;
 }
 
+export interface LoadingSettings {
+  style: 'curtain' | 'minimal';
+  minLoadTime: number;
+  revealDuration: number;
+  taglineDelay: number;
+  taglineStagger: number;
+}
+
 export interface Profile {
   name: string;
   handle: string;
@@ -68,4 +76,5 @@ export interface Profile {
   about: string;
   logoText?: string;
   logoImage?: string;
+  loadingSettings?: LoadingSettings;
 }

@@ -37,14 +37,14 @@ function App() {
 
   useEffect(() => {
     // Simulate minimum loading time for premium feel
-    // BUT also wait for content to be ready
+    const duration = profile?.loadingSettings?.minLoadTime || 6000;
+
     const timer = setTimeout(() => {
-      // Only set to false if content is also ready (handled by derived state below)
       setIsMinLoadComplete(true);
-    }, 6000);
+    }, duration);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [profile?.loadingSettings?.minLoadTime]);
 
   const [isMinLoadComplete, setIsMinLoadComplete] = useState(false);
   const showLoading = !isMinLoadComplete || loading;

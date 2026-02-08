@@ -16,7 +16,14 @@ const EMPTY_PROFILE = {
     github: "",
     about: "",
     logoText: "",
-    logoImage: ""
+    logoImage: "",
+    loadingSettings: {
+        style: 'curtain',
+        minLoadTime: 6000,
+        revealDuration: 3.5,
+        taglineDelay: 1.5,
+        taglineStagger: 0.1
+    }
 };
 
 const NAV_ITEMS = [
@@ -69,7 +76,14 @@ export function useContent() {
             ]);
 
             if (profileData && typeof profileData === 'object') {
-                setProfile(profileData);
+                setProfile({
+                    ...EMPTY_PROFILE, // Ensure all defaults are present
+                    ...profileData,
+                    loadingSettings: {
+                        ...EMPTY_PROFILE.loadingSettings,
+                        ...(profileData.loadingSettings || {})
+                    }
+                });
             }
 
             if (Array.isArray(projectsData)) {
