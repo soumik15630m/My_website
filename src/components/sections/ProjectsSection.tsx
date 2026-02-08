@@ -1,5 +1,5 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useRef } from 'react';
+import { motion, useScroll, useSpring } from 'framer-motion';
 import { Section } from '../Section';
 import { ScrollTrigger } from '../ScrollTrigger';
 import { TimelineTrail } from '../TimelineTrail';
@@ -28,6 +28,24 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
     const displayedProjects = projects.slice(0, visibleCount);
     const hasMore = visibleCount < projects.length;
 
+    // --- Timeline Sync Hardware ---
+    // We track the scroll progress of the ENTIRE grid here.
+    // This ensures physics are calculated ONCE effectively globally,
+    // guaranteeing the Line and the Dots are perfectly synced.
+    const gridRef = useRef<HTMLDivElement>(null);
+    const { scrollYProgress } = useScroll({
+        target: gridRef,
+        offset: ["start center", "end center"]
+    });
+
+    // Overdamped Heavy Physics (Hardcap Acceleration)
+    const smoothProgress = useSpring(scrollYProgress, {
+        mass: 3,
+        stiffness: 25,
+        damping: 80,
+        restDelta: 0.001
+    });
+
     const loadMore = () => {
         if (hasMore) {
             setVisibleCount(prev => Math.min(prev + 3, projects.length));
@@ -36,7 +54,12 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
 
     return (
         <div className="max-w-5xl mx-auto relative">
-            {/* === DECORATIVE ELEMENTS === */}
+            {/* ... decorative elements omitted (unchanged) ... */}
+            {/* For brevity in the replace tool, assuming context is preserved or I need to include them? 
+                The instruction says I'm replacing lines 1-146, so I SHOULD include the decorative elements if I replace the whole block.
+                Actually, simpler to target specific blocks if possible, but the imports change at the top.
+                I will include the whole block to be safe.
+            */}
             {/* Floating Ambient Orbs - Optimized blur radius */}
             <div className="pointer-events-none absolute inset-0 overflow-hidden">
                 {/* Top-right accent orb */}
@@ -126,16 +149,22 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
             </Section>
 
             <motion.div
+                ref={gridRef} /* Global Ref for Sync */
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
                 className="grid grid-cols-1 gap-16 relative z-10 md:ml-32"
             >
-                {/* Global Timeline Trail - fills continuously as you scroll */}
-                <TimelineTrail />
+                {/* Global Timeline Trail - Driven by parent physics */}
+                <TimelineTrail progress={smoothProgress} />
 
                 {displayedProjects.map((project, index) => (
-                    <TimelineDot key={project.id} index={index}>
+                    <TimelineDot
+                        key={project.id}
+                        index={index}
+                        total={projects.length}
+                        globalProgress={smoothProgress}
+                    >
                         <ProjectCard
                             project={project}
                             onOpen={setSelectedProject}

@@ -1,41 +1,37 @@
-import React, { useRef } from 'react';
-import { motion, useScroll, useTransform, useSpring, MotionValue } from 'framer-motion';
+import React from 'react';
+import { motion, useTransform, MotionValue } from 'framer-motion';
 
 interface TimelineDotProps {
-    children: React.ReactElement; // Must be a single element to clone
+    children: React.ReactElement;
     index: number;
+    total: number;
+    globalProgress: MotionValue<number>;
 }
 
-export const TimelineDot: React.FC<TimelineDotProps> = ({ children, index }) => {
-    const ref = useRef<HTMLDivElement>(null);
+export const TimelineDot: React.FC<TimelineDotProps> = ({ children, index, total, globalProgress }) => {
+    // Determine the exact progress point where this dot sits on the line.
+    // 0 = Top (Index 0), 1 = Bottom (Index total-1).
+    const threshold = total > 1 ? index / (total - 1) : 0;
 
-    const { scrollYProgress } = useScroll({
-        target: ref,
-        offset: ["start center", "center center", "end start"]
-    });
+    // Define a small "activation window" around the threshold.
+    // When the line approaches (threshold - buffer), we start glowing.
+    // buffer = 0.05 means "5% of section height before the dot".
+    const buffer = 0.05;
+    const start = Math.max(0, threshold - buffer);
+    const end = Math.min(1, threshold);
 
-    // Sync Fix: useSpring configuration matches TimelineTrail exactly.
-    const smoothProgress = useSpring(scrollYProgress, {
-        mass: 3,
-        stiffness: 25,
-        damping: 80,
-        restDelta: 0.001
-    });
+    // Transform global progress to local glow values
+    // Opacity: Fades in as line approaches
+    const glowOpacity = useTransform(globalProgress, [start, end], [0.1, 1]);
 
-    // Transform scroll progress to glow values
+    // Scale: Pops up as line hits it
+    const glowScale = useTransform(globalProgress, [start, end, end + 0.1], [0.8, 1.4, 1]);
 
-    // Opacity: Minimal at start, Blooms at center, Stays active
-    const glowOpacity = useTransform(smoothProgress, [0, 0.48, 0.5, 1], [0.1, 0.1, 1, 1]);
-
-    // Scale: Small -> Pop -> Normal active
-    const glowScale = useTransform(smoothProgress, [0, 0.48, 0.5, 1], [0.8, 0.8, 1.4, 1]);
-
-    // Dot shadow glow - No shadow before, intense at center, stays subtle active
+    // Shadow: Intense glow at hit moment
     const dotShadow = useTransform(
-        smoothProgress,
-        [0, 0.48, 0.5, 1],
+        globalProgress,
+        [start, end, end + 0.1],
         [
-            "none",
             "none",
             "0px 0px 20px rgba(34, 197, 94, 1), 0px 0px 40px rgba(34, 197, 94, 0.6)",
             "0px 0px 10px rgba(34, 197, 94, 0.4)"
@@ -43,20 +39,22 @@ export const TimelineDot: React.FC<TimelineDotProps> = ({ children, index }) => 
     );
 
     // Number transforms
-    const numberOpacity = useTransform(smoothProgress, [0, 0.48, 0.5, 1], [0.05, 0.05, 0.3, 0.2]);
-    const numberScale = useTransform(smoothProgress, [0, 0.5, 1], [0.9, 1.1, 1]);
-    const numberY = useTransform(smoothProgress, [0, 0.5, 1], [20, 0, 0]);
+    const numberOpacity = useTransform(globalProgress, [start, end], [0.05, 0.3]);
+    const numberScale = useTransform(globalProgress, [start, end, end + 0.1], [0.9, 1.1, 1]);
+    const numberY = useTransform(globalProgress, [start, end, end + 0.1], [20, 0, 0]);
 
-    // Clone child to pass activeValue (the progress)
-    // We pass 'smoothProgress' so the child can derive its own animations (like arrow opacity)
+    // Pass a "local" 0-1 progress to child if it needs it (Optional)
+    // We map 0..1 global to "Active" boolean or similar if needed, 
+    // but for now we pass the raw value or a derived signal.
+    // Let's pass the 'glowOpacity' as a proxy for "how active I am"
     const childWithProp = React.cloneElement(children, {
-        activeValue: smoothProgress,
-        // @ts-ignore - injecting prop that might not be in generic ReactElement type
+        activeValue: glowOpacity,
+        // @ts-ignore
     });
 
     return (
-        <div ref={ref} className="relative">
-            {/* Serial number - repositioned to -left-32 (8rem) for clearance */}
+        <div className="relative">
+            {/* Serial number */}
             <motion.span
                 style={{
                     opacity: numberOpacity,
@@ -69,7 +67,7 @@ export const TimelineDot: React.FC<TimelineDotProps> = ({ children, index }) => 
                 {String(index + 1).padStart(2, '0')}
             </motion.span>
 
-            {/* Timeline dot - aligned center with line at -left-4 (approx) */}
+            {/* Timeline dot */}
             <motion.div
                 style={{
                     opacity: glowOpacity,
