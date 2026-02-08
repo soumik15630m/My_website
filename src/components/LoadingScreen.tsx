@@ -141,16 +141,30 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ profile }) => {
                         transition={{ delay: 1.0 }} // Delayed appearance
                         className="text-blue-400/80 font-mono text-sm tracking-[0.3em] uppercase"
                     >
-                        Systems Engineer
+                        {profile?.role || 'Systems Engineer'}
                     </motion.p>
-                    <motion.p
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 1.5, duration: 1 }}
-                        className="text-white/40 text-[10px] tracking-widest font-light uppercase"
-                    >
-                        Architecting Digital Excellence
-                    </motion.p>
+
+                    {/* Premium Tagline: Staggered Letter Reveal */}
+                    <div className="flex overflow-hidden">
+                        {(profile?.tagline || "Architecting Digital Excellence").split("").map((char, index) => (
+                            <motion.span
+                                key={index}
+                                initial={{ opacity: 0, filter: "blur(10px)", y: 5 }}
+                                animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
+                                transition={{
+                                    duration: 0.8,
+                                    delay: 1.5 + (index * 0.03), // Stagger effect
+                                    ease: "easeOut"
+                                }}
+                                className="text-white/40 text-[10px] tracking-widest font-light uppercase inline-block"
+                                style={{
+                                    marginRight: char === " " ? "0.5em" : "0" // Maintain space width
+                                }}
+                            >
+                                {char === " " ? "\u00A0" : char}
+                            </motion.span>
+                        ))}
+                    </div>
                 </div>
             </div>
         </motion.div>
