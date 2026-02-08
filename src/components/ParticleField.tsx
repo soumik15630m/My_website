@@ -53,33 +53,29 @@ export const ParticleField: React.FC<ParticleFieldProps> = ({ text = "STK" }) =>
         const ctx = offscreen.getContext('2d');
         if (!ctx) return;
 
-        // "Professional Luxury" - Wide tracking, Orbitron
-        ctx.font = 'bold 25vw "Orbitron", sans-serif';
+        // Minimalist - Inter, Heavy weight, Wide spacing
+        ctx.font = '900 25vw "Inter", sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.lineWidth = 2; // Thin edge
+        ctx.lineWidth = 2;
         ctx.strokeStyle = 'white';
-        // Add extra spacing if supported, or just rely on font width
-        // Canvas doesn't support letter-spacing natively easily, so we rely on the wide font definition
         ctx.strokeText(textToRender, width / 2, height / 2);
 
         const imageData = ctx.getImageData(0, 0, width, height).data;
         const points: { x: number, y: number }[] = [];
 
-        // Sample pixels - Edge detection via stroke
-        // We need enough points to cover the edge
+        // Sample pixels
         const step = 2;
 
         for (let y = 0; y < height; y += step) {
             for (let x = 0; x < width; x += step) {
-                // Check for non-transparent pixel (the stroke)
                 if (imageData[(y * width + x) * 4 + 3] > 128) {
                     points.push({ x, y });
                 }
             }
         }
 
-        // Shuffle points to distribute particles randomly along the edge
+        // Shuffle points
         for (let i = points.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [points[i], points[j]] = [points[j], points[i]];
@@ -138,10 +134,10 @@ export const ParticleField: React.FC<ParticleFieldProps> = ({ text = "STK" }) =>
 
         ctx.clearRect(0, 0, width, height);
 
-        // Draw Watermark (Background) - Subtle
+        // Draw Watermark (Background) - Subtle, Minimalist
         if (text) {
             ctx.save();
-            ctx.font = 'bold 25vw "Orbitron", sans-serif';
+            ctx.font = '900 25vw "Inter", sans-serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillStyle = 'rgba(255, 255, 255, 0.02)';
@@ -160,7 +156,6 @@ export const ParticleField: React.FC<ParticleFieldProps> = ({ text = "STK" }) =>
         particlesRef.current.forEach((particle, index) => {
             // IDLE BEHAVIOR: Drift to Edge Targets
             if (hasTargets) {
-                // Loop targets so EVERY particle has a spot
                 const target = targets[index % targets.length];
 
                 const dx = target.x - particle.x;
@@ -189,15 +184,13 @@ export const ParticleField: React.FC<ParticleFieldProps> = ({ text = "STK" }) =>
                     particle.vx -= Math.cos(angle) * force * 0.8;
                     particle.vy -= Math.sin(angle) * force * 0.8;
                 } else {
-                    // Attraction on hover (Original Behavior)
+                    // Attraction on hover
                     particle.vx += Math.cos(angle) * force * 0.02;
                     particle.vy += Math.sin(angle) * force * 0.02;
                 }
 
                 particle.alpha = Math.min(0.6, particle.baseAlpha + force * 0.2);
             } else if (!hasTargets) {
-                // Only decay alpha if not interacting AND not idling
-                // If idling, we want them visible
                 particle.alpha += (particle.baseAlpha - particle.alpha) * 0.05;
             }
 
@@ -210,7 +203,7 @@ export const ParticleField: React.FC<ParticleFieldProps> = ({ text = "STK" }) =>
             particle.x += particle.vx;
             particle.y += particle.vy;
 
-            // Friction (Base friction, less if idling to allow settling)
+            // Friction
             if (!hasTargets) {
                 particle.vx *= 0.995;
                 particle.vy *= 0.995;
@@ -229,7 +222,7 @@ export const ParticleField: React.FC<ParticleFieldProps> = ({ text = "STK" }) =>
             ctx.fill();
         });
 
-        // Draw connections (Disable when idling to act as cleaner outline)
+        // Draw connections
         if (!hasTargets) {
             for (let i = 0; i < particlesRef.current.length; i++) {
                 const p1 = particlesRef.current[i];
@@ -278,26 +271,46 @@ export const ParticleField: React.FC<ParticleFieldProps> = ({ text = "STK" }) =>
             resetIdleTimer();
         };
 
+        const handleMouseDown = (e: MouseEvent) => {
+            mouseRef.current.isClicking = true;
+            mouseRef.current.x = e.clientX;
+            mouseRef.current.y = e.clientY;
+            spawnBurst(e.clientX, e.clientY, 25);
+            resetIdleTimer();
+        };
+
+        const handleMouseUp = () => {
+            mouseRef.current.isClicking = false;
+            resetIdleTimer();
+        };
+
+        const handleScroll = () => {
+            const delta = window.scrollY - lastScrollY.current;
+            scrollVelocityRef.current = delta;
+            lastScrollY.current = window.scrollY;
+            resetIdleTimer();
+        };
+
         window.addEventListener('mousemove', handleInput);
-        window.addEventListener('mousedown', handleInput);
-        window.addEventListener('mouseup', () => { mouseRef.current.isClicking = false; });
+        window.addEventListener('mousedown', handleMouseDown);
+        window.addEventListener('mouseup', handleMouseUp);
         window.addEventListener('touchstart', handleInput);
-        window.addEventListener('scroll', resetIdleTimer, { passive: true });
+        window.addEventListener('scroll', handleScroll, { passive: true });
         window.addEventListener('resize', handleResize);
 
         animationRef.current = requestAnimationFrame(animate);
 
         return () => {
             window.removeEventListener('mousemove', handleInput);
-            window.removeEventListener('mousedown', handleInput);
-            window.removeEventListener('mouseup', () => { });
+            window.removeEventListener('mousedown', handleMouseDown);
+            window.removeEventListener('mouseup', handleMouseUp);
             window.removeEventListener('touchstart', handleInput);
-            window.removeEventListener('scroll', resetIdleTimer);
+            window.removeEventListener('scroll', handleScroll);
             window.removeEventListener('resize', handleResize);
             if (animationRef.current) cancelAnimationFrame(animationRef.current);
             if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
         };
-    }, [handleResize, animate, resetIdleTimer]);
+    }, [handleResize, animate, resetIdleTimer, spawnBurst]);
 
     return (
         <canvas
